@@ -1,5 +1,5 @@
 export default class SessionInfoService {
     static getBaseUrlForAPI() {
-        return "/";
+        return "https://us-central1-dogteamdobermans.cloudfunctions.net/";
     }
 }
