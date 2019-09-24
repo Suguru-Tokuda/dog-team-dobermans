@@ -1,6 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as cors from 'cors';
+import * as formidable from 'formidable';
+// import * as path from 'path';
+// import * as os from 'os';
 
 admin.initializeApp(functions.config().firease);
 
@@ -98,6 +101,46 @@ export const puppy = functions.https.onRequest((request, response) => {
                 }
             }
         }
+    });
+});
+
+export const puppyPictures = functions.https.onRequest(async (request, response) => {
+    corsHeader(request, response, async () => {
+        const form = new formidable.IncomingForm();
+        return new Promise((resolve, reject) => {
+            form.parse(request, function(err, fields, files) {
+                const file = files.fileToUpload;
+                console.log(file);
+            });
+        });
+        // const pictures = request.body;
+        // console.log(request.body);
+        // if (pictures.length > 0) {
+        //     const bucket = admin.storage().bucket();
+        //     for (let i = 0, max = pictures.length; i < max; i++) {
+        //         console.log('=========');
+        //         console.log(os.tmpdir());
+        //         console.log('=========');
+        //         console.log('=========');
+        //         console.log(pictures[i]);
+        //         console.log('=========');
+        //         const tempFilePath = path.join(`${os.tmpdir()}/puppies`, pictures[i].name);
+        //         bucket.upload(tempFilePath, {
+        //             destination: 'puppies',
+        //             metadata: {
+        //                 contentType: 'image/jpeg'
+        //             }
+        //         })
+        //         .then(res => {
+        //             console.log(res);
+        //         })
+        //         .catch(err => {
+        //             console.log(err);
+        //         });
+        //     }
+        // } else {
+        //     response.status(400).send('No data included');
+        // }
     });
 });
 
