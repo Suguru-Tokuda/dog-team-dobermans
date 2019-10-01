@@ -191,7 +191,7 @@ export const parent = functions.https.onRequest((request, response) => {
                     }
                 }
             }
-        }    
+        }
     });
 });
 
@@ -200,11 +200,60 @@ export const buyer = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const method = request.method;
         const query = request.query;
+        const paths = request.path.split('/');
+        console.log(paths);
         const id = query.id;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
         } else if (query.key === API_KEY) {
-            
+            if (paths.length === 1 && paths[0] === '') {
+                if (method === 'GET') {
+                    if (id.length > 0) {
+                        const buyerRef = admin.firestore().collection('buyers').doc(id);
+                        buyerRef.get()
+                            .then(doc => {
+                                response.status(200).send(doc.data());
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    } else {
+                        response.status(204);
+                    }
+                } else if (method === 'POST') {
+                    const data = request.body;
+                    admin.firestore().collection('buyers').add(data)
+                        .then(snapshot => {
+                            response.status(201).json({id: snapshot.id, data: data});
+                        })
+                        .catch(err => {
+                            response.sendStatus(500).send(err);
+                        });
+                } else if (method === 'PUT') {
+                    if (id.length > 0) {
+                        const data = request.body;
+                        const buyerRef = admin.firestore().collection('buyers').doc(id);
+                        buyerRef.set(data, { merge: true })
+                            .then(snapshot => {
+                                response.status(200).json({id: id, data: data});
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    }
+                } else if (method === 'DELETE') {
+                    if (id.length > 0) {
+                        const buyerRef = admin.firestore().collection('buyers').doc(id);
+                        buyerRef.delete()
+                            .then(res => {
+                                response.status(200).json({ id: id });
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    }
+                }
+            }
         }
     });
 });
