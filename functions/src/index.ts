@@ -194,3 +194,17 @@ export const parent = functions.https.onRequest((request, response) => {
         }    
     });
 });
+
+// buyer CRUD
+export const buyer = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const method = request.method;
+        const query = request.query;
+        const id = query.id;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send("Missing api key");
+        } else if (query.key === API_KEY) {
+            
+        }
+    });
+});
