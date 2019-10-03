@@ -201,7 +201,6 @@ export const buyer = functions.https.onRequest((request, response) => {
         const method = request.method;
         const query = request.query;
         const paths = request.path.split('/');
-        console.log(paths);
         const id = query.id;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
@@ -224,7 +223,9 @@ export const buyer = functions.https.onRequest((request, response) => {
                     const data = request.body;
                     admin.firestore().collection('buyers').add(data)
                         .then(snapshot => {
-                            response.status(201).json({id: snapshot.id, data: data});
+                            const retVal = data;
+                            retVal.buyerId = snapshot.id;
+                            response.status(201).json(retVal);
                         })
                         .catch(err => {
                             response.sendStatus(500).send(err);
