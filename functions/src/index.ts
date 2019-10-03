@@ -239,7 +239,9 @@ export const buyer = functions.https.onRequest((request, response) => {
                     const data = request.body;
                     admin.firestore().collection('buyers').add(data)
                         .then(snapshot => {
-                            response.status(201).json({id: snapshot.id, data: data});
+                            const retVal = data;
+                            retVal.buyerId = snapshot.id;
+                            response.status(201).json(retVal);
                         })
                         .catch(err => {
                             response.sendStatus(500).send(err);
