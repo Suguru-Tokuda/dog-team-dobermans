@@ -47,7 +47,7 @@ export const puppy = functions.https.onRequest((request, response) => {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === API_KEY) {
-                const id = query.id;
+                const id = query.puppyId;
                 if (request.method === 'GET') {
                     if (id.length > 0) {
                         const puppyRef = admin.firestore().collection('puppies').doc(id);
@@ -140,7 +140,7 @@ export const parent = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const method = request.method;
         const query = request.query;
-        const id = query.id;
+        const id = query.parentId;
         const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
@@ -212,7 +212,7 @@ export const buyer = functions.https.onRequest((request, response) => {
         const method = request.method;
         const query = request.query;
         const path = request.path;
-        const id = query.id;
+        const id = query.buyerId;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
         } else if (query.key === API_KEY) {
@@ -271,29 +271,61 @@ export const buyer = functions.https.onRequest((request, response) => {
                     }
                 }
             } else if (path === '/search') {
-                const searchKeyword = request.body.searchKeyword.toLowerCase();
+                const searchKeyword = query.searchKeyword.toLowerCase();
                 admin.firestore().collection('buyers').get()
-                    .then(snapshot => {
+                    .then(querySnapshot => {
                         const buyersArr: any = [];
-                        if (snapshot.size > 0) { 
-                            snapshot.forEach((doc) => {
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
                                 const retVal = doc.data();
                                 retVal.buyerId = doc.id;
                                 let found = false;
-                                if (typeof retVal.firstName !== undefined && retVal.firstName.toLowerCase() === searchKeyword)
-                                    found = true;
-                                if (typeof retVal.lastName !== undefined && retVal.lastName.toLowerCase() === searchKeyword)
-                                    found = true;
-                                if (typeof retVal.email !== undefined && retVal.email.toLowerCase() === searchKeyword)
-                                    found = true;
-                                if (typeof retVal.state !== undefined && retVal.state.toLowerCase() === searchKeyword)
-                                    found = true;
-                                if (typeof retVal.state !== undefined && retVal.city.toLowerCase() === searchKeyword)
-                                    found = true;
+                                if (typeof retVal.firstName !== 'undefined' && searchKeyword.indexOf(retVal.firstName.toLowerCase()) !== -1)
+                                        found = true;
+                                if (typeof retVal.lastName !== 'undefined' && searchKeyword.indexOf(retVal.lastName.toLowerCase()) !== -1)
+                                        found = true;
+                                if (typeof retVal.email !== 'undefined' && searchKeyword.indexOf(retVal.email.toLowerCase() !== -1))
+                                        found = true;
+                                if (typeof retVal.state !== 'undefined' && searchKeyword.indexOf(retVal.state.toLowerCase() !== -1))
+                                        found = true;
+                                if (typeof retVal.city !== 'undefined' && searchKeyword.indexOf(retVal.city.toLowerCase() !== -1))
+                                        found = true;
                                 if (found === true)
                                     buyersArr.push(retVal)
                             });
+                            response.status(200).send(buyersArr);
+                        } else {
+                            response.status(200).send([]);
                         }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            }
+        }
+    });
+});
+
+export const buyers = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing api key');
+        } else if (query.key) {
+            if (query.key !== API_KEY) {
+                response.status(400).send('Incorrect API key');
+            } else if (query.key === API_KEY) {
+                admin.firestore().collection('buyers').get()
+                    .then(querySnapshot => {
+                        const buysersArr: any = [];
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
+                                const retVal = doc.data();
+                                retVal.buyerId = doc.id;
+                                buysersArr.push(retVal);
+                            });
+                        }
+                        response.status(200).send(buysersArr);
                     })
                     .catch(err => {
                         response.status(500).send(err);
