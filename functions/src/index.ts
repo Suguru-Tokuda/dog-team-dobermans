@@ -23,7 +23,7 @@ export const puppies = functions.https.onRequest((request, response) => {
                     if (querySnapshot.size > 0) {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
-                            retVal.puppyId = doc.id;
+                            retVal.puppyID = doc.id;
                             puppyArr.push(retVal);
                         });
                     }
@@ -47,7 +47,7 @@ export const puppy = functions.https.onRequest((request, response) => {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === API_KEY) {
-                const id = query.puppyId;
+                const id = query.puppyID;
                 if (request.method === 'GET') {
                     if (id.length > 0) {
                         const puppyRef = admin.firestore().collection('puppies').doc(id);
@@ -55,7 +55,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                             let retVal: any = {};
                             if (typeof doc.data() !== undefined) {
                                 retVal = doc.data();
-                                retVal.puppyId = doc.id;
+                                retVal.puppyID = doc.id;
                             }
                             response.status(200).send(retVal);
                         })
@@ -121,7 +121,7 @@ export const parents = functions.https.onRequest((request, response) => {
                     if (querySnapshot.size > 0) {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
-                            retVal.parentId = doc.id;
+                            retVal.parentID = doc.id;
                             parentsArr.push(retVal);
                         });
                     }
@@ -140,7 +140,7 @@ export const parent = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const method = request.method;
         const query = request.query;
-        const id = query.parentId;
+        const id = query.parentID;
         const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
@@ -157,7 +157,7 @@ export const parent = functions.https.onRequest((request, response) => {
                                     let retVal: any = {};
                                     if (typeof doc.data() !== undefined) {
                                         retVal = doc.data();
-                                        retVal.parentId = doc.id;
+                                        retVal.parentID = doc.id;
                                     }
                                     response.status(200).send(retVal);
                                 })
@@ -212,7 +212,7 @@ export const buyer = functions.https.onRequest((request, response) => {
         const method = request.method;
         const query = request.query;
         const path = request.path;
-        const id = query.buyerId;
+        const id = query.buyerID;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing api key");
         } else if (query.key === API_KEY) {
@@ -225,7 +225,7 @@ export const buyer = functions.https.onRequest((request, response) => {
                                 let retVal: any = {};
                                 if (typeof doc.data() !== undefined) {
                                     retVal = doc.data();
-                                    retVal.buyerId = doc.id;
+                                    retVal.buyerID = doc.id;
                                 }
                                 response.status(200).send(retVal);
                             })
@@ -240,7 +240,7 @@ export const buyer = functions.https.onRequest((request, response) => {
                     admin.firestore().collection('buyers').add(data)
                         .then(snapshot => {
                             const retVal = data;
-                            retVal.buyerId = snapshot.id;
+                            retVal.buyerID = snapshot.id;
                             response.status(201).json(retVal);
                         })
                         .catch(err => {
@@ -271,26 +271,28 @@ export const buyer = functions.https.onRequest((request, response) => {
                     }
                 }
             } else if (path === '/search') {
-                const searchKeyword = query.searchKeyword.toLowerCase();
+                const searchKeywords = query.searchKeywords.toLowerCase().split(' ');
                 admin.firestore().collection('buyers').get()
                     .then(querySnapshot => {
                         const buyersArr: any = [];
                         if (querySnapshot.size > 0) {
                             querySnapshot.forEach((doc) => {
                                 const retVal = doc.data();
-                                retVal.buyerId = doc.id;
-                                let found = false;
-                                if (typeof retVal.firstName !== 'undefined' && searchKeyword.indexOf(retVal.firstName.toLowerCase()) !== -1)
-                                        found = true;
-                                if (typeof retVal.lastName !== 'undefined' && searchKeyword.indexOf(retVal.lastName.toLowerCase()) !== -1)
-                                        found = true;
-                                if (typeof retVal.email !== 'undefined' && searchKeyword.indexOf(retVal.email.toLowerCase() !== -1))
-                                        found = true;
-                                if (typeof retVal.state !== 'undefined' && searchKeyword.indexOf(retVal.state.toLowerCase() !== -1))
-                                        found = true;
-                                if (typeof retVal.city !== 'undefined' && searchKeyword.indexOf(retVal.city.toLowerCase() !== -1))
-                                        found = true;
-                                if (found === true)
+                                retVal.buyerID = doc.id;
+                                let foundCount = 0;
+                                searchKeywords.forEach((searchKeyword: string) => {
+                                    if (typeof retVal.firstName !== 'undefined' && retVal.firstName.toLowerCase().indexOf(searchKeyword) !== -1)
+                                            foundCount++;
+                                    if (typeof retVal.lastName !== 'undefined' && retVal.lastName.toLowerCase().indexOf(searchKeyword) !== -1)
+                                            foundCount++;
+                                    if (typeof retVal.email !== 'undefined' && retVal.email.toLowerCase().indexOf(searchKeyword) !== -1)
+                                            foundCount++;
+                                    if (typeof retVal.state !== 'undefined' && retVal.state.toLowerCase().indexOf(searchKeyword) !== -1)
+                                            foundCount++;
+                                    if (typeof retVal.city !== 'undefined' && retVal.city.toLowerCase().indexOf(searchKeyword) !== -1)
+                                            foundCount++;
+                                });
+                                if (foundCount > 0)
                                     buyersArr.push(retVal)
                             });
                             response.status(200).send(buyersArr);
@@ -321,7 +323,7 @@ export const buyers = functions.https.onRequest((request, response) => {
                         if (querySnapshot.size > 0) {
                             querySnapshot.forEach((doc) => {
                                 const retVal = doc.data();
-                                retVal.buyerId = doc.id;
+                                retVal.buyerID = doc.id;
                                 buysersArr.push(retVal);
                             });
                         }

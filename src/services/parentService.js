@@ -3,7 +3,7 @@ export default class ParentService {
         return `${SessionInfoService.getBaseUrlForAPI()}parents`;
     }
 
-    static getParent(parentId) {
+    static getParent(parentID) {
 
     }
 }

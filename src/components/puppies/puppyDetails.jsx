@@ -7,8 +7,8 @@ class PuppyDetails extends Component {
         dateOfBirth: null,
         name: '',
         color: '',
-        parentId: 0,
-        puppyId: 0,
+        parentID: 0,
+        puppyID: 0,
         imageUrls: []
     };
 
