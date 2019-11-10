@@ -4,7 +4,7 @@ import * as cors from 'cors';
 
 admin.initializeApp(functions.config().firease);
 
-const API_KEY = "AIzaSyAECZwk3f30Nd3kcViscEEADiWW01VI9xs";
+const API_KEY = "xVgOiL6lkEvzL5PVekwe2M7zYkYmq7kfCiHPJ4FEEJhc9I2PcgGKCkNpsWt36yAfssyJGIBUBtYQEMEpK7s6TinhLfqUNMOYQatD";
 const corsHeader = cors({ origin: true });
 
 // get all puppies
@@ -12,7 +12,7 @@ export const puppies = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         if (typeof query.key === 'undefined') {
-            response.status(400).send("Missing api key");
+            response.status(400).send("Missing API key");
         } else if (query.key) {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
@@ -42,15 +42,15 @@ export const puppy = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         if (typeof query.key === 'undefined') {
-            response.status(400).send("Missing api key");
+            response.status(400).send("Missing API key");
         } else if (query.key) {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === API_KEY) {
-                const id = query.puppyID;
+                const puppyId = query.puppyID;
                 if (request.method === 'GET') {
-                    if (id.length > 0) {
-                        const puppyRef = admin.firestore().collection('puppies').doc(id);
+                    if (puppyId.length > 0) {
+                        const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
                         puppyRef.get().then(doc => {
                             let retVal: any = {};
                             if (typeof doc.data() !== undefined) {
@@ -69,29 +69,33 @@ export const puppy = functions.https.onRequest((request, response) => {
                     const data = request.body;
                     admin.firestore().collection('/puppies').add(data)
                         .then(snapshot => {
-                            response.status(201).json({ id: snapshot.id, data: data });
+                            const retVal = data;
+                            retVal.puppyID = snapshot.id;
+                            response.status(201).send(retVal);
                         })
                         .catch(err => {
                             response.sendStatus(500).send(err);
                         });
                 } else if (request.method === 'PUT') {
-                    if (id.length > 0) {
+                    if (puppyId.length > 0) {
                             const data = request.body;
-                            const puppyRef = admin.firestore().collection('puppies').doc(id);
+                            const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
                             puppyRef.set(data, { merge: true })
-                                .then(snapshot => {
-                                    response.status(200).json({ id: id, data: data });
+                                .then(() => {
+                                    const retVal = data;
+                                    retVal.puppyID = puppyId;
+                                    response.status(200).send(retVal);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
                                 });
                         }
                 } else if (request.method === 'DELETE') {
-                    if (id.length > 0) {
-                            const puppyRef = admin.firestore().collection('puppies').doc(id);
+                    if (puppyId.length > 0) {
+                            const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
                             puppyRef.delete()
                                 .then(res => {
-                                    response.status(200).json({ id: id });
+                                    response.status(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -110,7 +114,7 @@ export const parents = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         if (typeof query.key === 'undefined') {
-            response.status(400).send("Missing api key");
+            response.status(400).send("Missing API key");
         } else if (query.key) {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
@@ -143,7 +147,7 @@ export const parent = functions.https.onRequest((request, response) => {
         const id = query.parentID;
         const path = request.path;
         if (typeof query.key === 'undefined') {
-            response.status(400).send("Missing api key");
+            response.status(400).send("Missing API key");
         } else if (query.key) {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
@@ -171,7 +175,9 @@ export const parent = functions.https.onRequest((request, response) => {
                         const data = request.body;
                         admin.firestore().collection('parents').add(data)
                             .then(snapshot => {
-                                response.status(201).json({ id: snapshot.id, data: data });
+                                const retVal = data;
+                                retVal.parentID = snapshot.id;
+                                response.status(201).send(retVal);
                             })
                             .catch(err => {
                                 response.sendStatus(500).send(err);
@@ -182,7 +188,9 @@ export const parent = functions.https.onRequest((request, response) => {
                             const parentRef = admin.firestore().collection('parents').doc(id);
                             parentRef.set(data, { merge: true })
                                 .then(snapshot => {
-                                    response.status(200).json({ id: id, data: data });
+                                    const retVal = data;
+                                    retVal.parentID = id;
+                                    response.status(200).send(retVal);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -193,7 +201,7 @@ export const parent = functions.https.onRequest((request, response) => {
                             const parentRef = admin.firestore().collection('parents').doc(id);
                             parentRef.delete()
                                 .then(res => {
-                                    response.status(200).json({ id: id });
+                                    response.status(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -214,7 +222,7 @@ export const buyer = functions.https.onRequest((request, response) => {
         const path = request.path;
         const id = query.buyerID;
         if (typeof query.key === 'undefined') {
-            response.status(400).send("Missing api key");
+            response.status(400).send("Missing API key");
         } else if (query.key === API_KEY) {
             if (path === '/') {
                 if (method === 'GET') {
@@ -312,7 +320,7 @@ export const buyers = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         if (typeof query.key === 'undefined') {
-            response.status(400).send('Missing api key');
+            response.status(400).send('Missing API key');
         } else if (query.key) {
             if (query.key !== API_KEY) {
                 response.status(400).send('Incorrect API key');
@@ -333,6 +341,154 @@ export const buyers = functions.https.onRequest((request, response) => {
                         response.status(500).send(err);
                     });
             }
+        }
+    });
+});
+
+export const aboutUs = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else if (query.key === API_KEY) {
+            // const aboutUsID = query.aboutUsID;
+            if (method === 'GET') {
+                admin.firestore().collection('aboutUs').get()
+                    .then(querySnapshot => {
+                        const aboutUsArr: any = [];
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
+                                const retVal = doc.data();
+                                retVal.aboutUsID = doc.id;
+                                aboutUsArr.push(retVal);
+                            });
+                        }
+                        if (aboutUsArr.length > 0) {
+                            response.status(200).send(aboutUsArr[0]);
+                        } else {
+                            response.status(200).send({});
+                        }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            }
+        }
+    });
+});
+
+export const testimonials = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        // const method = request.method;
+        const query = request.query;
+        const path = request.path;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else if (query.key === API_KEY) {
+            if (path === '/') {
+                admin.firestore().collection('testimonials').get()
+                    .then(querySnapshot => {
+                        const testimonialsArr: any = [];
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
+                                const testimonial = doc.data();
+                                testimonial.testimonialID = doc.id;
+                                testimonialsArr.push(testimonial);
+                            });
+                        }
+                        if (testimonialsArr.length > 0) {
+                            response.status(200).send(testimonialsArr)
+                        } else {
+                            response.status(200).send({});
+                        }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            } else if (path === '/live') {
+                admin.firestore().collection('testimonials').get()
+                    .then(querySnapshot => {
+                        const testimonialsArr: any = [];
+                        if (querySnapshot.size > 0) { 
+                            querySnapshot.forEach((doc) => {
+                                const testimonial = doc.data();
+                                testimonial.testimonialID = doc.id;
+                                if (testimonial.live === true) {
+                                    testimonialsArr.push(testimonial);
+                                }
+                            });
+                        }
+                        if (testimonialsArr.length > 0) {
+                            response.status(200).send(testimonialsArr)
+                        } else {
+                            response.status(200).send({});
+                        }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            }
+        }
+    });
+});
+
+export const contactus = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else if (query.key === API_KEY) {
+            if (method === 'GET') {
+                admin.firestore().collection('contactUs').get()
+                    .then(querySnapshot => {
+                        if (querySnapshot.size > 0) {
+                            const docs = querySnapshot.docs;
+                            const doc = docs[0];
+                            const retVal = doc.data();
+                            retVal.contactUsID = doc.id;
+                            response.status(200).send(retVal);
+                        } else {
+                            response.status(200).send({});
+                        }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            } else if (method === 'PUT') {
+                admin.firestore().collection('contactUs').get()
+                    .then(querySnapshot => {
+                        if (querySnapshot.size > 0) {
+                            // update
+                            const contactUsID = query.contactUsID;
+                            const data = request.body;
+                            const contactUsRef = admin.firestore().collection('contactUs').doc(contactUsID);
+                            contactUsRef.set(data, { merge: true })
+                                .then(() => {
+                                    const retVal = data;
+                                    retVal.contacdtUsID = contactUsID;
+                                    response.status(201).send(retVal);
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                });
+                        } else {
+                            const data = request.body;
+                            // create new
+                            admin.firestore().collection('/contactUs').add(data)
+                                .then(snapshot => {
+                                    response.status(200).json
+                                })
+                                .catch(err => {
+                                    response.sendStatus(500).send(err);
+                                });
+                        }
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+            } 
         }
     });
 });
