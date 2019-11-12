@@ -397,11 +397,7 @@ export const testimonials = functions.https.onRequest((request, response) => {
                                 testimonialsArr.push(testimonial);
                             });
                         }
-                        if (testimonialsArr.length > 0) {
-                            response.status(200).send(testimonialsArr)
-                        } else {
-                            response.status(200).send({});
-                        }
+                        response.status(200).send(testimonialsArr)
                     })
                     .catch(err => {
                         response.status(500).send(err);
