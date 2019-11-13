@@ -10,6 +10,7 @@ import 'bootstrap-select/dist/css/bootstrap-select.min.css';
 import 'nouislider/distribute/nouislider.min.css';
 // import 'owl.carousel/dist/assets/owl.carousel.min.css';
 // import 'owl.carousel/dist/assets/owl.theme.default.min.css';
+import 'toastr/build/toastr.min.css';
 import './assets/css/style.default.css';
 import 'jquery';
 import 'popper.js';

@@ -16,16 +16,16 @@ export default class Topnavbar extends Component {
                                     <Link className="nav-link" to="/">Home</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Puppies</Link>
+                                    <Link className="nav-link" to="/puppies">Puppies</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Parents</Link>
+                                    <Link className="nav-link" to="/our-dogs">Our Dogs</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Farm</Link>
+                                    <Link className="nav-link" to="/about-us">About us</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Contact</Link>
+                                    <Link className="nav-link" to="/contact-us">Contact us</Link>
                                 </li>
                             </ul>
                         </div>
