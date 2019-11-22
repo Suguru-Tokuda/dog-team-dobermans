@@ -399,7 +399,7 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                                     introductions: data
                                 };
                                 admin.firestore().collection('aboutUs').add(aboutUsData)
-                                    .then(snapshot => {
+                                    .then(() => {
                                         response.sendStatus(201).send(aboutUsData);
                                     })
                                     .catch(err => {
@@ -407,6 +407,9 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                                     });
                             }
                         })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
                 }
             }
         }
