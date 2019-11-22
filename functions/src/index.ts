@@ -349,30 +349,65 @@ export const aboutUs = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         const method = request.method;
+        const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else if (query.key === API_KEY) {
-            // const aboutUsID = query.aboutUsID;
-            if (method === 'GET') {
-                admin.firestore().collection('aboutUs').get()
-                    .then(querySnapshot => {
-                        const aboutUsArr: any = [];
-                        if (querySnapshot.size > 0) {
-                            querySnapshot.forEach((doc) => {
-                                const retVal = doc.data();
-                                retVal.aboutUsID = doc.id;
-                                aboutUsArr.push(retVal);
-                            });
-                        }
-                        if (aboutUsArr.length > 0) {
-                            response.status(200).send(aboutUsArr[0]);
-                        } else {
-                            response.status(200).send({});
-                        }
-                    })
-                    .catch(err => {
-                        response.status(500).send(err);
-                    });
+            if (path === '/') {
+                if (method === 'GET') {
+                    admin.firestore().collection('aboutUs').get()
+                        .then(querySnapshot => {
+                            const aboutUsArr: any = [];
+                            if (querySnapshot.size > 0) {
+                                querySnapshot.forEach((doc) => {
+                                    const retVal = doc.data();
+                                    retVal.aboutUsID = doc.id;
+                                    aboutUsArr.push(retVal);
+                                });
+                            }
+                            if (aboutUsArr.length > 0) {
+                                response.status(200).send(aboutUsArr[0]);
+                            } else {
+                                response.status(200).send({});
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                }
+            } else if (path === '/introductions') {
+                if (method === 'PUT') {
+                    admin.firestore().collection('aboutUs').get()
+                        .then(querySnapshot => {
+                            const data = request.body;
+                            if (querySnapshot.size > 0) {
+                                const aboutUsData = {
+                                    introductions: data
+                                };
+                                const aboutUsID = querySnapshot.docs[0].id;
+                                const aboutUsRef = admin.firestore().collection('aboutUs').doc(aboutUsID);
+                                aboutUsRef.set(aboutUsData, { merge: true })
+                                    .then(() => {
+                                        response.status(200);
+                                    })
+                                    .catch(err => {
+                                        response.sendStatus(500).send(err);
+                                    });
+                            } else {
+                                const aboutUsData = {
+                                    ourTeams: [],
+                                    introductions: data
+                                };
+                                admin.firestore().collection('aboutUs').add(aboutUsData)
+                                    .then(snapshot => {
+                                        response.sendStatus(201).send(aboutUsData);
+                                    })
+                                    .catch(err => {
+                                        response.sendStatus(500).send(err);
+                                    });
+                            }
+                        })
+                }
             }
         }
     });
