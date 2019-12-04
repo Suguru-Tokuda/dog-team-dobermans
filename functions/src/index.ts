@@ -395,15 +395,51 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                                     });
                             } else {
                                 const aboutUsData = {
-                                    ourTeams: [],
+                                    ourTeam: [],
                                     introductions: data
                                 };
                                 admin.firestore().collection('aboutUs').add(aboutUsData)
                                     .then(() => {
-                                        response.sendStatus(201).send(aboutUsData);
+                                        response.status(201).send(aboutUsData);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                }
+            } else if (path === '/ourTeam') {
+                if (method === 'PUT') {
+                    admin.firestore().collection('aboutUs').get()
+                        .then(querySnapshot => {
+                            const data = request.body;
+                            if (querySnapshot.size > 0) {
+                                const aboutUsData = {
+                                    ourTeam: data
+                                };
+                                const aboutUsID = querySnapshot.docs[0].id;
+                                const aboutUsRef = admin.firestore().collection('aboutUs').doc(aboutUsID);
+                                aboutUsRef.set(aboutUsData, { merge: true })
+                                    .then(() => {
+                                        response.sendStatus(200);
                                     })
                                     .catch(err => {
                                         response.sendStatus(500).send(err);
+                                    });
+                            } else {
+                                const aboutUsData = {
+                                    ourTeam: data,
+                                    introductions: []
+                                };
+                                admin.firestore().collection('aboutUs').add(aboutUsData)
+                                    .then(() => {
+                                        response.status(201).send(aboutUsData);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
                                     });
                             }
                         })
@@ -422,7 +458,7 @@ export const testimonials = functions.https.onRequest((request, response) => {
         const query = request.query;
         const path = request.path;
         if (typeof query.key === 'undefined') {
-                (400).send('Missing API key');
+                response.status(400).send('Missing API key');
         } else if (query.key === API_KEY) {
             if (path === '/') {
                 admin.firestore().collection('testimonials').get()
