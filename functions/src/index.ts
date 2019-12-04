@@ -388,7 +388,7 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                                 const aboutUsRef = admin.firestore().collection('aboutUs').doc(aboutUsID);
                                 aboutUsRef.set(aboutUsData, { merge: true })
                                     .then(() => {
-                                        response.status(200);
+                                        response.sendStatus(200);
                                     })
                                     .catch(err => {
                                         response.sendStatus(500).send(err);
@@ -422,7 +422,7 @@ export const testimonials = functions.https.onRequest((request, response) => {
         const query = request.query;
         const path = request.path;
         if (typeof query.key === 'undefined') {
-            response.status(400).send('Missing API key');
+                (400).send('Missing API key');
         } else if (query.key === API_KEY) {
             if (path === '/') {
                 admin.firestore().collection('testimonials').get()
