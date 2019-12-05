@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 class ParentDetail extends Component {
     state = {
@@ -23,7 +24,17 @@ class ParentDetail extends Component {
                             <h1>{name}</h1>
                         </div>
                         <div classNaem="col-lg-3 text-right order-1 order-lg-2">
-
+                            <ul className="breadcrumb justify-content-lg-end">
+                                <li className="breadcrumb-item">
+                                    <Link to="/">Home</Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to="/our-dogs">Our dogs</Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {name}
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
