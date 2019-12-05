@@ -10,7 +10,7 @@ class Puppies extends Component {
     }
 
     render() {
-
+        return <h1>Puppies</h1>;
     }
 }
 

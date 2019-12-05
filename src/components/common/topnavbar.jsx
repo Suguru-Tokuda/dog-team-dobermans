@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 export default class Topnavbar extends Component {
-
     render() {
         return(
             <header className="header">
@@ -16,10 +15,10 @@ export default class Topnavbar extends Component {
                                     <Link className="nav-link" to="/">Home</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/puppies">Puppies</Link>
+                                    <Link className="nav-link" to="/our-dogs">Our Dogs</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/our-dogs">Our Dogs</Link>
+                                    <Link className="nav-link" to="/puppies">Puppies</Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/about-us">About us</Link>
