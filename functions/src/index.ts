@@ -47,15 +47,36 @@ export const puppy = functions.https.onRequest((request, response) => {
             if (query.key !== API_KEY) {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === API_KEY) {
-                const puppyId = query.puppyID;
+                const puppyID = query.puppyID;
                 if (request.method === 'GET') {
-                    if (puppyId.length > 0) {
-                        const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
-                        puppyRef.get().then(doc => {
+                    if (puppyID.length > 0) {
+                        const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
+                        puppyRef.get().then(async (doc) => {
                             let retVal: any = {};
                             if (typeof doc.data() !== undefined) {
                                 retVal = doc.data();
                                 retVal.puppyID = doc.id;
+                                /* get dad and mom info */
+                                const dadID = retVal.dadID;
+                                const momID = retVal.momID;
+                                const dadRef = admin.firestore().collection('parents').doc(dadID);
+                                const momRef = admin.firestore().collection('parents').doc(momID);
+                                await dadRef.get()
+                                    .then(dadDoc => {
+                                        retVal.dad = dadDoc.data();
+                                        retVal.dad.dadID = dadID;
+                                    })
+                                    .catch(err => {
+                                       response.status(500).send(err); 
+                                    });
+                                await momRef.get()
+                                    .then(momDoc => {
+                                        retVal.mom = momDoc.data();
+                                        retVal.mom.momID = momID;
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
                             }
                             response.status(200).send(retVal);
                         })
@@ -77,13 +98,13 @@ export const puppy = functions.https.onRequest((request, response) => {
                             response.sendStatus(500).send(err);
                         });
                 } else if (request.method === 'PUT') {
-                    if (puppyId.length > 0) {
+                    if (puppyID.length > 0) {
                             const data = request.body;
-                            const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
+                            const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.set(data, { merge: true })
                                 .then(() => {
                                     const retVal = data;
-                                    retVal.puppyID = puppyId;
+                                    retVal.puppyID = puppyID;
                                     response.status(200).send(retVal);
                                 })
                                 .catch(err => {
@@ -91,8 +112,8 @@ export const puppy = functions.https.onRequest((request, response) => {
                                 });
                         }
                 } else if (request.method === 'DELETE') {
-                    if (puppyId.length > 0) {
-                            const puppyRef = admin.firestore().collection('puppies').doc(puppyId);
+                    if (puppyID.length > 0) {
+                            const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.delete()
                                 .then(res => {
                                     response.status(200);
@@ -101,7 +122,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                                     response.sendStatus(500).send(err);
                                 });
                         } else {
-                        response.status(400).send('Invalid Id');
+                        response.status(400).send('Invalid ID');
                     }
                 }
             }
