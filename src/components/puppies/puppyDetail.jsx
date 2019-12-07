@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
+import PageNotFound from '../common/pageNotFound';
 import PuppyService from '../../services/puppyService';
 
 class PuppyDetail extends Component {
@@ -13,15 +14,37 @@ class PuppyDetail extends Component {
         dadID: 0,
         momID: 0,
         puppyID: 0,
-        pictures: {}
+        pictures: {},
+        parents: {},
+        pageLoaded: false,
+        puppyFound: false
     };
 
     constructor(props) {
-        
+        super(props);
+        const puppyID = props.match.params.puppyID;
+        if (puppyID.length === 0) {
+            this.state.puppyFound = false;
+        }
     }
 
     componentDidMount() {
-        PuppyService.getPuppyDetail()
+        const { puppyID } = this.state;
+        PuppyService.getPuppyDetail(puppyID)
+            .then(res => {
+                if (Object.keys(res).length === 0) {
+                    this.setState({ puppyFound: false });
+                } else {
+
+                    this.setState({ puppyFound: true });
+                }
+            })
+            .catch(err => {
+
+            })
+            .finally(() => {
+                this.setState({ pageLoaded: true });
+            });
     }
 
     getHeader() {
@@ -209,13 +232,20 @@ class PuppyDetail extends Component {
     }
 
     render() {
-        return (
-            <React.Fragment>
-                {this.getHeader()}
-                {this.getDetailsSection()}
-                {this.getAdditionalInfoSection()}
-            </React.Fragment>
-        );
+        const { puppyFound, pageLoaded } = this.state;
+        if (puppyFound === true && pageLoaded === true) {
+            return (
+                <React.Fragment>
+                    {this.getHeader()}
+                    {this.getDetailsSection()}
+                    {this.getAdditionalInfoSection()}
+                </React.Fragment>
+            );
+        } else if (puppyFound === false && pageLoaded === true) {
+            return <PageNotFound />;
+        } else {
+            return null;
+        }
     }
 }
 
