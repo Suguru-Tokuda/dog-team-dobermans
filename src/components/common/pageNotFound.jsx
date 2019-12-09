@@ -12,10 +12,11 @@ class PageNotFound extends Component {
                 <section className="padding-small">
                     <div className="container">
                         <div className="row">
-                        <div className="col-xl-8 col-lg-10">
-                            <h2 className="text-superbig">404</h2>
-                            <p className="lead">We don't know what what happened but that <strong>page is not here</strong>.</p>
-                        </div>
+                            <div className="col-xl-8 col-lg-10">
+                                <h2 className="text-superbig">404</h2>
+                                <p className="lead">We don't know what what happened but that <strong>page is not here</strong>.</p>
+                                <img src="https://i2.wp.com/wall.coloringpagelogo.com/wp-content/uploads/2019/01/dobermann-hd-wallpaper-background-images-in-doberman-dog-sad-animal-wallpaper-free-7618.jpg?w=800&ssl=1" alt="sad-doberman" className="img-fluid" />
+                            </div>
                         </div>
                     </div>
                 </section>
