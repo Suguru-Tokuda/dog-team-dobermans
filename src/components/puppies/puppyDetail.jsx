@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import PageNotFound from '../common/pageNotFound';
 import PuppyService from '../../services/puppyService';
+import $ from 'jquery';
 
 class PuppyDetail extends Component {
     state = {
@@ -11,10 +13,12 @@ class PuppyDetail extends Component {
         price: 0,
         color: '',
         weight: 0,
+        sex: '',
+        type: '',
         dadID: 0,
         momID: 0,
         puppyID: 0,
-        pictures: {},
+        pictures: [],
         parents: {},
         pageLoaded: false,
         puppyFound: false
@@ -25,17 +29,37 @@ class PuppyDetail extends Component {
         const puppyID = props.match.params.puppyID;
         if (puppyID.length === 0) {
             this.state.puppyFound = false;
+        } else {
+            this.state.puppyID = puppyID;
         }
     }
 
     componentDidMount() {
         const { puppyID } = this.state;
-        PuppyService.getPuppyDetail(puppyID)
+        PuppyService.getPuppy(puppyID)
             .then(res => {
-                if (Object.keys(res).length === 0) {
+                if (Object.keys(res.data).length === 0) {
                     this.setState({ puppyFound: false });
                 } else {
-
+                    const puppyData = res.data;
+                    const parents = {
+                        dad: puppyData.dad,
+                        mom: puppyData.mom
+                    };
+                    this.setState({
+                        name: puppyData.name,
+                        description: puppyData.description,
+                        dateOfBirth: puppyData.dateOfBirth,
+                        price: puppyData.price,
+                        color: puppyData.color,
+                        weight: puppyData.weight,
+                        sex: puppyData.sex,
+                        type: puppyData.type,
+                        dadID: puppyData.dadID,
+                        momID: puppyData.momID,
+                        pictures: puppyData.pictures,
+                        parents: parents,
+                    });
                     this.setState({ puppyFound: true });
                 }
             })
@@ -45,6 +69,17 @@ class PuppyDetail extends Component {
             .finally(() => {
                 this.setState({ pageLoaded: true });
             });
+    }
+
+    componentDidUpdate() {
+        $(document).ready(function(){
+            $('.owl-carousel').owlCarousel({
+                items: 1,
+                thumbs: true,
+                thumbsPrerendered: true,
+                dots: false
+            });
+        });
     }
 
     getHeader() {
@@ -62,7 +97,7 @@ class PuppyDetail extends Component {
                                     <Link to="/">Home</Link>
                                 </li>
                                 <li className="breadcrumb-item">
-                                    <Link to="/puppiess">Puppies</Link>
+                                    <Link to="/puppies">Puppies</Link>
                                 </li>
                                 <li className="breadcrumb-item active">
                                     {name}
@@ -79,22 +114,27 @@ class PuppyDetail extends Component {
         const { pictures } = this.state;
         if (pictures.length > 0) {
             const images = pictures.map((picture, i) => {
-                <div key={`picture-${i}`} className="owl-stage-outer">
-                    <div className="owl-item" style={{width: "690px"}}>
-                        <div className="item">
-                            <img src={picture.url} alt={picture.reference} />
-                        </div>
+                return (
+                    <div key={`picture-${i}`} className="item">
+                        <img src={picture.url} alt={picture.reference} />
                     </div>
-                </div>
+                );
             });
+            const thumbs = pictures.map((picture, i) => {
+                return (
+                    <button key={`thumb-item-${i}`} className="owl-thumb-item"><img src={picture.url} alt={picture.reference} /></button>
+                    
+                );
+            })
             return (
-                <div className="product-images col-lg-6">
-                    <div data-slider-id="1" className="owl-carousel items-slider owl-drag owl-loaded">
-                        <div className="owl-stage">
-                            {images}                                    
-                        </div>
+                <React.Fragment>
+                    <div data-slider-id="1" className="owl-carousel">
+                        {images}                                    
                     </div>
-                </div>
+                    <div data-slider-id="1" className="owl-thumbs">
+                        {thumbs}
+                    </div>
+                </React.Fragment> 
             );
         } else {
             return null;
@@ -102,40 +142,31 @@ class PuppyDetail extends Component {
     }
 
     getDetailsSection() {
-        const { name, descripton, price } = this.state;
+        const { name, description, price } = this.state;
         return (
             <section className="product-details">
-                <div className="row">
-                    <div className="product-images col-lg-6">
-                        {this.getImageCarousel()}
-                    </div>
-                    <div className="details col-lg-6">
-                        <div className="d-flex align-items-center justify-content-between flex-column flex-sm-row">
-                            <ul className="price list-inline no-margin">
-                                <li className="list-inline-item">{name}</li>
-                                <li className="list-inline-item current">{`$${price}`}</li>
-                            </ul>
+                <div className="container">
+                    <div className="row">
+                        <div className="product-images col-lg-6">
+                            {this.getImageCarousel()}
                         </div>
-                        <p>{descripton}</p>
+                        <div className="details col-lg-6">
+                            <div className="d-flex align-items-center justify-content-between flex-column flex-sm-row">
+                                <ul className="price list-inline no-margin">
+                                    <li className="list-inline-item">{name}</li>
+                                    <li className="list-inline-item current">{`$${price}`}</li>
+                                </ul>
+                            </div>
+                            <p>{description}</p>
+                        </div>
                     </div>
                 </div>
             </section>
         );
     }
 
-    getDescription() {
-        const { description } = this.state;
-        if (description !== '') {
-            return (
-                <div className="details col-lg-6">
-                    <p>{description}</p>
-                </div>
-            );
-        }
-    }
-
     getAdditionalInfoSection() {
-        const { description, dateOfBirth, color, weight, parents } = this.state;
+        const { description, dateOfBirth, color, weight, sex, type, parents } = this.state;
         const { dad, mom } = parents;
         if (description !== '') {
             return (
@@ -143,7 +174,7 @@ class PuppyDetail extends Component {
                     <div className="container">
                         <ul role="tablist" className="nav nav-tabs flex-column flex-sm-row">
                             <li className="nav-item">
-                                <a data-toggle="tab" href="#description" role="tab" className="nav-link">Description</a>
+                                <a data-toggle="tab" href="#description" role="tab" className="nav-link active">Description</a>
                             </li>
                             <li className="nav-item">
                                 <a data-toggle="tab" href="#additional-information" role="tab" className="nav-link">Additional Information</a>
@@ -153,75 +184,103 @@ class PuppyDetail extends Component {
                             </li>
                         </ul>
                         <div className="tab-content">
-                            <div id="description" role="tabpanel" className="tab-pane"><p>{description}</p></div>
+                            <div id="description" role="tabpanel" className="tab-pane active"><p>{description}</p></div>
                             <div id="additional-information" role="tabpanel" className="tab-pane">
                                 <table className="table">
-                                    <tr>
-                                        <th>Date of birth</th>
-                                        <tr>{moment(dateOfBirth).format('MM/DD/YYYY')}</tr>
-                                    </tr>
-                                    <tr>
-                                        <th>Color</th>
-                                        <tr>{color}</tr>
-                                    </tr>
-                                    <tr>
-                                        <th>Weight (lbs)</th>
-                                        <th>{weight}</th>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <th className="border-0">Date of birth</th>
+                                            <td className="border-0">{moment(dateOfBirth).format('MM/DD/YYYY')}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Color</th>
+                                            <td>{color}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Weight (lbs)</th>
+                                            <td>{weight}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sex</th>
+                                            <td>{`${sex.substring(0, 1).toUpperCase()}${sex.substring(1, sex.length).toLowerCase()}`}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Type</th>
+                                            <td>{`${type.substring(0, 1).toUpperCase()}${type.substring(1, type.length).toLowerCase()}`}</td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div id="parents" role="tabpanel" className="tab-pane">
                                 <table className="table">
-                                    <tr>
-                                        <th>Dad</th>
-                                        <td>
-                                            <table className="table table-borderless">
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <td>{dad.name}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Color</th>
-                                                    <td>{dad.color}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Weight (lbs)</th>
-                                                    <td>{dad.weight}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Picture</th>
-                                                    <td>
-                                                        <img src={dad.picture.url} atl={dad.picture.reference} />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Momo</th>
-                                        <td>
-                                            <table className="table table-borderless">
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <td>{mom.name}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Color</th>
-                                                    <td>{mom.color}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Weight (lbs)</th>
-                                                    <td>{mom.weight}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Picture</th>
-                                                    <td>
-                                                        <img src={mom.picture.url} atl={mom.picture.reference} />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <th className="border-0">Dad</th>
+                                            <td className="border-0">
+                                                <table className="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <td>{dad.name}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Color</th>
+                                                            <td>{dad.color}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Weight (lbs)</th>
+                                                            <td>{dad.weight}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Type</th>
+                                                            <td>{`${dad.type.substring(0, 1).toUpperCase()}${dad.type.substring(1, dad.type.length).toLowerCase()}`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Picture</th>
+                                                            <td>
+                                                                <div className="float-left">
+                                                                    <Link to={`/our-dogs/${dad.dadID}`}><img className="review-image" src={dad.pictures[0].url} atl={dad.pictures[0].reference} /></Link>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody> 
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Mom</th>
+                                            <td>
+                                                <table className="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <td>{mom.name}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Color</th>
+                                                            <td>{mom.color}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Weight (lbs)</th>
+                                                            <td>{mom.weight}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Type</th>
+                                                            <td>{`${mom.type.substring(0, 1).toUpperCase()}${mom.type.substring(1, mom.type.length).toLowerCase()}`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Picture</th>
+                                                            <td>
+                                                                <div className="float-left">
+                                                                    <Link to={`/our-dogs/${mom.momID}`}><img className="review-image" src={mom.pictures[0].url} atl={mom.pictures[0].reference} /></Link>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
