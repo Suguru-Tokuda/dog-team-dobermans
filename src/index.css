@@ -6,3 +6,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.owl-carousel .item img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
