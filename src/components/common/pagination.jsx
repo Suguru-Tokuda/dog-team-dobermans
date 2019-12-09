@@ -88,31 +88,31 @@ class Pagination extends Component {
     getPagination = () => {
         if (this.state.totalItems > 0) {
             const paginationItems = this.state.paginationInfo.pages.map(page => 
-                <li key={page} className={'page-item' + this.getPageItemClass(page)} onClick={() => this.handlePageChange(page)}>
-                    <button className="page-link">{page}</button>
+                <li key={page} className="page-item" onClick={() => this.handlePageChange(page)}>
+                    <button className={`page-link ${this.getPageItemClass(page)}`}>{page}</button>
                 </li>
             );
             return (
-                <nav aria-label="pagination">
-                    <ul className="pagination pagination-sm justify-content-center">
-                        <li className={"page-item" + this.getFirstBtnClass()} onClick={() => this.handlePageChange(1)}>
-                            <button className="page-link" aria-label="First">First</button>
+                <nav aria-label="pagination" className="d-flex justify-content-center">
+                    <ul className="pagination pagination-custom">
+                        <li className="page-item" onClick={() => this.handlePageChange(1)}>
+                            <button className={`page-link ${this.getFirstBtnClass()}`} aria-label="First">First</button>
                         </li>
-                        <li className={'page-item' + this.getFirstBtnClass()} onClick={() => this.handlePageChange(this.state.currentPage - 1)}>
-                            <button className="page-link">
+                        <li className="page-item" onClick={() => this.handlePageChange(this.state.currentPage - 1)}>
+                            <button className={`page-link ${this.getFirstBtnClass()}`}>
                                 <span aria-hidden="true">«</span>
                                 <span className="sr-only">Previous</span>
                             </button>
                         </li>
                         {paginationItems}
-                        <li className={'page-item' + this.getLastBtnClass()} onClick={() => this.handlePageChange(this.state.currentPage + 1)}>
-                            <button className="page-link">
+                        <li className="page-item" onClick={() => this.handlePageChange(this.state.currentPage + 1)}>
+                            <button className={`page-link ${this.getLastBtnClass()}`}>
                                 <span aria-hidden="true">»</span>
                                 <span className="sr-only">Next</span>
                             </button>
                         </li>
-                        <li className={"page-item" + this.getLastBtnClass()} onClick={() => this.handlePageChange(this.state.paginationInfo.totalPages)}>
-                            <button className="page-link">Last</button>
+                        <li className="page-item" onClick={() => this.handlePageChange(this.state.paginationInfo.totalPages)}>
+                            <button className={`page-link ${this.getLastBtnClass()}`}>Last</button>
                         </li>
                     </ul>
                 </nav>
