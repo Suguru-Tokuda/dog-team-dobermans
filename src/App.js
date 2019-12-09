@@ -6,6 +6,7 @@ import Footer from './components/common/footer';
 import Puppies from './components/puppies/puppies';
 import Parents from './components/parents/parents';
 import AboutUs from './components/aboutUs/aboutUs';
+import Contact from './components/contact/contact';
 import PageNotFound from './components/common/pageNotFound';
 
 class App extends Component {
@@ -19,6 +20,7 @@ class App extends Component {
             <Route path="/puppies" render={(props) => <Puppies {...props} />} />
             <Route path="/our-dogs" render={(props) => <Parents {...props} />} />
             <Route path="/about-us" render={(props) => <AboutUs {...props} />} />
+            <Route path="/contact" render={(props) => <Contact {...props} />} />
             <Route component={PageNotFound} />
           </Switch>
         <Footer />
