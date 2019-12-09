@@ -49,7 +49,7 @@ export const puppy = functions.https.onRequest((request, response) => {
             } else if (query.key === API_KEY) {
                 const puppyID = query.puppyID;
                 if (request.method === 'GET') {
-                    if (puppyID.length > 0) {
+                    if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
                         const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                         puppyRef.get().then(async (doc) => {
                             let retVal: any = {};
@@ -88,17 +88,17 @@ export const puppy = functions.https.onRequest((request, response) => {
                     }
                 } else if (request.method === 'POST') {
                     const data = request.body;
-                    admin.firestore().collection('/puppies').add(data)
+                    admin.firestore().collection('puppies').add(data)
                         .then(snapshot => {
                             const retVal = data;
                             retVal.puppyID = snapshot.id;
                             response.status(201).send(retVal);
                         })
                         .catch(err => {
-                            response.sendStatus(500).send(err);
+                            response.status(500).send(err);
                         });
                 } else if (request.method === 'PUT') {
-                    if (puppyID.length > 0) {
+                    if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
                             const data = request.body;
                             const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.set(data, { merge: true })
@@ -112,7 +112,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                                 });
                         }
                 } else if (request.method === 'DELETE') {
-                    if (puppyID.length > 0) {
+                    if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
                             const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.delete()
                                 .then(res => {
@@ -396,14 +396,14 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                             response.status(500).send(err);
                         });
                 }
-            } else if (path === '/introductions') {
+            } else if (path === '/missionStatements') {
                 if (method === 'PUT') {
                     admin.firestore().collection('aboutUs').get()
                         .then(querySnapshot => {
                             const data = request.body;
                             if (querySnapshot.size > 0) {
                                 const aboutUsData = {
-                                    introductions: data
+                                    missionStatements: data
                                 };
                                 const aboutUsID = querySnapshot.docs[0].id;
                                 const aboutUsRef = admin.firestore().collection('aboutUs').doc(aboutUsID);
@@ -417,7 +417,7 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                             } else {
                                 const aboutUsData = {
                                     ourTeam: [],
-                                    introductions: data
+                                    missionStatements: data
                                 };
                                 admin.firestore().collection('aboutUs').add(aboutUsData)
                                     .then(() => {
@@ -468,6 +468,8 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                             response.status(500).send(err);
                         });
                 }
+            } else {
+                response.status(404);
             }
         }
     });
@@ -524,7 +526,7 @@ export const testimonials = functions.https.onRequest((request, response) => {
     });
 });
 
-export const contactus = functions.https.onRequest((request, response) => {
+export const contact = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         const method = request.method;
@@ -532,13 +534,13 @@ export const contactus = functions.https.onRequest((request, response) => {
             response.status(400).send('Missing API key');
         } else if (query.key === API_KEY) {
             if (method === 'GET') {
-                admin.firestore().collection('contactUs').get()
+                admin.firestore().collection('contact').get()
                     .then(querySnapshot => {
                         if (querySnapshot.size > 0) {
                             const docs = querySnapshot.docs;
                             const doc = docs[0];
                             const retVal = doc.data();
-                            retVal.contactUsID = doc.id;
+                            retVal.contactID = doc.id;
                             response.status(200).send(retVal);
                         } else {
                             response.status(200).send({});
@@ -548,17 +550,17 @@ export const contactus = functions.https.onRequest((request, response) => {
                         response.status(500).send(err);
                     });
             } else if (method === 'PUT') {
-                admin.firestore().collection('contactUs').get()
+                admin.firestore().collection('contact').get()
                     .then(querySnapshot => {
                         if (querySnapshot.size > 0) {
                             // update
-                            const contactUsID = query.contactUsID;
+                            const contactID = query.contactID;
                             const data = request.body;
-                            const contactUsRef = admin.firestore().collection('contactUs').doc(contactUsID);
-                            contactUsRef.set(data, { merge: true })
+                            const contactRef = admin.firestore().collection('contact').doc(contactID);
+                            contactRef.set(data, { merge: true })
                                 .then(() => {
                                     const retVal = data;
-                                    retVal.contacdtUsID = contactUsID;
+                                    retVal.contacdtUsID = contactID;
                                     response.status(201).send(retVal);
                                 })
                                 .catch(err => {
@@ -567,7 +569,7 @@ export const contactus = functions.https.onRequest((request, response) => {
                         } else {
                             const data = request.body;
                             // create new
-                            admin.firestore().collection('/contactUs').add(data)
+                            admin.firestore().collection('/contact').add(data)
                                 .then(snapshot => {
                                     response.status(200).json
                                 })
@@ -580,6 +582,92 @@ export const contactus = functions.https.onRequest((request, response) => {
                         response.status(500).send(err);
                     });
             } 
+        }
+    });
+});
+
+export const waitList = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else if (query.key === API_KEY) {
+            if (method === 'GET') {
+                const waitRequestID = query.waitRequestID;
+                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                    admin.firestore().collection('waitList').get()
+                        .then(querySnapshot => {
+                            if (querySnapshot.size > 0) {
+                                const retVal = [] as any;
+                                querySnapshot.forEach((doc) => {
+                                    const waitRequest = doc.data();
+                                    waitRequest.waitID = doc.id;
+                                    retVal.push(waitRequest);
+                                });
+                                response.status(200).send(retVal);
+                            } else {
+                                response.status(200).send([]);
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        })
+                } else {
+                    admin.firestore().collection('waitList').doc(waitRequestID).get()
+                        .then(doc => {
+                            let retVal: any = {};
+                            retVal = doc.data();
+                            retVal.waitRequestID = doc.id;
+                            response.status(200).send(retVal);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                }
+            } else if (method === 'POST') {
+                const data = request.body;
+                admin.firestore().collection('waitList').add(data)
+                    .then(() => {
+                        response.sendStatus(201);
+                    })
+                    .catch((err => {
+                        response.status(500).send(err);
+                    }));
+            } else if (method === 'PUT') {
+                const waitRequestID = query.waitRequestID;
+                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                    const data = request.body;
+                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                    waitRequestRef.set(data, { merge: true })
+                        .then(() => {
+                            const retVal = data;
+                            retVal.waitRequestID = waitRequestRef;
+                            response.status(200).send(retVal);
+                        })
+                        .catch(err => {
+                            response.sendStatus(500).send(err);
+                        }); 
+                } else {
+                    response.status(400).send('Missing waitRequestID');
+                }
+            } else if (method === 'DELETE') {
+                const waitRequestID = query.waitRequestID;
+                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                    waitRequestRef.delete()
+                        .then(res => {
+                            response.status(200);
+                        })
+                        .catch(err => {
+                            response.sendStatus(500).send(err);
+                        });
+                } else {
+                    response.status(400).send('Invalid ID');
+                }
+            } else {
+                response.status(400).send('Non supported method');
+            }
         }
     });
 });
