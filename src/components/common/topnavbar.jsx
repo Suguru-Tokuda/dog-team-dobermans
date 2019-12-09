@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default class Topnavbar extends Component {
     render() {
@@ -7,24 +7,24 @@ export default class Topnavbar extends Component {
             <header className="header">
                 <nav className="navbar navbar-expand-lg fixed-top">
                     <div className="container-fluid">
-                        <Link className="navbar-brand" to="/">Logo</Link>
+                        <NavLink className="navbar-brand" to="/">Logo</NavLink>
                         <button type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" className="navbar-toggler navbar-toggler-right"><i className="fa fa-bars"></i></button>
                         <div id="navbarCollapse" className="collapse navbar-collapse">
                             <ul className="navbar-nav mx-auto">
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Home</Link>
+                                    <NavLink exact className="nav-link" activeClassName="active" to="/">Home</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/our-dogs">Our Dogs</Link>
+                                    <NavLink className="nav-link" activeClassName="active" to="/our-dogs">Our Dogs</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/puppies">Puppies</Link>
+                                    <NavLink className="nav-link" activeClassName="active" to="/puppies">Puppies</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/about-us">About us</Link>
+                                    <NavLink className="nav-link" activeClassName="active" to="/about-us">About us</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/contact-us">Contact us</Link>
+                                    <NavLink className="nav-link" activeClassName="active" to="/contact">Contact</NavLink>
                                 </li>
                             </ul>
                         </div>
