@@ -21,6 +21,9 @@ export default class Topnavbar extends Component {
                                     <NavLink className="nav-link" activeClassName="active" to="/puppies">Puppies</NavLink>
                                 </li>
                                 <li className="nav-item">
+                                    <NavLink className="nav-link" activeClassName="active" to="/testimonials">Testimonials</NavLink>
+                                </li>
+                                <li className="nav-item">
                                     <NavLink className="nav-link" activeClassName="active" to="/about-us">About us</NavLink>
                                 </li>
                                 <li className="nav-item">
