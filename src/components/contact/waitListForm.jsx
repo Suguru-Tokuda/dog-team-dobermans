@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import LaddaButton , { S, SLIDE_LEFT } from 'react-ladda';
+import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import ValidationService from '../../services/validationService';
 import WaitListService from '../../services/waitListService';
 import toastr from 'toastr';
@@ -45,7 +45,7 @@ class WaitListForm extends Component {
         if (firstName !== '') {
             delete validations.firstName;
         } else {
-            validations.firstName = 'Enter first firstName';
+            validations.firstName = 'Enter first name';
         }
         selections.firstName = firstName;
         this.setState({ selections, validations });
