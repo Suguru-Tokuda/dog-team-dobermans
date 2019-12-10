@@ -12,3 +12,7 @@ code {
   width: 100%;
   height: auto;
 }
+
+input[type="file"] {
+  display: none;
+}
