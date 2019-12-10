@@ -24,6 +24,7 @@ import 'jquery-countdown/dist/jquery.countdown.min.js';
 import 'masonry-layout/dist/masonry.pkgd.min.js';
 import 'imagesloaded/imagesloaded.pkgd.min.js';
 import 'ladda/dist/ladda-themeless.min.css';
+import 'react-image-crop/dist/ReactCrop.css';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 serviceWorker.unregister();
