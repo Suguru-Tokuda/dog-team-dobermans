@@ -480,25 +480,70 @@ export const testimonials = functions.https.onRequest((request, response) => {
         // const method = request.method;
         const query = request.query;
         const path = request.path;
+        const method = request.method;
         if (typeof query.key === 'undefined') {
                 response.status(400).send('Missing API key');
         } else if (query.key === API_KEY) {
             if (path === '/') {
-                admin.firestore().collection('testimonials').get()
-                    .then(querySnapshot => {
-                        const testimonialsArr: any = [];
-                        if (querySnapshot.size > 0) {
-                            querySnapshot.forEach((doc) => {
-                                const testimonial = doc.data();
-                                testimonial.testimonialID = doc.id;
-                                testimonialsArr.push(testimonial);
+                if (method === 'GET') {
+                    admin.firestore().collection('testimonials').get()
+                        .then(querySnapshot => {
+                            const testimonialsArr: any = [];
+                            if (querySnapshot.size > 0) {
+                                querySnapshot.forEach((doc) => {
+                                    const testimonial = doc.data();
+                                    testimonial.testimonialID = doc.id;
+                                    testimonialsArr.push(testimonial);
+                                });
+                            }
+                            response.status(200).send(testimonialsArr)
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else if (method === 'POST') {
+                    const data = request.body;
+                    admin.firestore().collection('testimonials').add(data)
+                        .then(() => {
+                            response.sendStatus(201);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else if (method === 'PUT') {
+                    const testimonialID = query.testimonialID;
+                    if (typeof testimonialID !== 'undefined' && testimonialID.length > 0) {
+                        const data = request.body;
+                        const testimonialRef = admin.firestore().collection('testimonials').doc(testimonialID);
+                        testimonialRef.set(data, { merge: true })
+                            .then(() => {
+                                const retVal = data;
+                                retVal.testimonialID = testimonialID;
+                                response.status(200).send(retVal);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
                             });
-                        }
-                        response.status(200).send(testimonialsArr)
-                    })
-                    .catch(err => {
-                        response.status(500).send(err);
-                    });
+                    } else {
+                        response.status(400).send('Missing testimonialID');
+                    }
+                } else if (method === 'DELETE') {
+                    const testimonialID = query.testimonialID;
+                    if (typeof testimonialID !== 'undefined' && testimonialID.length > 0) {
+                        const testimonialRef = admin.firestore().collection('testimonials').doc(testimonialID);
+                        testimonialRef.delete()
+                            .then(() => {
+                                response.status(200);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    } else {
+                        response.status(400).send('Missing testimonialID');
+                    }
+                } else {
+                    response.status(400).send('Unsupported method');
+                }
             } else if (path === '/live') {
                 admin.firestore().collection('testimonials').get()
                     .then(querySnapshot => {
@@ -642,7 +687,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     waitRequestRef.set(data, { merge: true })
                         .then(() => {
                             const retVal = data;
-                            retVal.waitRequestID = waitRequestRef;
+                            retVal.waitRequestID = waitRequestID;
                             response.status(200).send(retVal);
                         })
                         .catch(err => {
@@ -656,7 +701,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                 if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
                     const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
                     waitRequestRef.delete()
-                        .then(res => {
+                        .then(() => {
                             response.status(200);
                         })
                         .catch(err => {
@@ -666,7 +711,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     response.status(400).send('Invalid ID');
                 }
             } else {
-                response.status(400).send('Non supported method');
+                response.status(400).send('Unsupported method');
             }
         }
     });
