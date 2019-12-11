@@ -110,9 +110,13 @@ class TestimonialForm extends Component {
     handleFinishImageCropping = (newFile) => {
         const { selections, validations } = this.state;
         selections.picture = newFile;
-        const imageURL = URL.createObjectURL(newFile);
+        const newImageURL = URL.createObjectURL(newFile);
+        const { imageURL } = this.state;
+        if (imageURL !== '') {
+            URL.revokeObjectURL(imageURL);
+        }
         delete validations.picture;
-        this.setState({ selections, validations, imageURL });
+        this.setState({ selections, validations, imageURL: newImageURL });
     }
 
     handleResetTempPictureFile = () => {
@@ -161,6 +165,8 @@ class TestimonialForm extends Component {
                         message: '',
                         picture: null
                     };
+                    const { imageURL } = this.state;
+                    URL.revokeObjectURL(imageURL); // Revoke the URL before erase it.
                     this.setState({ selections: selections, tempImageFile: null, imageURL: '', validations: {}, formSubmitted: false });
                 })
                 .catch(err => {
