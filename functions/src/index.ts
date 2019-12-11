@@ -1,11 +1,61 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as cors from 'cors';
+import * as nodemailer from 'nodemailer';
 
 admin.initializeApp(functions.config().firease);
 
 const API_KEY = "xVgOiL6lkEvzL5PVekwe2M7zYkYmq7kfCiHPJ4FEEJhc9I2PcgGKCkNpsWt36yAfssyJGIBUBtYQEMEpK7s6TinhLfqUNMOYQatD";
 const corsHeader = cors({ origin: true });
+
+async function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
+    const htmlBody = `
+                <h3>New Testimonial</h3>
+                <br /><br />
+                <table>
+                    <tr>
+                        <th>First name</th>
+                        <td>${firstName}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Name</th>
+                        <td>${lastName}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td><a href="mailto:${email}">${email}</a></td>
+                    </tr>
+                    <tr>
+                        <th>Dog name</th>
+                        <td>${dogName}</td>
+                    </tr>
+                    <tr>
+                        <th>Picture</th>
+                        <td><img src="${picture.url}" alt="${picture.reference}" /></td>
+                    </tr>
+                </table>
+    `;
+    sendEmail(htmlBody);
+}
+
+async function sendEmail(htmlBody: string) {
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.office365.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'dogTeam@dogteamdobermans.com',
+            pass: 'DogTeamDobermans'
+        }
+    });
+
+    await transporter.sendMail({
+        from: 'dogTeam@dogteamdobermans.com',
+        to: 'suguru.tokuda@gmail.com',
+        subject: 'New Testimonial',
+        html: htmlBody
+    });
+}
 
 // get all puppies
 export const puppies = functions.https.onRequest((request, response) => {
@@ -504,7 +554,9 @@ export const testimonials = functions.https.onRequest((request, response) => {
                 } else if (method === 'POST') {
                     const data = request.body;
                     admin.firestore().collection('testimonials').add(data)
-                        .then(() => {
+                        .then(async () => {
+                            const { firstName, lastName, dogName, email, picture } = data;
+                            await notifyNewTestimonial(firstName, lastName, dogName, email, picture);
                             response.sendStatus(201);
                         })
                         .catch(err => {
