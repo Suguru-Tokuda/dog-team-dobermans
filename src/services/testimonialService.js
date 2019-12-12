@@ -63,7 +63,7 @@ export default class TestimonialService {
                         .then((downloadURL) => {
                             resolve({
                                 reference: reference,
-                                rul: downloadURL
+                                url: downloadURL
                             });
                         });
                 });
