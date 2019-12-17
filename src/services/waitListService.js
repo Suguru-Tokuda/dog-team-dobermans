@@ -15,7 +15,8 @@ export default class WaitListService {
             phone: phone,
             message: message,
             color: color,
-            create: date
+            created: date,
+            notified: null
         };
         return axios.post(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
     }

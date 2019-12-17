@@ -2,44 +2,61 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as cors from 'cors';
 import * as nodemailer from 'nodemailer';
+import * as api from '../src/api.json';
 
 admin.initializeApp(functions.config().firease);
 
-const API_KEY = "xVgOiL6lkEvzL5PVekwe2M7zYkYmq7kfCiHPJ4FEEJhc9I2PcgGKCkNpsWt36yAfssyJGIBUBtYQEMEpK7s6TinhLfqUNMOYQatD";
 const corsHeader = cors({ origin: true });
 
-async function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
-    const htmlBody = `
-                <h3>New Testimonial</h3>
-                <br /><br />
-                <table>
-                    <tr>
-                        <th>First name</th>
-                        <td>${firstName}</td>
-                    </tr>
-                    <tr>
-                        <th>Last Name</th>
-                        <td>${lastName}</td>
-                    </tr>
-                    <tr>
-                        <th>Email</th>
-                        <td><a href="mailto:${email}">${email}</a></td>
-                    </tr>
-                    <tr>
-                        <th>Dog name</th>
-                        <td>${dogName}</td>
-                    </tr>
-                    <tr>
-                        <th>Picture</th>
-                        <td><img src="${picture.url}" alt="${picture.reference}" /></td>
-                    </tr>
-                </table>
-    `;
-    sendEmail(htmlBody);
+function getAPIKEY() {
+    const parsedJSON = JSON.parse(JSON.stringify(api));
+    return parsedJSON.API_KEY;
 }
 
-async function sendEmail(htmlBody: string) {
-    let transporter = nodemailer.createTransport({
+async function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
+    return new Promise((resolve, reject) => {
+        const htmlBody = `
+                    <!DOCTYPE html>
+                        <body>
+                            <h3>New Testimonial</h3>
+                            <br /><br />
+                            <table>
+                                <tr>
+                                    <th>First name</th>
+                                    <td>${firstName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Last Name</th>
+                                    <td>${lastName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td><a href="mailto:${email}">${email}</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Dog name</th>
+                                    <td>${dogName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Picture</th>
+                                    <td><img src="${picture.url}" alt="${picture.reference}" /></td>
+                                </tr>
+                            </table>
+                        </body>
+                    </html>
+        `;
+        sendEmail('suguru.tokuda@gmail.com', 'New Testimonial Submitted', htmlBody)
+            .then(() => {
+                resolve();
+            })
+            .catch(() => {
+                reject();
+            });
+    });
+}
+
+async function sendEmail(email: string, subject: string, htmlBody: string) {
+    const transporter = nodemailer.createTransport({
         host: 'smtp.office365.com',
         port: 587,
         secure: false,
@@ -51,8 +68,8 @@ async function sendEmail(htmlBody: string) {
 
     await transporter.sendMail({
         from: 'dogTeam@dogteamdobermans.com',
-        to: 'suguru.tokuda@gmail.com',
-        subject: 'New Testimonial',
+        to: email,
+        subject: subject,
         html: htmlBody
     });
 }
@@ -64,9 +81,9 @@ export const puppies = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
-            if (query.key !== API_KEY) {
+            if (query.key !== getAPIKEY()) {
                 response.status(400).send("Incorrect API key");
-            } else if (query.key === API_KEY) {
+            } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('puppies').get()
                 .then(querySnapshot => {
                     const puppyArr: any = [];
@@ -94,9 +111,9 @@ export const puppy = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
-            if (query.key !== API_KEY) {
+            if (query.key !== getAPIKEY()) {
                 response.status(400).send("Incorrect API key");
-            } else if (query.key === API_KEY) {
+            } else if (query.key === getAPIKEY()) {
                 const puppyID = query.puppyID;
                 if (request.method === 'GET') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
@@ -187,9 +204,9 @@ export const parents = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
-            if (query.key !== API_KEY) {
+            if (query.key !== getAPIKEY()) {
                 response.status(400).send("Incorrect API key");
-            } else if (query.key === API_KEY) {
+            } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('parents').get()
                 .then(querySnapshot => {
                     const parentsArr: any = [];
@@ -220,9 +237,9 @@ export const parent = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
-            if (query.key !== API_KEY) {
+            if (query.key !== getAPIKEY()) {
                 response.status(400).send("Incorrect API key");
-            } else if (query.key === API_KEY) {
+            } else if (query.key === getAPIKEY()) {
                 if (path === '/') {
                     if (method === 'GET') {
                         if (id.length > 0) {
@@ -294,7 +311,7 @@ export const buyer = functions.https.onRequest((request, response) => {
         const id = query.buyerID;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
-        } else if (query.key === API_KEY) {
+        } else if (query.key === getAPIKEY()) {
             if (path === '/') {
                 if (method === 'GET') {
                     if (id.length > 0) {
@@ -393,9 +410,9 @@ export const buyers = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else if (query.key) {
-            if (query.key !== API_KEY) {
+            if (query.key !== getAPIKEY()) {
                 response.status(400).send('Incorrect API key');
-            } else if (query.key === API_KEY) {
+            } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('buyers').get()
                     .then(querySnapshot => {
                         const buysersArr: any = [];
@@ -423,7 +440,7 @@ export const aboutUs = functions.https.onRequest((request, response) => {
         const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
-        } else if (query.key === API_KEY) {
+        } else if (query.key === getAPIKEY()) {
             if (path === '/') {
                 if (method === 'GET') {
                     admin.firestore().collection('aboutUs').get()
@@ -527,13 +544,12 @@ export const aboutUs = functions.https.onRequest((request, response) => {
 
 export const testimonials = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
-        // const method = request.method;
         const query = request.query;
         const path = request.path;
         const method = request.method;
         if (typeof query.key === 'undefined') {
                 response.status(400).send('Missing API key');
-        } else if (query.key === API_KEY) {
+        } else if (query.key === getAPIKEY()) {
             if (path === '/') {
                 if (method === 'GET') {
                     admin.firestore().collection('testimonials').get()
@@ -580,16 +596,17 @@ export const testimonials = functions.https.onRequest((request, response) => {
                         response.status(400).send('Missing testimonialID');
                     }
                 } else if (method === 'DELETE') {
-                    const testimonialID = query.testimonialID;
-                    if (typeof testimonialID !== 'undefined' && testimonialID.length > 0) {
-                        const testimonialRef = admin.firestore().collection('testimonials').doc(testimonialID);
-                        testimonialRef.delete()
-                            .then(() => {
-                                response.status(200);
-                            })
-                            .catch(err => {
-                                response.sendStatus(500).send(err);
-                            });
+                    const testimonialIDs = request.body.testimonialIDs;
+                    if (typeof testimonialIDs !== 'undefined' && testimonialIDs.length > 0) {
+                        testimonialIDs.forEach(async (testimonialID: string) => {
+                            try {
+                                const testimonialRef = admin.firestore().collection('testimonials').doc(testimonialID);
+                                await testimonialRef.delete();
+                            } catch (err) {
+                                response.status(500).send(err);
+                            }
+                        });
+                        response.sendStatus(200);
                     } else {
                         response.status(400).send('Missing testimonialID');
                     }
@@ -597,27 +614,33 @@ export const testimonials = functions.https.onRequest((request, response) => {
                     response.status(400).send('Unsupported method');
                 }
             } else if (path === '/live') {
-                admin.firestore().collection('testimonials').get()
-                    .then(querySnapshot => {
-                        const testimonialsArr: any = [];
-                        if (querySnapshot.size > 0) { 
-                            querySnapshot.forEach((doc) => {
-                                const testimonial = doc.data();
-                                testimonial.testimonialID = doc.id;
-                                if (testimonial.live === true) {
-                                    testimonialsArr.push(testimonial);
-                                }
-                            });
-                        }
-                        if (testimonialsArr.length > 0) {
-                            response.status(200).send(testimonialsArr)
-                        } else {
-                            response.status(200).send({});
-                        }
-                    })
-                    .catch(err => {
-                        response.status(500).send(err);
-                    });
+                if (method === 'GET') {
+                    admin.firestore().collection('testimonials').get()
+                        .then(querySnapshot => {
+                            const testimonialsArr: any = [];
+                            if (querySnapshot.size > 0) { 
+                                querySnapshot.forEach((doc) => {
+                                    const testimonial = doc.data();
+                                    testimonial.testimonialID = doc.id;
+                                    if (testimonial.live === true) {
+                                        testimonialsArr.push(testimonial);
+                                    }
+                                });
+                            }
+                            if (testimonialsArr.length > 0) {
+                                response.status(200).send(testimonialsArr)
+                            } else {
+                                response.status(200).send({});
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else {
+                    response.status(400).send('Unsupported method');
+                }
+            } else {
+                response.status(400).send('Unsupported path');
             }
         }
     });
@@ -629,7 +652,7 @@ export const contact = functions.https.onRequest((request, response) => {
         const method = request.method;
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
-        } else if (query.key === API_KEY) {
+        } else if (query.key === getAPIKEY()) {
             if (method === 'GET') {
                 admin.firestore().collection('contact').get()
                     .then(querySnapshot => {
@@ -687,83 +710,109 @@ export const waitList = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
         const method = request.method;
+        const path = request.path;
+
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
-        } else if (query.key === API_KEY) {
-            if (method === 'GET') {
-                const waitRequestID = query.waitRequestID;
-                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
-                    admin.firestore().collection('waitList').get()
-                        .then(querySnapshot => {
-                            if (querySnapshot.size > 0) {
-                                const retVal = [] as any;
-                                querySnapshot.forEach((doc) => {
-                                    const waitRequest = doc.data();
-                                    waitRequest.waitID = doc.id;
-                                    retVal.push(waitRequest);
-                                });
+        } else if (query.key === getAPIKEY()) {
+            if (path === '/') {
+                if (method === 'GET') {
+                    const waitRequestID = query.waitRequestID;
+                    if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                        admin.firestore().collection('waitList').get()
+                            .then(querySnapshot => {
+                                if (querySnapshot.size > 0) {
+                                    const retVal = [] as any;
+                                    querySnapshot.forEach((doc) => {
+                                        const waitRequest = doc.data();
+                                        waitRequest.waitID = doc.id;
+                                        retVal.push(waitRequest);
+                                    });
+                                    response.status(200).send(retVal);
+                                } else {
+                                    response.status(200).send([]);
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            })
+                    } else {
+                        admin.firestore().collection('waitList').doc(waitRequestID).get()
+                            .then(doc => {
+                                let retVal: any = {};
+                                retVal = doc.data();
+                                retVal.waitRequestID = doc.id;
                                 response.status(200).send(retVal);
-                            } else {
-                                response.status(200).send([]);
-                            }
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        })
-                } else {
-                    admin.firestore().collection('waitList').doc(waitRequestID).get()
-                        .then(doc => {
-                            let retVal: any = {};
-                            retVal = doc.data();
-                            retVal.waitRequestID = doc.id;
-                            response.status(200).send(retVal);
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
-                }
-            } else if (method === 'POST') {
-                const data = request.body;
-                admin.firestore().collection('waitList').add(data)
-                    .then(() => {
-                        response.sendStatus(201);
-                    })
-                    .catch((err => {
-                        response.status(500).send(err);
-                    }));
-            } else if (method === 'PUT') {
-                const waitRequestID = query.waitRequestID;
-                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    }
+                } else if (method === 'POST') {
                     const data = request.body;
-                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
-                    waitRequestRef.set(data, { merge: true })
+                    admin.firestore().collection('waitList').add(data)
                         .then(() => {
-                            const retVal = data;
-                            retVal.waitRequestID = waitRequestID;
-                            response.status(200).send(retVal);
+                            response.sendStatus(201);
                         })
-                        .catch(err => {
-                            response.sendStatus(500).send(err);
-                        }); 
+                        .catch((err => {
+                            response.status(500).send(err);
+                        }));
+                } else if (method === 'PUT') {
+                    const waitRequestID = query.waitRequestID;
+                    if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                        const data = request.body;
+                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                        waitRequestRef.set(data, { merge: true })
+                            .then(() => {
+                                const retVal = data;
+                                retVal.waitRequestID = waitRequestID;
+                                response.status(200).send(retVal);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            }); 
+                    } else {
+                        response.status(400).send('Missing waitRequestID');
+                    }
+                } else if (method === 'DELETE') {
+                    const waitRequestID = query.waitRequestID;
+                    if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                        waitRequestRef.delete()
+                            .then(() => {
+                                response.status(200);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    } else {
+                        response.status(400).send('Invalid ID');
+                    }
                 } else {
-                    response.status(400).send('Missing waitRequestID');
+                    response.status(400).send('Unsupported method');
                 }
-            } else if (method === 'DELETE') {
-                const waitRequestID = query.waitRequestID;
-                if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
-                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
-                    waitRequestRef.delete()
-                        .then(() => {
-                            response.status(200);
-                        })
-                        .catch(err => {
-                            response.sendStatus(500).send(err);
-                        });
+            } else if (path === '/email') {
+                if (method === 'POST') {
+                    const data = request.body;
+                    const waitListIDs = data.waitListIDs;
+                    let waitRequest = null;
+                    waitListIDs.forEach(async (waitListRequestID: string) => {
+                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitListRequestID);
+                        waitRequestRef.get()
+                            .then(async (doc) => {
+                                waitRequest = doc.data();
+                                if (waitRequest !== undefined) {
+                                    await sendEmail(waitRequest.email, data.subject, data.message);
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    });
+                    response.sendStatus(200);
                 } else {
-                    response.status(400).send('Invalid ID');
+                    response.status(400).send('Unsupported method');
                 }
-            } else {
-                response.status(400).send('Unsupported method');
             }
         }
     });
