@@ -707,7 +707,7 @@ export const contact = functions.https.onRequest((request, response) => {
 });
 
 export const waitList = functions.https.onRequest((request, response) => {
-    corsHeader(request, response, () => {
+    corsHeader(request, response, async () => {
         const query = request.query;
         const method = request.method;
         const path = request.path;
@@ -795,27 +795,24 @@ export const waitList = functions.https.onRequest((request, response) => {
                 if (method === 'POST') {
                     const data = request.body;
                     const waitRequestIDs = data.waitRequestIDs;
-                    let waitRequest: any = null;
-                    waitRequestIDs.forEach(async (waitListRequestID: string) => {
-                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitListRequestID);
-                        waitRequestRef.get()
+                    for (let i = 0, max = waitRequestIDs.length; i < max; i++) {
+                        const waitRequestID = waitRequestIDs[i];
+                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                        await waitRequestRef.get()
                             .then(async (doc) => {
+                                let waitRequest: any = {};
                                 waitRequest = doc.data();
-                                if (waitRequest !== undefined) {
-                                    await waitRequestRef.set({ notified: new Date().toISOString() }, { merge: true })
-                                        .catch(err => {
-                                            console.log(err);
-                                        });
-                                    sendEmail(waitRequest.email, data.subject, data.body)
-                                        .catch((err) => {
-                                            console.log(err);
-                                        });
-                                }
+                                waitRequest.notified = new Date().toISOString();
+                                await waitRequestRef.set(waitRequest, { merge: true });
+                                await sendEmail(waitRequest.email, data.subject, data.body)
+                                    .catch(err => {
+                                        console.log(err);
+                                    });
                             })
                             .catch(err => {
                                 response.status(500).send(err);
                             });
-                    });
+                    }
                     response.sendStatus(200);
                 } else {
                     response.status(400).send('Unsupported method');
