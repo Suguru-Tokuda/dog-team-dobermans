@@ -13,7 +13,7 @@ function getAPIKEY() {
     return parsedJSON.API_KEY;
 }
 
-async function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
+function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
     return new Promise((resolve, reject) => {
         const htmlBody = `
                     <!DOCTYPE html>
@@ -55,7 +55,7 @@ async function notifyNewTestimonial(firstName: string, lastName: string, dogName
     });
 }
 
-async function sendEmail(email: string, subject: string, htmlBody: string) {
+function sendEmail(email: string, subject: string, htmlBody: string) {
     const transporter = nodemailer.createTransport({
         host: 'smtp.office365.com',
         port: 587,
@@ -65,13 +65,13 @@ async function sendEmail(email: string, subject: string, htmlBody: string) {
             pass: 'DogTeamDobermans'
         }
     });
-
-    await transporter.sendMail({
+    const options = {
         from: 'dogTeam@dogteamdobermans.com',
         to: email,
         subject: subject,
         html: htmlBody
-    });
+    };
+    return transporter.sendMail(options);
 }
 
 // get all puppies
@@ -791,18 +791,25 @@ export const waitList = functions.https.onRequest((request, response) => {
                 } else {
                     response.status(400).send('Unsupported method');
                 }
-            } else if (path === '/email') {
+            } else if (path === '/notify') {
                 if (method === 'POST') {
                     const data = request.body;
-                    const waitListIDs = data.waitListIDs;
-                    let waitRequest = null;
-                    waitListIDs.forEach(async (waitListRequestID: string) => {
+                    const waitRequestIDs = data.waitRequestIDs;
+                    let waitRequest: any = null;
+                    waitRequestIDs.forEach(async (waitListRequestID: string) => {
                         const waitRequestRef = admin.firestore().collection('waitList').doc(waitListRequestID);
                         waitRequestRef.get()
                             .then(async (doc) => {
                                 waitRequest = doc.data();
                                 if (waitRequest !== undefined) {
-                                    await sendEmail(waitRequest.email, data.subject, data.message);
+                                    await waitRequestRef.set({ notified: new Date().toISOString() }, { merge: true })
+                                        .catch(err => {
+                                            console.log(err);
+                                        });
+                                    sendEmail(waitRequest.email, data.subject, data.body)
+                                        .catch((err) => {
+                                            console.log(err);
+                                        });
                                 }
                             })
                             .catch(err => {
