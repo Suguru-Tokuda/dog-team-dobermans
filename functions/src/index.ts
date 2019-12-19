@@ -711,7 +711,6 @@ export const waitList = functions.https.onRequest((request, response) => {
         const query = request.query;
         const method = request.method;
         const path = request.path;
-
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else if (query.key === getAPIKEY()) {
@@ -719,24 +718,6 @@ export const waitList = functions.https.onRequest((request, response) => {
                 if (method === 'GET') {
                     const waitRequestID = query.waitRequestID;
                     if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
-                        admin.firestore().collection('waitList').get()
-                            .then(querySnapshot => {
-                                if (querySnapshot.size > 0) {
-                                    const retVal = [] as any;
-                                    querySnapshot.forEach((doc) => {
-                                        const waitRequest = doc.data();
-                                        waitRequest.waitID = doc.id;
-                                        retVal.push(waitRequest);
-                                    });
-                                    response.status(200).send(retVal);
-                                } else {
-                                    response.status(200).send([]);
-                                }
-                            })
-                            .catch(err => {
-                                response.status(500).send(err);
-                            })
-                    } else {
                         admin.firestore().collection('waitList').doc(waitRequestID).get()
                             .then(doc => {
                                 let retVal: any = {};
@@ -747,6 +728,25 @@ export const waitList = functions.https.onRequest((request, response) => {
                             .catch(err => {
                                 response.status(500).send(err);
                             });
+                    } else {
+                        admin.firestore().collection('waitList').get()
+                        .then(querySnapshot => {
+                            if (querySnapshot.size > 0) {
+                                const retVal = [] as any;
+                                querySnapshot.forEach((doc) => {
+                                    const waitRequest = doc.data();
+                                    waitRequest.waitRequestID = doc.id;
+                                    retVal.push(waitRequest);
+                                });
+                                response.status(200).send(retVal);
+                            } else {
+                                response.status(200).send([]);
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+
                     }
                 } else if (method === 'POST') {
                     const data = request.body;

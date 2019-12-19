@@ -9,7 +9,7 @@ export default class WaitListService {
 
     static createWaitRequest(firstName, lastName, email, phone, message, color, date) {
         const data = {
-            firsName: firstName,
+            firstName: firstName,
             lastName: lastName,
             email: email,
             phone: phone,
