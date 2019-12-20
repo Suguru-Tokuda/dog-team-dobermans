@@ -92,7 +92,11 @@ export const puppies = functions.https.onRequest((request, response) => {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
                             retVal.puppyID = doc.id;
-                            puppyArr.push(retVal);
+                            if (query.live === "true" && retVal.live === true)  {
+                                puppyArr.push(retVal);
+                            } else if (typeof query.live === 'undefined' || query.live === false) {
+                                puppyArr.push(retVal);
+                            }
                         });
                     }
                     response.status(200).send(puppyArr);
@@ -215,7 +219,11 @@ export const parents = functions.https.onRequest((request, response) => {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
                             retVal.parentID = doc.id;
-                            parentsArr.push(retVal);
+                            if (query.live === "true" && retVal.query === true) {
+                                parentsArr.push(retVal);
+                            } else if (typeof query.live === 'undefined' || query.live === false) {
+                                parentsArr.push(retVal);
+                            }
                         });
                     }
                     response.status(200).send(parentsArr);
@@ -804,9 +812,15 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 let waitRequest: any = {};
                                 waitRequest = doc.data();
                                 waitRequest.notified = new Date().toISOString();
+                                let body = data.body;
                                 await waitRequestRef.set(waitRequest, { merge: true });
-                                console.log(data.body);
-                                await sendEmail(waitRequest.email, data.subject, data.body)
+                                if (body.indexOf('[FIRST_NAME]') !== -1) {
+                                    body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
+                                }
+                                if (body.indexOf('[LAST_NAME]') !== -1) {
+                                    body = body.replace(/\[LAST_NAME\]/gm, waitRequest.lastName);
+                                }
+                                await sendEmail(waitRequest.email, data.subject, body)
                                     .catch(err => {
                                         console.log(err);
                                     });
