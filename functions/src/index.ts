@@ -66,6 +66,7 @@ function sendEmail(email: string, subject: string, htmlBody: string) {
         }
     });
     const options = {
+        sender: 'dogTeam@dogteamdobermans.com',
         from: 'dogTeam@dogteamdobermans.com',
         to: email,
         subject: subject,
@@ -804,6 +805,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 waitRequest = doc.data();
                                 waitRequest.notified = new Date().toISOString();
                                 await waitRequestRef.set(waitRequest, { merge: true });
+                                console.log(data.body);
                                 await sendEmail(waitRequest.email, data.subject, data.body)
                                     .catch(err => {
                                         console.log(err);
