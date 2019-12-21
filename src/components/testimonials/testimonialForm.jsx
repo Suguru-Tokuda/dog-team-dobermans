@@ -184,85 +184,84 @@ class TestimonialForm extends Component {
         return (
             <React.Fragment>
                 <section>
-                    <div className="container">
-                        <header className="mb-5"><h2 className="heading-line">Testimonial form</h2></header>
-                        <div className="row">
-                            <div className="col-md-7">
-                                <form noValidate className="custom-form form">
-                                    <div className="controls">
-                                        <div className="row">
-                                            <div className="col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="firstName" className={`form-label`}>First Name *</label>
-                                                    <input type="text" name="firstName" id="firstName" placeholder="Enter your first name" className={`form-control ${this.getFormClass('firstName')}`} value={firstName} onChange={this.handleSetFirstName} />
-                                                    {formSubmitted === true && validations.firstName && (
-                                                        <small className="text-danger">Enter first name</small>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="lastName" className={`form-label`}>Last Name *</label>
-                                                    <input type="text" name="lastName" id="lastName" placeholder="Enter your last name" className={`form-control ${this.getFormClass('lastName')}`} value={lastName} onChange={this.handleSetLastName} />
-                                                    {formSubmitted === true && validations.lastName && (
-                                                        <small className="text-danger">Enter last name</small>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="dogName" className={`form-label`}>Dog Name *</label>
-                                                    <input type="text" name="dogName" id="dogName" placeholder="Enter your dog's name" className={`form-control ${this.getFormClass('dogName')}`} value={dogName} onChange={this.handleSetDogName} />
-                                                    {formSubmitted === true && validations.dogName && (
-                                                        <small className="text-danger">Enter your dog's name</small>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="email" className={`form-label`}>Email *</label>
-                                                    <input type="email" name="email" id="email" placeholder="Enter email" className={`form-control ${this.getFormClass('email')}`} value={email} onChange={this.handleSetEmail} />
-                                                    {formSubmitted === true && validations.email && (
-                                                        <small className="text-danger">Enter email</small>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-sm-6">
-                                                <label htmlFor="picture-upload" className="btn btn-primary">
-                                                    <i className="fa fa-picture-o"></i> Select
-                                                </label>
-                                                <input id="picture-upload" type="file" accept="image/*" onChange={this.handleImageChange} />
-                                                {formSubmitted === true && validations.picture && (
-                                                    <React.Fragment>
-                                                        <br />
-                                                        <small className="text-danger">Select picture</small>
-                                                    </React.Fragment>
+                    <header><h2 className="heading-line">Testimonial form</h2></header>
+                    <div className="row">
+                        <div className="col-md-7">
+                            <form noValidate className="custom-form form">
+                                <div className="controls">
+                                    <div className="row">
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="firstName" className={`form-label`}>First Name *</label>
+                                                <input type="text" name="firstName" id="firstName" placeholder="Enter your first name" className={`form-control ${this.getFormClass('firstName')}`} value={firstName} onChange={this.handleSetFirstName} />
+                                                {formSubmitted === true && validations.firstName && (
+                                                    <small className="text-danger">Enter first name</small>
                                                 )}
                                             </div>
-                                            {imageURL !== '' && (
-                                                <div className="col-sm-6">
-                                                    <img className="img-fluid rounded-circle" src={imageURL} alt="testimonial-picture" />
-                                                </div>
-                                            )}
                                         </div>
-                                        <div className="form-group">
-                                            <label htmlFor="message" className={`form-label`}>Your message for us *</label>
-                                            <textarea row="4" className={`form-control ${this.getFormClass('message')}`} placehodler="Enter your message" value={message} onChange={this.handleSetMessage}></textarea>
-                                            {formSubmitted === true && validations.message && (
-                                                <small className="text-danger">{validations.message}</small>
-                                            )}
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="lastName" className={`form-label`}>Last Name *</label>
+                                                <input type="text" name="lastName" id="lastName" placeholder="Enter your last name" className={`form-control ${this.getFormClass('lastName')}`} value={lastName} onChange={this.handleSetLastName} />
+                                                {formSubmitted === true && validations.lastName && (
+                                                    <small className="text-danger">Enter last name</small>
+                                                )}
+                                            </div>
                                         </div>
-                                        <LaddaButton className="btn btn-primary" loading={loading} onClick={this.handleSubmitForm} data-size={S} data-style={SLIDE_LEFT}>Send Request</LaddaButton>
                                     </div>
-                                </form>
-                            </div>
-                            <div className="col-md-5">
-    
-                            </div>
+                                    <div className="row">
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="dogName" className={`form-label`}>Dog Name *</label>
+                                                <input type="text" name="dogName" id="dogName" placeholder="Enter your dog's name" className={`form-control ${this.getFormClass('dogName')}`} value={dogName} onChange={this.handleSetDogName} />
+                                                {formSubmitted === true && validations.dogName && (
+                                                    <small className="text-danger">Enter your dog's name</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="email" className={`form-label`}>Email *</label>
+                                                <input type="email" name="email" id="email" placeholder="Enter email" className={`form-control ${this.getFormClass('email')}`} value={email} onChange={this.handleSetEmail} />
+                                                {formSubmitted === true && validations.email && (
+                                                    <small className="text-danger">Enter email</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-sm-12">
+                                            <label htmlFor="picture-upload" className="btn btn-primary">
+                                                <i className="fa fa-picture-o"></i> Select
+                                            </label>
+                                            <p>Please select a picture of you and your dog together.</p>
+                                            <input id="picture-upload" type="file" accept="image/*" onChange={this.handleImageChange} />
+                                            {formSubmitted === true && validations.picture && (
+                                                <React.Fragment>
+                                                    <br />
+                                                    <small className="text-danger">Select picture</small>
+                                                </React.Fragment>
+                                            )}
+                                        </div>
+                                        {imageURL !== '' && (
+                                            <div className="col-sm-6">
+                                                <img className="img-fluid rounded-circle" src={imageURL} alt="testimonial-picture" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="message" className={`form-label`}>Your message for us *</label>
+                                        <textarea row="4" className={`form-control ${this.getFormClass('message')}`} placehodler="Enter your message" value={message} onChange={this.handleSetMessage}></textarea>
+                                        {formSubmitted === true && validations.message && (
+                                            <small className="text-danger">{validations.message}</small>
+                                        )}
+                                    </div>
+                                    <LaddaButton className="btn btn-primary" loading={loading} onClick={this.handleSubmitForm} data-size={S} data-style={SLIDE_LEFT}>Send Request</LaddaButton>
+                                </div>
+                            </form>
+                        </div>
+                        <div className="col-md-5">
+
                         </div>
                     </div>
                 </section>

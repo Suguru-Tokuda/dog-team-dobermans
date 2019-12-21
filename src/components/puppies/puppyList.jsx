@@ -49,9 +49,9 @@ class PuppyList extends Component {
     getPuppyList() {
         const { puppies } = this.state;
         if (puppies.length > 0) {
-            return <PuppiesTable puppies={puppies} />;
+            return <PuppiesTable {...this.props} puppies={puppies} />;
         } else {
-            return null;
+            return <div style={{marginTop: "500px"}}></div>;
         }
     }
 

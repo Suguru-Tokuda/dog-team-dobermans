@@ -20,6 +20,7 @@ class PuppyDetail extends Component {
         puppyID: 0,
         pictures: [],
         parents: {},
+        sold: false,
         pageLoaded: false,
         puppyFound: false
     };
@@ -59,6 +60,7 @@ class PuppyDetail extends Component {
                         momID: puppyData.momID,
                         pictures: puppyData.pictures,
                         parents: parents,
+                        sold: puppyData.sold
                     });
                     this.setState({ puppyFound: true });
                 }
@@ -99,9 +101,11 @@ class PuppyDetail extends Component {
                                 <li className="breadcrumb-item">
                                     <Link to="/puppies">Puppies</Link>
                                 </li>
-                                <li className="breadcrumb-item active">
-                                    {name}
-                                </li>
+                                {name !== '' && (
+                                    <li className="breadcrumb-item active">
+                                        {name}
+                                    </li>
+                                )}
                             </ul>
                         </div>
                     </div>
@@ -123,7 +127,6 @@ class PuppyDetail extends Component {
             const thumbs = pictures.map((picture, i) => {
                 return (
                     <button key={`thumb-item-${i}`} className="owl-thumb-item"><img src={picture.url} alt={picture.reference} /></button>
-                    
                 );
             })
             return (
@@ -142,12 +145,15 @@ class PuppyDetail extends Component {
     }
 
     getDetailsSection() {
-        const { name, description, price } = this.state;
+        const { name, description, price, sold } = this.state;
         return (
             <section className="product-details">
                 <div className="container">
                     <div className="row">
                         <div className="product-images col-lg-6">
+                            {sold === true && (
+                                <div className="ribbon-danger text-uppercase">Sold</div>
+                            )}
                             {this.getImageCarousel()}
                         </div>
                         <div className="details col-lg-6">
@@ -302,8 +308,13 @@ class PuppyDetail extends Component {
             );
         } else if (puppyFound === false && pageLoaded === true) {
             return <PageNotFound />;
-        } else {
-            return null;
+        } else if (pageLoaded === false) {
+            return (
+                <React.Fragment>
+                    {this.getHeader()}
+                    <div style={{marginTop: '700px'}}></div>
+                </React.Fragment>
+            );
         }
     }
 }

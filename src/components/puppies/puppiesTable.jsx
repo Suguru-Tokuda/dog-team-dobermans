@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '../common/pagination';
+import queryString from 'query-string';
 
 class PuppiesTable extends Component {
     state = {
@@ -22,6 +23,12 @@ class PuppiesTable extends Component {
 
     constructor(props) {
         super(props);
+        if (props.location.search !== undefined) {
+            const params = queryString.parse(props.location.search);
+            if (!isNaN(params.page)) {
+                this.state.paginationInfo.currentPage = parseInt(params.page);
+            }
+        }
         this.state.tableData = props.puppies;
         this.state.filteredData = JSON.parse(JSON.stringify(props.puppies));
         this.state.paginationInfo.totalItems = props.puppies.length;
@@ -42,7 +49,6 @@ class PuppiesTable extends Component {
             this.setState({ updateDisplayedData: false });
             this.updateDisplayedData(paginationInfo.currentPage, paginationInfo.startIndex, paginationInfo.endIndex);
         }
-
     }
 
     updateDisplayedData = (currentPage, startIndex, endIndex) => {
@@ -56,7 +62,14 @@ class PuppiesTable extends Component {
         paginationInfo.currentPage = currentPage;
         paginationInfo.startIndex = startIndex;
         paginationInfo.endIndex = endIndex;
+        this.updateURL(currentPage);
         this.setState({ paginationInfo, displayedData });
+    }
+
+    updateURL(currentPage) {
+        const pathname = this.props.location.pathname;
+        const url = `${pathname}?page=${currentPage}`;
+        this.props.history.push(url);
     }
 
     getPagination() {
@@ -80,6 +93,9 @@ class PuppiesTable extends Component {
                     <div key={`puppy-${i}`} className="item col-xl-4 col-md-6">
                         <div className="product is-gray">
                             <div className="image d-flex align-items-center justify-content-center">
+                                {puppy.sold === true && ( 
+                                    <div className="ribbon ribbon-danger text-uppercase">Sold</div>
+                                )}
                                 <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
                                 <div className="hover-overlay d-flex align-items-center justify-content-center">
                                     <Link className="visit-product active" to={`/puppies/${puppy.puppyID}`}><i className="icon-search"></i>View</Link>

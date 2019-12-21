@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import TestimonialList from './testimonialList';
 import TestimonialForm from './testimonialForm';
 
 class Testimonials extends Component {
-    state = {
-
-    };
-
     constructor(props) {
         super(props);
     }
@@ -39,7 +36,10 @@ class Testimonials extends Component {
         return (
             <React.Fragment>
                 {this.getHeader()}
-                <TestimonialForm />
+                <div className="container">
+                    <TestimonialList {...this.props} />
+                    <TestimonialForm {...this.props} />
+                </div>
             </React.Fragment>
         )
     }

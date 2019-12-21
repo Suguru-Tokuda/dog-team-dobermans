@@ -75,6 +75,69 @@ function sendEmail(email: string, subject: string, htmlBody: string) {
     return transporter.sendMail(options);
 }
 
+export const homepageContents = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else {
+            if (query.key !== getAPIKEY()) {
+                response.status(400).send('Incorrect API key');
+            } else if (query.key === getAPIKEY()) {
+                if (method === 'GET') {
+                    admin.firestore().collection('homepageContents').get()
+                        .then(querySnapshot => {
+                            if (querySnapshot.size > 0) {
+                                response.status(200).send(querySnapshot.docs[0].data());
+                            } else {
+                                response.sendStatus(200);
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else if (method === 'PUT') {
+                    const homepageContentData = request.body;
+                    admin.firestore().collection('homepageContents').get()
+                        .then(async (querySnapshot) => {
+                            if (querySnapshot.size > 0) {
+                                const homepageContentID = querySnapshot.docs[0].id;
+                                const homepageContentRef = admin.firestore().collection('homepageContents').doc(homepageContentID);
+                                homepageContentRef.set(homepageContentData, { merge: true })
+                                    .then(() => {
+                                        response.sendStatus(200);        
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                            } else {
+                                admin.firestore().collection('homepageContents').add(homepageContentData)
+                                    .then(() => {
+                                        response.sendStatus(200);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            admin.firestore().collection('homepageContents').add(homepageContentData)
+                                .then(() => {
+                                    response.sendStatus(200);
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                });
+                        });
+                } else {
+                    response.status(404).send('Unsupported method');
+                }
+            }
+        }
+    });
+});
+
 // get all puppies
 export const puppies = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
@@ -488,7 +551,7 @@ export const aboutUs = functions.https.onRequest((request, response) => {
                                         response.sendStatus(200);
                                     })
                                     .catch(err => {
-                                        response.sendStatus(500).send(err);
+                                        response.status(500).send(err);
                                     });
                             } else {
                                 const aboutUsData = {
@@ -568,7 +631,13 @@ export const testimonials = functions.https.onRequest((request, response) => {
                                 querySnapshot.forEach((doc) => {
                                     const testimonial = doc.data();
                                     testimonial.testimonialID = doc.id;
-                                    testimonialsArr.push(testimonial);
+                                    if (typeof query.approved !== 'undefined' && query.approved === 'true') {
+                                        if (testimonial.approved === true) {
+                                            testimonialsArr.push(testimonial);
+                                        }
+                                    } else {
+                                        testimonialsArr.push(testimonial);
+                                    }
                                 });
                             }
                             response.status(200).send(testimonialsArr)
@@ -619,32 +688,6 @@ export const testimonials = functions.https.onRequest((request, response) => {
                     } else {
                         response.status(400).send('Missing testimonialID');
                     }
-                } else {
-                    response.status(400).send('Unsupported method');
-                }
-            } else if (path === '/live') {
-                if (method === 'GET') {
-                    admin.firestore().collection('testimonials').get()
-                        .then(querySnapshot => {
-                            const testimonialsArr: any = [];
-                            if (querySnapshot.size > 0) { 
-                                querySnapshot.forEach((doc) => {
-                                    const testimonial = doc.data();
-                                    testimonial.testimonialID = doc.id;
-                                    if (testimonial.live === true) {
-                                        testimonialsArr.push(testimonial);
-                                    }
-                                });
-                            }
-                            if (testimonialsArr.length > 0) {
-                                response.status(200).send(testimonialsArr)
-                            } else {
-                                response.status(200).send({});
-                            }
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
                 } else {
                     response.status(400).send('Unsupported method');
                 }

@@ -86,9 +86,11 @@ class ParentDetail extends Component {
                                 <li className="breadcrumb-item">
                                     <Link to="/our-dogs">Our dogs</Link>
                                 </li>
-                                <li className="breadcrumb-item active">
-                                    {name}
-                                </li>
+                                {name !== '' && (
+                                    <li className="breadcrumb-item active">
+                                        {name}
+                                    </li>
+                                )}
                             </ul>
                         </div>
                     </div>
@@ -211,8 +213,13 @@ class ParentDetail extends Component {
             )
         } else if (parentFound === false && pageLoaded === true) {
             return <PageNotFound />;
-        } else {
-            return null;
+        } else if (pageLoaded === false) {
+            return (
+                <React.Fragment>
+                    {this.getHeader()}
+                    <div style={{marginTop: '700px'}}></div>
+                </React.Fragment>
+            );
         }
     }
 }

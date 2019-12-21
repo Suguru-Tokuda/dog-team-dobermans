@@ -10,7 +10,7 @@ export default class TestimonialService {
     }
 
     static getTestimonials() {
-        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}`);
+        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&approved=true`);
     }
 
     static createTestimonial(firstName, lastName, dogName, email, message, picture, date) {

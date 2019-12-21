@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import Pagination from '../common/pagination';
 import queryString from 'query-string';
+import moment from 'moment';
 
-class ParentsTable extends Component {
+class TestimonialsTable extends Component {
     state = {
         tableData: [],
         filteredData: [],
@@ -13,7 +13,7 @@ class ParentsTable extends Component {
             startIndex: 0,
             endIndex: 0,
             maxPages: 5,
-            pageSize: 9,
+            pageSize: 5,
             totalItems: 0
         },
         gridSearch: '',
@@ -24,23 +24,23 @@ class ParentsTable extends Component {
     constructor(props) {
         super(props);
         if (props.location.search !== undefined) {
-            const params = queryString.parse(props.location.search); 
-            if (!isNaN(params.page))  {
+            const params = queryString.parse(props.location.search);
+            if (!isNaN(params.page)) {
                 this.state.paginationInfo.currentPage = parseInt(params.page);
             }
         }
-        this.state.tableData = props.parents;
-        this.state.filteredData = JSON.parse(JSON.stringify(props.parents));
-        this.state.paginationInfo.totalItems = props.parents.length;
+        this.state.tableData = props.testimonials;
+        this.state.filteredData = JSON.parse(JSON.stringify(props.testimonials));
+        this.state.paginationInfo.totalItems = props.testimonials.length;
     }
 
     componentDidUpdate(props) {
         const { tableData, paginationInfo, updateDisplayedData } = this.state;
-        if (JSON.stringify(props.parents) !== JSON.stringify(tableData)) {
+        if (JSON.stringify(props.testimonials) !== JSON.stringify(tableData)) {
             paginationInfo.totalItems = props.tableData.length;
             this.setState({
-                tableData: props.parents,
-                filteredData: JSON.parse(JSON.stringify(props.parents)),
+                tableData: props.testimonials,
+                filteredData: JSON.parse(JSON.stringify(props.testimonials)),
                 paginationInfo: paginationInfo,
                 updateDisplayedData: true
             });
@@ -49,7 +49,6 @@ class ParentsTable extends Component {
             this.setState({ updateDisplayedData: false });
             this.updateDisplayedData(paginationInfo.currentPage, paginationInfo.startIndex, paginationInfo.endIndex);
         }
-
     }
 
     updateDisplayedData = (currentPage, startIndex, endIndex) => {
@@ -86,33 +85,23 @@ class ParentsTable extends Component {
         }
     }
 
-    getItems() {
+    getTestimonials() {
         const { displayedData } = this.state;
         if (displayedData.length > 0) {
-            const items = displayedData.map((parent, i) => {
+            return displayedData.map((testimonial, i) => {
                 return (
-                    <div key={`parent-${i}`} className="item col-xl-4 col-md-6">
-                        <div className="product is-gray">
-                            <div className="image d-flex align-items-center justify-content-center">
-                                <img src={parent.pictures[0].url} alt={parent.pictures[0].reference} className="img-fluid" />
-                                <div className="hover-overlay d-flex align-items-center justify-content-center">
-                                    <Link className="visit-product active" to={`/our-dogs/${parent.parentID}`}><i className="icon-search"></i>View</Link>
-                                </div>
-                            </div>
-                            <div className="title">
-                                <Link to={`/our-dogs/${parent.parentID}`}>
-                                    <h3 className="h6 text-uppercase no-margin-bottom">{parent.name}</h3>
-                                </Link>
-                            </div>
+                    <div className="row review" key={`testimonial-${i}`}>
+                        <div className="col-3 text-center">
+                            <img src={testimonial.picture.url} alt={testimonial.picture.reference} className="review-image" />
+                            <span>{moment(testimonial.created).format('MMM YYYY').toUpperCase()}</span>
+                        </div>
+                        <div className="col-9 review-text">
+                            <h6>{`${testimonial.firstName} ${testimonial.lastName}`}</h6>
+                            <p className="text-muted text-small">{testimonial.message}</p>
                         </div>
                     </div>
                 )
             });
-            return (
-                <div className="row">
-                    {items}
-                </div>
-            )
         } else {
             return null;
         }
@@ -120,12 +109,22 @@ class ParentsTable extends Component {
 
     render() {
         return (
-            <div className="products-grid col-xl-9 col-lg-8 sidebar-left">
-                {this.getItems()}
-                {this.getPagination()}
-            </div>
-        )
+            <section className="product-description">
+                <div className="row">
+                    <div className="col-xl-12">
+                        <div className="block">
+                            <div className="block-header">
+                                <h6>Submitted Testimonials</h6>
+                            </div>
+                        </div>
+                        {this.getTestimonials()}
+                        {this.getPagination()}
+                    </div>
+                </div>
+            </section>
+        );
     }
+
 }
 
-export default ParentsTable;
+export default TestimonialsTable;

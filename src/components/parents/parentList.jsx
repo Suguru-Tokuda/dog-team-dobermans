@@ -49,9 +49,9 @@ class ParentList extends Component {
     getParentList() {
         const { parents } = this.state;
         if (parents.length > 0) {
-            return <ParentsTable parents={parents} />;
+            return <ParentsTable {...this.props} parents={parents} />;
         } else {
-            return null;
+            return <div style={{marginTop: "500px"}}></div>;
         }
     }
 
