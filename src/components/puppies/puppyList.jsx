@@ -5,7 +5,8 @@ import PuppyService from '../../services/puppyService';
 
 class PuppyList extends Component {
     state = {
-        puppies: []
+        puppies: [],
+        loaded: false
     };
 
     constructor(props) {
@@ -19,6 +20,9 @@ class PuppyList extends Component {
             })
             .catch(err => {
                 console.log(err);
+            })
+            .finally(() => {
+                this.setState({ loaded: true });
             });
     }
 
@@ -47,11 +51,13 @@ class PuppyList extends Component {
     }
 
     getPuppyList() {
-        const { puppies } = this.state;
-        if (puppies.length > 0) {
+        const { puppies, loaded } = this.state;
+        if (puppies.length > 0 && loaded === true) {
             return <PuppiesTable {...this.props} puppies={puppies} />;
+        } else if (puppies.length === 0 && loaded === true) {
+            return <p style={{marginTop: "100px", marginBottom: "500px"}}>No puppies available at the moment...</p>
         } else {
-            return <div style={{marginTop: "500px"}}></div>;
+            return <div style={{marginTop: "800px"}}></div>;
         }
     }
 

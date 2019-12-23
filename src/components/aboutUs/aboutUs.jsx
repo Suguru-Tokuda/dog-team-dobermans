@@ -56,7 +56,7 @@ class AboutUs extends Component {
         if (missionStatements.length > 0) { 
             return <MissionStatements missionStatements={missionStatements} />
         }
-        return null;
+        return <div style={{marginTop: '400px'}}></div>;
     }
 
     getOurTeam() {
@@ -64,7 +64,7 @@ class AboutUs extends Component {
         if (ourTeam.length > 0) {
             return <OurTeam ourTeam={ourTeam} />
         }
-        return null;
+        return <div style={{marginTop: '400px'}}></div>;
     }
 
     render() {

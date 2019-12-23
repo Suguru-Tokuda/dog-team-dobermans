@@ -5,7 +5,8 @@ import ParentService from '../../services/parentService';
 
 class ParentList extends Component {
     state = {
-        parents: []
+        parents: [],
+        loaded: false
     };
 
     constructor(props) {
@@ -19,6 +20,9 @@ class ParentList extends Component {
             })
             .catch(err => {
                 console.log(err);
+            })
+            .finally(() => {
+                this.setState({ loaded: true });
             });
     }
 
@@ -47,11 +51,13 @@ class ParentList extends Component {
     }
 
     getParentList() {
-        const { parents } = this.state;
-        if (parents.length > 0) {
+        const { parents, loaded } = this.state;
+        if (parents.length > 0 && loaded === true) {
             return <ParentsTable {...this.props} parents={parents} />;
+        } else if (parents.length === 0 && loaded === true ) {
+            return <p style={{marginTop: "100px", marginBottom: "500px" }}>No dogs available at the moment...</p>
         } else {
-            return <div style={{marginTop: "500px"}}></div>;
+            return <div style={{marginTop: "800px"}}></div>;
         }
     }
 

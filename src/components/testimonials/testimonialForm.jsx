@@ -230,11 +230,11 @@ class TestimonialForm extends Component {
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div className="col-sm-12">
+                                        <div className="col-sm-6">
+                                            <label>Picture of you and your dog</label><br />
                                             <label htmlFor="picture-upload" className="btn btn-primary">
                                                 <i className="fa fa-picture-o"></i> Select
                                             </label>
-                                            <p>Please select a picture of you and your dog together.</p>
                                             <input id="picture-upload" type="file" accept="image/*" onChange={this.handleImageChange} />
                                             {formSubmitted === true && validations.picture && (
                                                 <React.Fragment>
