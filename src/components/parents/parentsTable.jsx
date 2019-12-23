@@ -73,6 +73,20 @@ class ParentsTable extends Component {
         this.props.history.push(url);
     }
 
+    getHeader() {
+        const { paginationInfo } = this.state;
+        return (
+            <header className="d-flex justify-content-between align-items-start">
+                <span className="visible-items">
+                    {`Showing `}
+                    <strong>{`${paginationInfo.startIndex + 1}-${paginationInfo.endIndex + 1}`}</strong>
+                    {` of `}
+                    <strong>{`${paginationInfo.totalItems}`}</strong>
+                </span>
+            </header>
+        );
+    }
+
     getPagination() {
         const { tableData, paginationInfo } = this.state;
         if (tableData.length > 0) {
@@ -121,6 +135,7 @@ class ParentsTable extends Component {
     render() {
         return (
             <div className="products-grid col-xl-9 col-lg-8 sidebar-left">
+                {this.getHeader()}
                 {this.getItems()}
                 {this.getPagination()}
             </div>
