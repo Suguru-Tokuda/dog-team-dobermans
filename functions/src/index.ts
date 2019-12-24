@@ -835,7 +835,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 response.status(200);
                             })
                             .catch(err => {
-                                response.sendStatus(500).send(err);
+                                response.status(500).send(err);
                             });
                     } else {
                         response.status(400).send('Invalid ID');
@@ -876,6 +876,90 @@ export const waitList = functions.https.onRequest((request, response) => {
                 } else {
                     response.status(400).send('Unsupported method');
                 }
+            }
+        }
+    });
+});
+
+export const blogs = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, async () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else if (query.key === getAPIKEY()) {
+            const blogID = query.blogID;
+            let blogRef;
+            if (typeof blogID !== 'undefined' && blogID.length > 0) {
+                blogRef = admin.firestore().collection('blogs').doc(blogID);
+            }
+            if (method === 'GET') {
+                if (typeof blogID !== 'undefined' && blogID.length > 0) {
+                    if (typeof blogRef !== 'undefined') {
+                        blogRef.get()
+                            .then(doc => {
+                                let blog: any = {};
+                                blog = doc.data();
+                                blog.blogID = doc.id;
+                                response.status(200).send(blog);
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            })
+                    } else {
+                        admin.firestore().collection('blogs').get()
+                            .then(querySnapshot => {
+                                if (querySnapshot.size > 0) {
+                                    const retVal = [] as any;
+                                    querySnapshot.forEach((doc) => {
+                                        const blog = doc.data();
+                                        blog.message = blog.message.replace(/<img(.*?)\>/gm, '');
+                                        blog.blogID = doc.id;
+                                        retVal.push(blog);
+                                    });
+                                    response.status(200).send(retVal);
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    }
+                }
+            } else if (method === 'PUT') {
+                const data = request.body;
+                if (typeof blogRef !== 'undefined') {
+                    blogRef.set(data, { merge: true })
+                        .then(() => {
+                            const retVal = data;
+                            retVal.blogID = blogID;
+                            response.status(200).send(retVal);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else {
+                    admin.firestore().collection('blogs').add(data)
+                        .then(() => {
+                            response.sendStatus(201);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                }
+            } else if (method === 'DELETE') {
+                if (typeof blogRef !== 'undefined') {
+                    blogRef.delete()
+                        .then(() => {
+                            response.status(200);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else {
+                    response.sendStatus(500);
+                }
+            } else {
+                response.status(400).send('Unsupported method');
             }
         }
     });
