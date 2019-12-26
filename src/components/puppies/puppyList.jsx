@@ -9,10 +9,6 @@ class PuppyList extends Component {
         loaded: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         PuppyService.getAllPuppies()
             .then(res => {

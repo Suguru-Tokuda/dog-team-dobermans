@@ -915,7 +915,7 @@ export const blogs = functions.https.onRequest((request, response) => {
                                 querySnapshot.forEach((doc) => {
                                     const blog = doc.data();
                                     blog.message = blog.message.replace(/(<([^>]+)>)/gm, '');
-                                    // blog.message = blog.message.replace(/(.*?).(.*?)/gm, '. ');
+                                    blog.message = blog.message.replace(/[\S](\.)[\S]/gm, ($0: any) => { return $0.replace('.', '. ') });
                                     blog.blogID = doc.id;
                                     retVal.push(blog);
                                 });
