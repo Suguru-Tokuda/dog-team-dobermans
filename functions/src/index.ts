@@ -914,7 +914,8 @@ export const blogs = functions.https.onRequest((request, response) => {
                                 const retVal = [] as any;
                                 querySnapshot.forEach((doc) => {
                                     const blog = doc.data();
-                                    blog.message = blog.message.replace(/<img(.*?)>/gm, '');
+                                    blog.message = blog.message.replace(/(<([^>]+)>)/gm, '');
+                                    // blog.message = blog.message.replace(/(.*?).(.*?)/gm, '. ');
                                     blog.blogID = doc.id;
                                     retVal.push(blog);
                                 });
@@ -924,7 +925,6 @@ export const blogs = functions.https.onRequest((request, response) => {
                             }
                         })
                         .catch(err => {
-                            console.log('could not get the doc for blogs');
                             response.status(500).send(err);
                         });
                 }
@@ -941,6 +941,7 @@ export const blogs = functions.https.onRequest((request, response) => {
                             response.status(500).send(err);
                         });
                 } else {
+                    data.created = new Date().toISOString();
                     admin.firestore().collection('blogs').add(data)
                         .then(() => {
                             response.sendStatus(201);
@@ -953,7 +954,7 @@ export const blogs = functions.https.onRequest((request, response) => {
                 if (typeof blogRef !== 'undefined') {
                     blogRef.delete()
                         .then(() => {
-                            response.status(200);
+                            response.sendStatus(200);
                         })
                         .catch(err => {
                             response.status(500).send(err);
