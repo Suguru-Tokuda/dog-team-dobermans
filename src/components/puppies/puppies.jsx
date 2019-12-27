@@ -4,9 +4,6 @@ import PuppyList from './puppyList';
 import PuppyDetail from './puppyDetail';
 
 class Puppies extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <React.Fragment>
