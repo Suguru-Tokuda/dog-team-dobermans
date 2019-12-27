@@ -968,3 +968,59 @@ export const blogs = functions.https.onRequest((request, response) => {
         }
     });
 });
+
+export const aboutDobermans = functions.https.onRequest((request, response) => {
+    corsHeader(request, response, () => {
+        const query = request.query;
+        const method = request.method;
+        if (typeof query.key === 'undefined') {
+            response.status(400).send('Missing API key');
+        } else {
+            if (query.key !== getAPIKEY()) {
+                if (method === 'GET') {
+                    admin.firestore().collection('aboutDobermans').get()
+                        .then(querySnapshot => {
+                            if (querySnapshot.size > 0) {
+                                const retVal = querySnapshot.docs[0].data().aboutDobermans;
+                                response.status(200).send(retVal);
+                            } else {
+                                response.status(200).send('');
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                } else if (method === 'PUT') {
+                    const aboutDobermansData = request.body;
+                    admin.firestore().collection('aboutDobermans').get()
+                        .then(async (querySnapshot) => {
+                            if (querySnapshot.size > 0) {
+                                const aboutDobermansID = querySnapshot.docs[0].id;
+                                const aboutDobermansRef = admin.firestore().collection('aboutDobermans').doc(aboutDobermansID);
+                                aboutDobermansRef.set(aboutDobermansData, { merge: true })
+                                    .then(() => {
+                                        response.sendStatus(200);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                            } else {
+                                admin.firestore().collection('aboutDobermans').add(aboutDobermansData) 
+                                    .then(() => {
+                                        response.sendStatus(200);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        })
+                } else {
+                    response.status(400).send('Unsupported method');
+                }
+            }
+        }
+    });
+});
