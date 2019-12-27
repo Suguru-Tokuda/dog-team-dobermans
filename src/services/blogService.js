@@ -10,4 +10,8 @@ export default class BlogService {
     static getAllBlogs() {
         return axios.get(`${this.getServiceBase}`);
     }
+
+    static getBlog(blogID) {
+        return axios.get(`${this.getServiceBase}&blogID=${blogID}`);
+    }
 }

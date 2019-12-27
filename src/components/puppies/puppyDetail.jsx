@@ -60,13 +60,14 @@ class PuppyDetail extends Component {
                         momID: puppyData.momID,
                         pictures: puppyData.pictures,
                         parents: parents,
-                        sold: puppyData.sold
+                        sold: puppyData.sold,
+                        puppyFound: true
                     });
-                    this.setState({ puppyFound: true });
                 }
             })
             .catch(err => {
-
+                toastr.error('There was an error in loading puppy data');
+                this.setState({ puppyFound: false });
             })
             .finally(() => {
                 this.setState({ pageLoaded: true });
