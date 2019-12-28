@@ -10,10 +10,6 @@ class AboutUs extends Component {
         ourTeam: []
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         AboutUsService.getAboutUs()
             .then(res => {
