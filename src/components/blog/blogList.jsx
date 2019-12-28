@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import BlogTables from './blogsTable';
 import BlogService from '../../services/blogService';
 import toastr from 'toastr';
 
@@ -48,7 +49,7 @@ class BlogList extends Component {
     getBlogList() {
         const { blogs, loaded } = this.state;
         if (blogs.length > 0 && loaded === true) {
-            return <BlogsTable {...this.props} blogs={blogs} />
+            return <BlogTables {...this.props} blogs={blogs} />
         }
     }
 

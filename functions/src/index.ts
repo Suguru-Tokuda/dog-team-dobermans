@@ -976,7 +976,7 @@ export const aboutDobermans = functions.https.onRequest((request, response) => {
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else {
-            if (query.key !== getAPIKEY()) {
+            if (query.key === getAPIKEY()) {
                 if (method === 'GET') {
                     admin.firestore().collection('aboutDobermans').get()
                         .then(querySnapshot => {
@@ -1020,6 +1020,8 @@ export const aboutDobermans = functions.https.onRequest((request, response) => {
                 } else {
                     response.status(400).send('Unsupported method');
                 }
+            } else {
+                response.status(404).send('Incorrect API key.');
             }
         }
     });
