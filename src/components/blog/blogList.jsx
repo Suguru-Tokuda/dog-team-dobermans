@@ -34,11 +34,13 @@ class BlogList extends Component {
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
-                                <Link to="/">Home</Link>
+                                <li className="breadcrumb-item">
+                                    <Link to="/">Home</Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Blog
+                                </li>
                             </ul>
-                            <li className="breadcrumb-item active">
-                                Blog
-                            </li>
                         </div>
                     </div>
                 </div>

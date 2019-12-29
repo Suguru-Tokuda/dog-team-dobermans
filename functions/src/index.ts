@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import * as cors from 'cors';
 import * as nodemailer from 'nodemailer';
 import * as api from '../src/api.json';
+import * as config from '../src/config.json';
 
 admin.initializeApp(functions.config().firease);
 
@@ -11,6 +12,11 @@ const corsHeader = cors({ origin: true });
 function getAPIKEY() {
     const parsedJSON = JSON.parse(JSON.stringify(api));
     return parsedJSON.API_KEY;
+}
+
+function getConfig() {
+    const parsedJSON = JSON.parse(JSON.stringify(config));
+    return parsedJSON.office;
 }
 
 function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
@@ -61,13 +67,13 @@ function sendEmail(email: string, subject: string, htmlBody: string) {
         port: 587,
         secure: false,
         auth: {
-            user: 'dogTeam@dogteamdobermans.com',
-            pass: 'DogTeamDobermans'
+            user: getConfig().user,
+            pass: getConfig().pass
         }
     });
     const options = {
-        sender: 'dogTeam@dogteamdobermans.com',
-        from: 'dogTeam@dogteamdobermans.com',
+        sender: getConfig().user,
+        from: getConfig().user,
         to: email,
         subject: subject,
         html: htmlBody
@@ -896,16 +902,26 @@ export const blogs = functions.https.onRequest((request, response) => {
             if (method === 'GET') {
                 if (typeof blogID !== 'undefined' && blogID.length > 0) {
                     if (typeof blogRef !== 'undefined') {
-                        blogRef.get()
-                        .then(doc => {
-                            let blog: any = {};
-                            blog = doc.data();
-                            blog.blogID = doc.id;
-                            response.status(200).send(blog);
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        })
+                        admin.firestore().collection('blogs').get()
+                            .then(querySnapshot => {
+                                const docs = querySnapshot.docs;
+                                let blog: any = {};
+                                for (let i = 0, max = docs.length; i < max; i++) {
+                                    if (docs[i].id === blogID) {
+                                        blog = docs[i].data();
+                                        if (typeof docs[i - 1] !== 'undefined') {
+                                            blog.nextBlogID = docs[i - 1].id;
+                                        }
+                                        if (typeof docs[i + 1] !== 'undefined') {
+                                            blog.prevBlogID = docs[i + 1].id;
+                                        }
+                                        response.status(200).send(blog);
+                                    }
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            })
                     }
                 } else {
                     admin.firestore().collection('blogs').get()

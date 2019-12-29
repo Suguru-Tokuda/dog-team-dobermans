@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import PageNotFound from '../common/pageNotFound';
 import BlogService from '../../services/blogService';
+import toastr from 'toastr';
 
 class BlogDetail extends Component {
     state = {
@@ -10,6 +11,8 @@ class BlogDetail extends Component {
         message: '',
         author: '',
         created: '',
+        prevBlogID: undefined,
+        nextBlogID: undefined,
         pageLoaded: false,
         blogFound: false
     };
@@ -25,6 +28,18 @@ class BlogDetail extends Component {
     }
 
     componentDidMount() {
+        this.getBlogData();
+    }
+
+    componentDidUpdate() {
+        const { updateData } = this.state;
+        if (updateData === true) {
+            this.setState({ updateData: false });
+            this.getBlogData();
+        }
+    }
+
+    getBlogData() {
         const { blogID } = this.state;
         BlogService.getBlog(blogID)
             .then(res => {
@@ -37,10 +52,25 @@ class BlogDetail extends Component {
                         message: blogData.message,
                         author: blogData.author,
                         created: blogData.created,
+                        prevBlogID: blogData.prevBlogID,
+                        nextBlogID: blogData.nextBlogID,
                         blogFound: true
                     });
                 }
             })
+            .catch(() => {
+                toastr.error('There was an error in loading blog data');
+            })
+            .finally(() => {
+                this.setState({ pageLoaded: true });
+            });
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.match.params.blogID !== prevState.blogID) {
+            return { blogID: nextProps.match.params.blogID, updateData: true };
+        }
+        return null;
     }
 
     getHeader() {
@@ -57,7 +87,7 @@ class BlogDetail extends Component {
                                 </p>
                             )}
                         </div>
-                        <div classname="col-lg-3 text-right order-1 order-lg-2">
+                        <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
                                 <li className="breadcrumb-item">
                                     <Link to="/">Home</Link>
@@ -79,7 +109,7 @@ class BlogDetail extends Component {
     }
 
     getMainMessage() {
-        const { message } = this.state;
+        const { message, nextBlogID, prevBlogID } = this.state;
         return (
             <section className="padding-small">
                 <div className="container">
@@ -90,6 +120,20 @@ class BlogDetail extends Component {
                             )}
                         </div>
                     </div>
+                    <nav aria-label="..." className="d-block w-100">
+                        <ul className="pagination pagination-custom d-flex justify-content-between d-block w-100">
+                            <li className="page-item">
+                                {nextBlogID !== undefined && (
+                                    <Link className={`page-link ${nextBlogID === undefined ? 'disabled' : ''}`} to={`/blog/${nextBlogID}`}>Newer Post</Link>
+                                )}
+                            </li>
+                            <li className="page-item">
+                                {prevBlogID !== undefined && (
+                                    <Link className={`page-link ${prevBlogID === undefined ? 'disabled' : ''}`} to={`/blog/${prevBlogID}`}>Older Post</Link>
+                                )}
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </section>
         );

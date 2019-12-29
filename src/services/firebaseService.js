@@ -8,8 +8,8 @@ const firebaseConfig = {
     projectId: "dogteamdobermans",
     storageBucket: "dogteamdobermans.appspot.com",
     messagingSenderId: "765501116399",
-    appId: "1:765501116399:web:1501cb42301f9a7a51f01a"
-};
+    appId: "1:765501116399:web:051a040ec68acc1b51f01a"
+  };
 
 firebase.initializeApp(firebaseConfig);
 
