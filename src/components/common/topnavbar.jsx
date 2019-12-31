@@ -7,7 +7,7 @@ export default class Topnavbar extends Component {
             <header className="header">
                 <nav className="navbar navbar-expand-lg fixed-top">
                     <div className="container-fluid">
-                        <NavLink className="navbar-brand" to="/">Logo</NavLink>
+                        <NavLink className="navbar-brand" to="/">Dog Team Dobermans</NavLink>
                         <button type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" className="navbar-toggler navbar-toggler-right"><i className="fa fa-bars"></i></button>
                         <div id="navbarCollapse" className="collapse navbar-collapse">
                             <ul className="navbar-nav mx-auto">
