@@ -156,15 +156,23 @@ export const puppies = functions.https.onRequest((request, response) => {
             } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('puppies').get()
                 .then(querySnapshot => {
+                    let limit: any = undefined;
+                    if (query.limit !== undefined)
+                        limit = parseInt(query.limit);
                     const puppyArr: any = [];
                     if (querySnapshot.size > 0) {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
                             retVal.puppyID = doc.id;
-                            if (query.live === "true" && retVal.live === true)  {
-                                puppyArr.push(retVal);
-                            } else if (typeof query.live === 'undefined' || query.live === false) {
-                                puppyArr.push(retVal);
+                            if (query.live === "true" && retVal.live === true) {
+                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                    puppyArr.push(retVal);
+                            } else if (query.live === "false" && retVal.live === false) {
+                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                    puppyArr.push(retVal);
+                            } else if (typeof query.live === 'undefined') {
+                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                    puppyArr.push(retVal);
                             }
                         });
                     }
@@ -283,15 +291,23 @@ export const parents = functions.https.onRequest((request, response) => {
             } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('parents').get()
                 .then(querySnapshot => {
+                    let limit: any = undefined;
+                    if (query.limit !== undefined)
+                        limit = parseInt(query.limit);
                     const parentsArr: any = [];
                     if (querySnapshot.size > 0) {
                         querySnapshot.forEach((doc) => {
                             const retVal = doc.data();
                             retVal.parentID = doc.id;
-                            if (query.live === "true" && retVal.query === true) {
-                                parentsArr.push(retVal);
-                            } else if (typeof query.live === 'undefined' || query.live === false) {
-                                parentsArr.push(retVal);
+                            if (query.live === "true" && retVal.live === true) {
+                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                    parentsArr.push(retVal);
+                            } else if (query.live === "false" && retVal.live === false) {
+                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                    parentsArr.push(retVal);
+                            } else if (typeof query.live === 'undefined') {
+                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                    parentsArr.push(retVal);
                             }
                         });
                     }
