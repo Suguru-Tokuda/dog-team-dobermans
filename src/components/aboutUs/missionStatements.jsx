@@ -32,6 +32,11 @@ class MissionStatements extends Component {
                             <div className="col-lg-4 col-sm-3 d-none d-sm-flex align-items-center">
                                 <img src={missionStatement.picture.url} alt={missionStatement.picture.reference} className="img-fluid" />
                             </div>
+                            <div className="d-sm-none d-md-none d-lg-none d-xl-none col-xs-12">
+                                <div style={{marginLeft: "6%"}}>
+                                    <img src={missionStatement.picture.url} alt={missionStatement.picture.reference} />
+                                </div>
+                            </div>
                         </React.Fragment>
                     );
                 } else if (i % 2 === 1) {
@@ -43,6 +48,11 @@ class MissionStatements extends Component {
                             <div className="col-lg-8 col-sm-9">
                                 <h2>{missionStatement.title}</h2>
                                 <p className="text-muted">{missionStatement.description}</p>
+                            </div>
+                            <div className="d-sm-none d-md-none d-lg-none d-xl-none col-xs-12 text-center">
+                                <div style={{marginLeft: "6%"}}>
+                                    <img src={missionStatement.picture.url} alt={missionStatement.picture.reference} />
+                                </div>
                             </div>
                         </React.Fragment>
                     );
