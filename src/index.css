@@ -13,6 +13,14 @@ code {
   height: auto;
 }
 
+.owl-dots {
+  text-align: center;
+}
+
+.owl-dots .owl-dot span {
+  border-radius: 50%;
+}
+
 input[type="file"] {
   display: none;
 }
