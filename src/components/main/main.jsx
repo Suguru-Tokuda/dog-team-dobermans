@@ -10,6 +10,7 @@ class Main extends Component {
     state = {
         videoSrc: '',
         news: '',
+        banner: null,
         puppies: [],
         parents: []
     };
@@ -38,6 +39,9 @@ class Main extends Component {
                 if (typeof homepageContentsData.news !== 'undefined') {
                     this.setState({ news: homepageContentsData.news });
                 }
+                if (typeof homepageContentsData.banner !== 'undefined') {
+                    this.setState({ banner: homepageContentsData.banner });
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -47,8 +51,23 @@ class Main extends Component {
 
     componentDidUpdate() {
         $(document).ready(function () {
-            $('.owl-carousel').owlCarousel({
-                items: 4
+            $('.owl-carousel').owlCarousel({ 
+                margin: 10, 
+                responsiveClass: true,
+                responsive: {
+                    0: {
+                        items: 1,
+                        nav: false
+                    },
+                    768: {
+                        items: 2,
+                        nav: false
+                    },
+                    992: {
+                        items: 4,
+                        nav: false
+                    }
+                } 
             });
         });
     }
@@ -99,13 +118,15 @@ class Main extends Component {
                             <div className="image d-flex align-items-center justify-content-center">
                                 <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
                                 <div className="hover-overlay d-flex align-items-center justify-content-center">
-                                    {puppy.sold === true && (
-                                        <div className="ribbon ribbon-danger text-uppercase">Sold</div>
-                                    )}
                                     <div className="CTA d-flex align-items-center justify-content-center">
                                         <Link to={`/puppies/${puppy.puppyID}`} className="visit-product active"><i className="fa fa-search"></i>View</Link>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="title">
+                                <Link to={`/puppies/${puppy.puppyID}`}>
+                                    <h3 className="h6 text-uppercase no-margin-bottom text-center">{puppy.name}</h3>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -127,13 +148,36 @@ class Main extends Component {
             );
         }
     }
+    
+    getBanner() {
+        const { banner } = this.state;
+        if (banner !== null) {
+            return (
+                <section style={{backgroundImage: `url(${banner.picture.url})`}} className="divider">
+                    <div className="container">
+                        <div className="row">
+                            <div className="col-lg-6">
+                                {banner.title !== '' && (
+                                    <h2 className="h1 text-uppercase no-margin">{banner.title}</h2>
+                                )}
+                                {banner.description !== '' && (
+                                    <p>{banner.description}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )
+        } else { 
+            return null;
+        }
+    }
 
     render() {
         const { videoSrc, news } = this.state;
         return (
             <div>
                 <section className="hero-video">
-                    {/* <video muted autoPlay loop src="https://firebasestorage.googleapis.com/v0/b/dogteamdobermans.appspot.com/o/mainVideo%2FolCKecjEqf?alt=media&token=9f707307-3126-44d9-b32b-d711ff94ae63" className="bg-video"></video> */}
                     <video muted autoPlay loop playsInline src={videoSrc} className="bg-video"></video>
                     <div className="container position-relative text-white text-center">
                         <div className="row">
@@ -147,6 +191,7 @@ class Main extends Component {
                 </section>
                 {this.getOurDogs()}
                 {this.getPuppies()}
+                {this.getBanner()}
                 {news !== '' && (
                     <section className="blog">
                         <div className="container">
