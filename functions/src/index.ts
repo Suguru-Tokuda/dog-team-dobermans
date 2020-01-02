@@ -943,13 +943,16 @@ export const blogs = functions.https.onRequest((request, response) => {
                     admin.firestore().collection('blogs').get()
                         .then(querySnapshot => {
                             if (querySnapshot.size > 0) {
-                                const retVal = [] as any;
+                                let retVal = [] as any;
                                 querySnapshot.forEach((doc) => {
                                     const blog = doc.data();
                                     blog.message = blog.message.replace(/(<([^>]+)>)/gm, '');
                                     blog.message = blog.message.replace(/[\S](\.)[\S]/gm, ($0: any) => { return $0.replace('.', '. ') });
                                     blog.blogID = doc.id;
                                     retVal.push(blog);
+                                });
+                                retVal = retVal.sort((a: any, b: any) => {
+                                    return (a.created > b.created ? -1 : a.created < b.created ? 1 : 0);
                                 });
                                 response.status(200).send(retVal);
                             } else {
