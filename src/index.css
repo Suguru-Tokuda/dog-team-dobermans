@@ -38,7 +38,7 @@ input[type="file"] {
 }
 
 nav.navbar {
-  background: #6600cc;
+  background: #7559A6;
   /* background: #D4AF37; */
 }
 
@@ -52,4 +52,8 @@ nav.navbar a.nav-link {
 
 nav.navbar a.nav-link.active {
   color: #e0ccff;
+}
+
+.fa-bars {
+  color: white;
 }
