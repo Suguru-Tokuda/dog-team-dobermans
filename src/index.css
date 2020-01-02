@@ -24,3 +24,32 @@ code {
 input[type="file"] {
   display: none;
 }
+
+@media screen and (min-width: 993px) {
+  section.divider {
+    height: 800px;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 992px) {
+  section.divider {
+    height: 800px;
+  }
+}
+
+nav.navbar {
+  background: #6600cc;
+  /* background: #D4AF37; */
+}
+
+.navbar-brand {
+  color: white;
+}
+
+nav.navbar a.nav-link {
+  color: white;
+}
+
+nav.navbar a.nav-link.active {
+  color: #e0ccff;
+}
