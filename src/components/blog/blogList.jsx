@@ -52,7 +52,7 @@ class BlogList extends Component {
         const { blogs, loaded } = this.state;
         if (blogs.length > 0 && loaded === true) {
             return <BlogTables {...this.props} blogs={blogs} />
-        } else if (blogs.length === 0 && loaded === false) {
+        } else if (blogs.length === 0 && loaded === true) {
             return <p style={{marginTop: "100px", marginBottom: "500px"}}>No blogs available...</p>
         } else {
             return <div style={{marginTop: "800px"}}></div>;
