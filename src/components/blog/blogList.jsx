@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import BlogTables from './blogsTable';
 import BlogService from '../../services/blogService';
 import toastr from 'toastr';
 
@@ -33,11 +34,13 @@ class BlogList extends Component {
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
-                                <Link to="/">Home</Link>
+                                <li className="breadcrumb-item">
+                                    <Link to="/">Home</Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Blog
+                                </li>
                             </ul>
-                            <li className="breadcrumb-item active">
-                                Blog
-                            </li>
                         </div>
                     </div>
                 </div>
@@ -48,7 +51,11 @@ class BlogList extends Component {
     getBlogList() {
         const { blogs, loaded } = this.state;
         if (blogs.length > 0 && loaded === true) {
-            return <BlogsTable {...this.props} blogs={blogs} />
+            return <BlogTables {...this.props} blogs={blogs} />
+        } else if (blogs.length === 0 && loaded === true) {
+            return <p style={{marginTop: "100px", marginBottom: "500px"}}>No blogs available...</p>
+        } else {
+            return <div style={{marginTop: "800px"}}></div>;
         }
     }
 

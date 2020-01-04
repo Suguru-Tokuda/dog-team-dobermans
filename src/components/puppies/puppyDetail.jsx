@@ -4,6 +4,7 @@ import moment from 'moment';
 import PageNotFound from '../common/pageNotFound';
 import PuppyService from '../../services/puppyService';
 import $ from 'jquery';
+import toastr from 'toastr';
 
 class PuppyDetail extends Component {
     state = {

@@ -12,11 +12,14 @@ export default class Footer extends Component {
                                 <div className="logo">Dog Team Dobermans Logo</div>
                             </div>
                             <div className="site-links col-lg-2 col-md-6">
-                                <h5 className="text-uppercase">Dog Team</h5>
+                                <h5 className="text-uppercase">Site Map</h5>
                                 <ul className="list-unstyled">
                                     <li><Link to="/">Home</Link></li>
+                                    <li><Link to="/about-dobermans">About Dobermans</Link></li>
                                     <li><Link to="/our-dogs">Our Dogs</Link></li>
                                     <li><Link to="/puppies">Puppies</Link></li>
+                                    <li><Link to="/blog">Blog</Link></li>
+                                    <li><Link to="/testimonials">Testimonials</Link></li>
                                     <li><Link to="/about-us">About Us</Link></li>
                                     <li><Link to="/contact">Contact</Link></li>
                                 </ul>

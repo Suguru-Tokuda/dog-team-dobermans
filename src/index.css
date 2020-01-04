@@ -13,6 +13,47 @@ code {
   height: auto;
 }
 
+.owl-dots {
+  text-align: center;
+}
+
+.owl-dots .owl-dot span {
+  border-radius: 50%;
+}
+
 input[type="file"] {
   display: none;
+}
+
+@media screen and (min-width: 993px) {
+  section.divider {
+    height: 800px;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 992px) {
+  section.divider {
+    height: 800px;
+  }
+}
+
+nav.navbar {
+  background: #7559A6;
+  /* background: #D4AF37; */
+}
+
+.navbar-brand {
+  color: white;
+}
+
+nav.navbar a.nav-link {
+  color: white;
+}
+
+nav.navbar a.nav-link.active {
+  color: #e0ccff;
+}
+
+.fa-bars {
+  color: white;
 }

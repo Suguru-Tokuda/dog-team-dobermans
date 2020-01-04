@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
@@ -11,6 +10,7 @@ import 'nouislider/distribute/nouislider.min.css';
 import 'owl.carousel/dist/assets/owl.carousel.css';
 import 'toastr/build/toastr.min.css';
 import './assets/css/style.default.css';
+import './index.css';
 import 'jquery';
 import 'popper.js';
 import 'jquery-ui';

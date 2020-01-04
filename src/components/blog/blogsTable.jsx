@@ -111,17 +111,17 @@ class BlogsTable extends Component {
                                 <img src={blog.thumbnail.url} alt={blog.thumbnail.url} />
                             </div>
                             <div className="info">
-                                <h4 className="h5">{blog.subject}</h4>
+                                <h4 className="h5">{blog.title}</h4>
                                 <span className="date">
                                     <i className="fa fa-clock-o"></i>
-                                    {moment(blog.created).format('MMM DDDo YYYY')}
+                                    {moment(blog.created).format('MMM Do YYYY')}
                                 </span>
+                                <p>{blog.message}</p>
+                                <Link className="read-more" to={`/blog/${blog.blogID}`}>
+                                    Read More
+                                    <i className="fa fa-long-arrow-right"></i>
+                                </Link>
                             </div>
-                            <p>{blog.message}</p>
-                            <Link className="read-more" to={`/blog/${blog.blogID}`}>
-                                Read More
-                                <i className="fa fa-long-arrow-right"></i>
-                            </Link>
                         </div>
                     </div>
                 );
