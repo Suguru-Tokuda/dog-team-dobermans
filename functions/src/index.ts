@@ -351,7 +351,7 @@ export const parent = functions.https.onRequest((request, response) => {
                                     response.status(500).send(err);
                                 });
                         } else {
-                            response.status(204);
+                            response.sendStatus(204);
                         }
                     } else if (method === 'POST') {
                         const data = request.body;
@@ -423,7 +423,7 @@ export const buyer = functions.https.onRequest((request, response) => {
                                 response.status(500).send(err);
                             });
                     } else {
-                        response.status(204);
+                        response.sendStatus(204);
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
@@ -765,7 +765,7 @@ export const contact = functions.https.onRequest((request, response) => {
                             // create new
                             admin.firestore().collection('contact').add(data)
                                 .then(snapshot => {
-                                    response.status(200).json
+                                    response.sendStatus(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -854,7 +854,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                         const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
                         waitRequestRef.delete()
                             .then(() => {
-                                response.status(200);
+                                response.sendStatus(200);
                             })
                             .catch(err => {
                                 response.status(500).send(err);
@@ -1019,7 +1019,7 @@ export const aboutDobermans = functions.https.onRequest((request, response) => {
                                 const retVal = querySnapshot.docs[0].data().aboutDobermans;
                                 response.status(200).send(retVal);
                             } else {
-                                response.status(200).send('');
+                                response.sendStatus(200);
                             }
                         })
                         .catch(err => {
