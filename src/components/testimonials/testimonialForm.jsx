@@ -245,7 +245,7 @@ class TestimonialForm extends Component {
                                         </div>
                                         {imageURL !== '' && (
                                             <div className="col-sm-6">
-                                                <img className="img-fluid rounded-circle" src={imageURL} alt="testimonial-picture" />
+                                                <img className="img-fluid rounded-circle" src={imageURL} alt={imageURL} />
                                             </div>
                                         )}
                                     </div>

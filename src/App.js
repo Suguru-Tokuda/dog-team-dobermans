@@ -14,10 +14,6 @@ import PageNotFound from './components/common/pageNotFound';
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <BrowserRouter>

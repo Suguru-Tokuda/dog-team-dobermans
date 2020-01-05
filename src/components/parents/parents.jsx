@@ -4,10 +4,6 @@ import ParentList from './parentList';
 import ParentDetail from './parentDetail';
 
 class Parents extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <React.Fragment>

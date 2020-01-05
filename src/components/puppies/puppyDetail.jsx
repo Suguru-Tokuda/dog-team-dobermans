@@ -243,7 +243,7 @@ class PuppyDetail extends Component {
                                                             <th>Picture</th>
                                                             <td>
                                                                 <div className="float-left">
-                                                                    <Link to={`/our-dogs/${dad.dadID}`}><img className="review-image" src={dad.pictures[0].url} atl={dad.pictures[0].reference} /></Link>
+                                                                    <Link to={`/our-dogs/${dad.dadID}`}><img className="review-image" src={dad.pictures[0].url} alt={dad.pictures[0].reference} /></Link>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -276,7 +276,7 @@ class PuppyDetail extends Component {
                                                             <th>Picture</th>
                                                             <td>
                                                                 <div className="float-left">
-                                                                    <Link to={`/our-dogs/${mom.momID}`}><img className="review-image" src={mom.pictures[0].url} atl={mom.pictures[0].reference} /></Link>
+                                                                    <Link to={`/our-dogs/${mom.momID}`}><img className="review-image" src={mom.pictures[0].url} alt={mom.pictures[0].reference} /></Link>
                                                                 </div>
                                                             </td>
                                                         </tr>

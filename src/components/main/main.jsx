@@ -37,7 +37,8 @@ class Main extends Component {
                     this.setState({ videoSrc: homepageContentsData.backgroundVideo.url })
                 }
                 if (typeof homepageContentsData.news !== 'undefined') {
-                    this.setState({ news: homepageContentsData.news });
+                    if (homepageContentsData.news !== '<p><br></p>')
+                        this.setState({ news: homepageContentsData.news });
                 }
                 if (typeof homepageContentsData.banner !== 'undefined') {
                     this.setState({ banner: homepageContentsData.banner });

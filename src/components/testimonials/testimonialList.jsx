@@ -8,10 +8,6 @@ class TestimonialsList extends Component {
         testimonials: []
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         TestimonialService.getTestimonials()
             .then(res => {

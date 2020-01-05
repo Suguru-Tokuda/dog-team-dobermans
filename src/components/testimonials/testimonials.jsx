@@ -4,10 +4,6 @@ import TestimonialList from './testimonialList';
 import TestimonialForm from './testimonialForm';
 
 class Testimonials extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     getHeader() {
         return (
             <section className="hero hero-page gray-bg padding-small">

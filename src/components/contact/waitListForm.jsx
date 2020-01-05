@@ -19,10 +19,6 @@ class WaitListForm extends Component {
         loading: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     getColorOptions() {
         const colors = ["Black & Tan", "Red", "Blue", "Fawn", "Black (Melanistic)"];
         return colors.map(color => <option value={color} key={color}>{color}</option>);

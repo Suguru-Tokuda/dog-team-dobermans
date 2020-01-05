@@ -9,10 +9,6 @@ class ParentList extends Component {
         loaded: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         ParentService.getAllParents()
             .then(res => {
