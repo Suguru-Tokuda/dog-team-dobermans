@@ -383,7 +383,7 @@ export const parent = functions.https.onRequest((request, response) => {
                             const parentRef = admin.firestore().collection('parents').doc(id);
                             parentRef.delete()
                                 .then(res => {
-                                    response.status(200);
+                                    response.sendStatus(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -763,7 +763,7 @@ export const contact = functions.https.onRequest((request, response) => {
                         } else {
                             const data = request.body;
                             // create new
-                            admin.firestore().collection('/contact').add(data)
+                            admin.firestore().collection('contact').add(data)
                                 .then(snapshot => {
                                     response.status(200).json
                                 })

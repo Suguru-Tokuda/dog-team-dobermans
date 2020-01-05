@@ -14,7 +14,7 @@ class PuppyDetail extends Component {
         price: 0,
         color: '',
         weight: 0,
-        sex: '',
+        gender: '',
         type: '',
         dadID: 0,
         momID: 0,
@@ -55,7 +55,7 @@ class PuppyDetail extends Component {
                         price: puppyData.price,
                         color: puppyData.color,
                         weight: puppyData.weight,
-                        sex: puppyData.sex,
+                        gender: puppyData.gender,
                         type: puppyData.type,
                         dadID: puppyData.dadID,
                         momID: puppyData.momID,
@@ -174,7 +174,7 @@ class PuppyDetail extends Component {
     }
 
     getAdditionalInfoSection() {
-        const { description, dateOfBirth, color, weight, sex, type, parents } = this.state;
+        const { description, dateOfBirth, color, weight, gender, type, parents } = this.state;
         const { dad, mom } = parents;
         if (description !== '') {
             return (
@@ -185,15 +185,11 @@ class PuppyDetail extends Component {
                                 <a data-toggle="tab" href="#description" role="tab" className="nav-link active">Description</a>
                             </li>
                             <li className="nav-item">
-                                <a data-toggle="tab" href="#additional-information" role="tab" className="nav-link">Additional Information</a>
-                            </li>
-                            <li className="nav-item">
                                 <a data-toggle="tab" href="#parents" role="tab" className="nav-link">Parents</a>
                             </li>
                         </ul>
                         <div className="tab-content">
-                            <div id="description" role="tabpanel" className="tab-pane active"><p>{description}</p></div>
-                            <div id="additional-information" role="tabpanel" className="tab-pane">
+                            <div id="description" role="tabpanel" className="tab-pane active">
                                 <table className="table">
                                     <tbody>
                                         <tr>
@@ -209,8 +205,8 @@ class PuppyDetail extends Component {
                                             <td>{weight}</td>
                                         </tr>
                                         <tr>
-                                            <th>Sex</th>
-                                            <td>{`${sex.substring(0, 1).toUpperCase()}${sex.substring(1, sex.length).toLowerCase()}`}</td>
+                                            <th>Gender</th>
+                                            <td>{`${gender.substring(0, 1).toUpperCase()}${gender.substring(1, gender.length).toLowerCase()}`}</td>
                                         </tr>
                                         <tr>
                                             <th>Type</th>

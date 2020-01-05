@@ -12,7 +12,7 @@ class ParentDetail extends Component {
         name: '',
         weight: 0,
         color: '',
-        sex: '',
+        gender: '',
         parentID: 0,
         pictures: [],
         pageLoaded: false,
@@ -41,7 +41,7 @@ class ParentDetail extends Component {
                         name: parentData.name,
                         description: parentData.description,
                         color: parentData.color,
-                        sex: parentData.sex,
+                        gender: parentData.gender,
                         type: parentData.type,
                         weight: parentData.weight,
                         dateOfBirth: parentData.dateOfBirth,
@@ -153,7 +153,7 @@ class ParentDetail extends Component {
     }
 
     getAdditionalInfoSection() {
-        const { description, dateOfBirth, color, sex, type, weight } = this.state;
+        const { description, dateOfBirth, color, gender, type, weight } = this.state;
         if (description !== '') {
             return (
                 <section className="product-description no-padding">
@@ -162,13 +162,9 @@ class ParentDetail extends Component {
                             <li className="nav-item">
                                 <a data-toggle="tab" href="#description" role="tab" className="nav-link active">Description</a>
                             </li>
-                            <li className="nav-item">
-                                <a data-toggle="tab" href="#additional-information" role="tab" className="nav-link">Additional Information</a>
-                            </li>
                         </ul>
                         <div className="tab-content">
-                            <div id="description" role="tabpanel" className="tab-pane active"><p>{description}</p></div>
-                            <div id="additional-information" role="tabpanel" className="tab-pane">
+                            <div id="description" role="tabpanel" className="tab-pane active">
                                 <table className="table">
                                     <tbody>
                                         <tr>
@@ -184,8 +180,8 @@ class ParentDetail extends Component {
                                             <td>{weight}</td>
                                         </tr>
                                         <tr>
-                                            <th>Sex</th>
-                                            <td>{`${sex.substring(0, 1).toUpperCase()}${sex.substring(1, sex.length).toLowerCase()}`}</td>
+                                            <th>Gender</th>
+                                            <td>{`${gender.substring(0, 1).toUpperCase()}${gender.substring(1, gender.length).toLowerCase()}`}</td>
                                         </tr>
                                         <tr>
                                             <th>Type</th>
