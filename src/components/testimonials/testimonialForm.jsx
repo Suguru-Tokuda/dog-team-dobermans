@@ -224,7 +224,7 @@ class TestimonialForm extends Component {
                                                 <label htmlFor="email" className={`form-label`}>Email *</label>
                                                 <input type="email" name="email" id="email" placeholder="Enter email" className={`form-control ${this.getFormClass('email')}`} value={email} onChange={this.handleSetEmail} />
                                                 {formSubmitted === true && validations.email && (
-                                                    <small className="text-danger">Enter email</small>
+                                                    <small className="text-danger">{validations.email}</small>
                                                 )}
                                             </div>
                                         </div>
