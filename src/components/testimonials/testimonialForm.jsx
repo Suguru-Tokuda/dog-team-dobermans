@@ -261,7 +261,7 @@ class TestimonialForm extends Component {
                             </form>
                         </div>
                         <div className="col-md-5">
-
+                            <p>Please submit your experience with Dog Team Dobermans. We appreciate your opinion about our Doberman puppies and share your thoughts with others.</p>
                         </div>
                     </div>
                 </section>

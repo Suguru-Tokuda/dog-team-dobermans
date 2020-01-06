@@ -96,7 +96,7 @@ class TestimonialsTable extends Component {
                             <span>{moment(testimonial.created).format('MMM YYYY').toUpperCase()}</span>
                         </div>
                         <div className="col-9 review-text">
-                            <h6>{`${testimonial.firstName} ${testimonial.lastName}`}</h6>
+                            <h6>{`${testimonial.firstName} & ${testimonial.dogName}`}</h6>
                             <p className="text-muted text-small">{testimonial.message}</p>
                         </div>
                     </div>

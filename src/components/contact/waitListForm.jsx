@@ -248,7 +248,7 @@ class WaitListForm extends Component {
                             </form>
                         </div>
                         <div className="col-md-5">
-                            <p>Some description about the wait list comes here (TODO)</p>
+                            <p>If you'd like to send a request us for a puppy, please fill out the form. When we have puppies with the color you pick and any other preference, we will contact you.</p>
                         </div>
                     </div>
                 </div>
