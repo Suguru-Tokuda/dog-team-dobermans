@@ -148,39 +148,77 @@ export const homepageContents = functions.https.onRequest((request, response) =>
 export const puppies = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
+        const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
             if (query.key !== getAPIKEY()) {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === getAPIKEY()) {
-                admin.firestore().collection('puppies').get()
-                .then(querySnapshot => {
-                    let limit: any = undefined;
-                    if (query.limit !== undefined)
-                        limit = parseInt(query.limit);
-                    const puppyArr: any = [];
-                    if (querySnapshot.size > 0) {
-                        querySnapshot.forEach((doc) => {
-                            const retVal = doc.data();
-                            retVal.puppyID = doc.id;
-                            if (query.live === "true" && retVal.live === true) {
-                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                    puppyArr.push(retVal);
-                            } else if (query.live === "false" && retVal.live === false) {
-                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                    puppyArr.push(retVal);
-                            } else if (typeof query.live === 'undefined') {
-                                if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                    puppyArr.push(retVal);
-                            }
-                        });
+                if (path === '/') {
+                    admin.firestore().collection('puppies').get()
+                    .then(querySnapshot => {
+                        let limit: any = undefined;
+                        if (query.limit !== undefined)
+                            limit = parseInt(query.limit);
+                        const puppyArr: any = [];
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
+                                const retVal = doc.data();
+                                retVal.puppyID = doc.id;
+                                if (query.live === "true" && retVal.live === true) {
+                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                        puppyArr.push(retVal);
+                                } else if (query.live === "false" && retVal.live === false) {
+                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                        puppyArr.push(retVal);
+                                } else if (typeof query.live === 'undefined') {
+                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                        puppyArr.push(retVal);
+                                }
+                            });
+                        }
+                        response.status(200).send(puppyArr);
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
+                } else if (path === '/getByBuyerID') {
+                    const buyerID = query.buyerID;
+                    if (typeof buyerID !== 'undefined' && buyerID.length >0) {
+                        const buyerRef = admin.firestore().collection('buyers').doc(buyerID);
+                        buyerRef.get()
+                            .then(async (doc) => {
+                                if (typeof doc.data() !== 'undefined') {
+                                    const buyerData = doc.data();
+                                    if (typeof buyerData !== 'undefined') {
+                                        const puppyIDs = buyerData.puppyIDs;
+                                        const retVal: any[] = [];
+                                        puppyIDs.foreach(async (puppyID: Number) => {
+                                            const puppyRef = admin.firestore().collection('puppies').doc(puppyID.toString());
+                                            if (typeof puppyRef !== 'undefined') {
+                                                await puppyRef.get()
+                                                    .then(puppyDoc => {
+                                                        const puppyData: any = puppyDoc.data();
+                                                        puppyData.puppyID = puppyDoc.id;
+                                                        retVal.push(puppyData);
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err);
+                                                    });
+                                            }
+                                        });
+                                        response.status(200).send(retVal);
+                                    }
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            })
+                    } else {
+                        response.status(404).send('Missing buyerID')
                     }
-                    response.status(200).send(puppyArr);
-                })
-                .catch(err => {
-                    response.status(500).send(err);
-                });
+                }
             }
         }
     });
@@ -190,6 +228,7 @@ export const puppies = functions.https.onRequest((request, response) => {
 export const puppy = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const query = request.query;
+        const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
         } else if (query.key) {
@@ -202,7 +241,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                         const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                         puppyRef.get().then(async (doc) => {
                             let retVal: any = {};
-                            if (typeof doc.data() !== undefined) {
+                            if (typeof doc.data() !== 'undefined') {
                                 retVal = doc.data();
                                 retVal.puppyID = doc.id;
                                 /* get dad and mom info */
@@ -216,7 +255,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                                         retVal.dad.dadID = dadID;
                                     })
                                     .catch(err => {
-                                       response.status(500).send(err); 
+                                        response.status(500).send(err); 
                                     });
                                 await momRef.get()
                                     .then(momDoc => {
@@ -237,15 +276,21 @@ export const puppy = functions.https.onRequest((request, response) => {
                     }
                 } else if (request.method === 'POST') {
                     const data = request.body;
-                    admin.firestore().collection('puppies').add(data)
-                        .then(snapshot => {
-                            const retVal = data;
-                            retVal.puppyID = snapshot.id;
-                            response.status(201).send(retVal);
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
+                    if (path === '/') {
+                        admin.firestore().collection('puppies').add(data)
+                            .then(snapshot => {
+                                const retVal = data;
+                                retVal.puppyID = snapshot.id;
+                                response.status(201).send(retVal);
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    } else if (path === '/transaction') {
+                        // const buyerID = data.buyerID;
+                        // const payment = data.payment;
+                        // admin.firestore().collection('puppies').doc(puppyID)
+                    }
                 } else if (request.method === 'PUT') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
                             const data = request.body;
