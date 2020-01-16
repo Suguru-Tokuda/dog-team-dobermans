@@ -146,7 +146,7 @@ export const homepageContents = functions.https.onRequest((request, response) =>
 
 // get all puppies
 export const puppies = functions.https.onRequest((request, response) => {
-    corsHeader(request, response, () => {
+    corsHeader(request, response, async () => {
         const query = request.query;
         const path = request.path;
         if (typeof query.key === 'undefined') {
@@ -218,6 +218,57 @@ export const puppies = functions.https.onRequest((request, response) => {
                     } else {
                         response.status(404).send('Missing buyerID')
                     }
+                } else if (path === '/processTransaction') {
+                    const transactionData = request.body;
+                    const puppyRef = admin.firestore().collection('puppies').doc(transactionData.puppyID);
+                    const buyerRef = admin.firestore().collection('buyers').doc(transactionData.buyerID);
+                    await puppyRef.set({buyerID: transactionData.buyerID}, { merge: true});
+                    await buyerRef.get()
+                        .then(async (snapshot) => {
+                            const buyerData = snapshot.data();
+                            if (typeof buyerData !== 'undefined') {
+                                buyerData.puppyIDs.push(transactionData.puppyID);
+                                await buyerRef.set(buyerData, {merge: true });
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
+                    response.sendStatus(200);
+                } else if (path === '/cancelTransaction') {
+                    const puppyID = query.puppyID;
+                    const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
+                    puppyRef.get()
+                        .then(async (puppySnapshot) => {
+                            const puppyData = puppySnapshot.data();
+                            if (typeof puppyData !== 'undefined') {
+                                const buyerID = puppyData.buyerID;
+                                puppyData.buyerID = null;
+                                puppyData.paidAmount = 0;
+                                const buyerRef = admin.firestore().collection('buyers').doc(buyerID);
+                                await buyerRef.get()
+                                    .then(async (buyerSnapshot) => {
+                                        const buyerData = buyerSnapshot.data();
+                                        if (typeof buyerData !== 'undefined') {
+                                            const index = buyerData.puppyIDs.indexOf(puppyID);
+                                            if (index !== -1) {
+                                                buyerData.puppyIDs.splice(index, 1);
+                                                await buyerRef.set(buyerData, { merge: true });
+                                            }
+                                        }
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                                await puppyRef.set(puppyData, { merge: true });
+                                response.sendStatus(200);
+                            } else {
+                                response.status(500).send('There was an error in getting puppy data');
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        })
                 }
             }
         }
@@ -309,7 +360,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
                             const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.delete()
-                                .then(res => {
+                                .then(() => {
                                     response.status(200);
                                 })
                                 .catch(err => {
