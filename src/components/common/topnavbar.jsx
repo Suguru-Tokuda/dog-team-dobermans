@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
+import * as siteLogo from '../../assets/img/site_logo.PNG';
 
 export default class Topnavbar extends Component {
     render() {
@@ -7,7 +8,9 @@ export default class Topnavbar extends Component {
             <header className="header">
                 <nav className="navbar navbar-expand-lg fixed-top">
                     <div className="container-fluid">
-                        <NavLink className="navbar-brand" to="/">Dog Team Dobermans</NavLink>
+                        <Link className="navbar-brand" to="/" style={{width: "179px"}}>
+                            <img src={siteLogo} style={{ width: "100%", filter: "invert(90%)" }} alt={siteLogo}></img>
+                        </Link>
                         <button type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" className="navbar-toggler navbar-toggler-right"><i className="fa fa-bars"></i></button>
                         <div id="navbarCollapse" className="collapse navbar-collapse">
                             <ul className="navbar-nav mx-auto">

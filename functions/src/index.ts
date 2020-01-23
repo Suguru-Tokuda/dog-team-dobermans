@@ -222,13 +222,27 @@ export const puppies = functions.https.onRequest((request, response) => {
                     const transactionData = request.body;
                     const puppyRef = admin.firestore().collection('puppies').doc(transactionData.puppyID);
                     const buyerRef = admin.firestore().collection('buyers').doc(transactionData.buyerID);
-                    await puppyRef.set({buyerID: transactionData.buyerID}, { merge: true});
+                    await puppyRef.get()
+                        .then(async (snapshot) => {
+                            const puppyData = snapshot.data();
+                            if (typeof puppyData !== 'undefined') {
+                                puppyData.buyerID = transactionData.buyerID;
+                                puppyData.paidAmount += transactionData.paidAmount;
+                                puppyData.sold = true;
+                                await puppyRef.set(puppyData, { merge: true });
+                            }
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
+                        });
                     await buyerRef.get()
                         .then(async (snapshot) => {
                             const buyerData = snapshot.data();
                             if (typeof buyerData !== 'undefined') {
-                                buyerData.puppyIDs.push(transactionData.puppyID);
-                                await buyerRef.set(buyerData, {merge: true });
+                                if (buyerData.puppyIDs.indexOf(transactionData.puppyID) === -1) {
+                                    buyerData.puppyIDs.push(transactionData.puppyID);
+                                    await buyerRef.set(buyerData, {merge: true });
+                                }
                             }
                         })
                         .catch(err => {
@@ -245,6 +259,7 @@ export const puppies = functions.https.onRequest((request, response) => {
                                 const buyerID = puppyData.buyerID;
                                 puppyData.buyerID = null;
                                 puppyData.paidAmount = 0;
+                                puppyData.sold = false;
                                 const buyerRef = admin.firestore().collection('buyers').doc(buyerID);
                                 await buyerRef.get()
                                     .then(async (buyerSnapshot) => {
