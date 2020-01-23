@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import * as siteLogo from '../../assets/img/site_logo.PNG';
 
 export default class Footer extends Component {
     render() {
@@ -9,7 +10,9 @@ export default class Footer extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="info col-lg-4">
-                                <div className="logo">Dog Team Dobermans Logo</div>
+                                <div className="logo" style={{width: "179px"}}>
+                                    <img src={siteLogo} alt={siteLogo} style={{width: "100%", filter: "invert(90%)"}}></img>
+                                </div>
                             </div>
                             <div className="site-links col-lg-2 col-md-6">
                                 <h5 className="text-uppercase">Site Map</h5>
