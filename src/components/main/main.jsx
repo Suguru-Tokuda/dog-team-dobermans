@@ -183,7 +183,7 @@ class Main extends Component {
                     <div className="container position-relative text-white text-center">
                         <div className="row">
                             <div className="col-xl-7 mx-auto">
-                                <h1 className="text-uppercase text-shadow letter-spacing-2 mb-4">Dog Team Dobermans</h1>
+                                <h1 className="text-uppercase text-shadow letter-spacing-0 mb-4">Dog Team Dobermans</h1>
                                 <hr className="bg-light m-5"></hr>
                                 <p className="lead mb-5">We breed quality dobermans.</p>
                             </div>
