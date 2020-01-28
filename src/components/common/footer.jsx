@@ -10,8 +10,8 @@ export default class Footer extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="info col-lg-4">
-                                <div className="logo" style={{width: "179px"}}>
-                                    <img src={siteLogo} alt={siteLogo} style={{width: "100%", filter: "invert(90%)"}}></img>
+                                <div className="logo">
+                                    <img src={siteLogo} style={{ width: "179px", filter: "invert(90%)" }} alt={siteLogo}></img>
                                 </div>
                             </div>
                             <div className="site-links col-lg-2 col-md-6">

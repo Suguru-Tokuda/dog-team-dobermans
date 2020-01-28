@@ -352,10 +352,6 @@ export const puppy = functions.https.onRequest((request, response) => {
                             .catch(err => {
                                 response.status(500).send(err);
                             });
-                    } else if (path === '/transaction') {
-                        // const buyerID = data.buyerID;
-                        // const payment = data.payment;
-                        // admin.firestore().collection('puppies').doc(puppyID)
                     }
                 } else if (request.method === 'PUT') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
@@ -376,7 +372,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                             const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.delete()
                                 .then(() => {
-                                    response.status(200);
+                                    response.sendStatus(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
@@ -437,7 +433,7 @@ export const parent = functions.https.onRequest((request, response) => {
     corsHeader(request, response, () => {
         const method = request.method;
         const query = request.query;
-        const id = query.parentID;
+        const parentID = query.parentID;
         const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send("Missing API key");
@@ -447,8 +443,8 @@ export const parent = functions.https.onRequest((request, response) => {
             } else if (query.key === getAPIKEY()) {
                 if (path === '/') {
                     if (method === 'GET') {
-                        if (id.length > 0) {
-                            const parentRef = admin.firestore().collection('parents').doc(id);
+                        if (parentID.length > 0) {
+                            const parentRef = admin.firestore().collection('parents').doc(parentID);
                             parentRef.get()
                                 .then(doc => {
                                     let retVal: any = {};
@@ -476,13 +472,13 @@ export const parent = functions.https.onRequest((request, response) => {
                                 response.sendStatus(500).send(err);
                             });
                     } else if (method === 'PUT') {
-                        if (id.length > 0) {
+                        if (parentID.length > 0) {
                             const data = request.body;
-                            const parentRef = admin.firestore().collection('parents').doc(id);
+                            const parentRef = admin.firestore().collection('parents').doc(parentID);
                             parentRef.set(data, { merge: true })
                                 .then(snapshot => {
                                     const retVal = data;
-                                    retVal.parentID = id;
+                                    retVal.parentID = parentID;
                                     response.status(200).send(retVal);
                                 })
                                 .catch(err => {
@@ -490,8 +486,8 @@ export const parent = functions.https.onRequest((request, response) => {
                                 });
                         }
                     } else if (method === 'DELETE') {
-                        if (id.length > 0) {
-                            const parentRef = admin.firestore().collection('parents').doc(id);
+                        if (parentID.length > 0) {
+                            const parentRef = admin.firestore().collection('parents').doc(parentID);
                             parentRef.delete()
                                 .then(res => {
                                     response.sendStatus(200);

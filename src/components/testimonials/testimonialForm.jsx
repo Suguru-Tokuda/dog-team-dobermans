@@ -83,13 +83,7 @@ class TestimonialForm extends Component {
 
     handleImageChange = (event) => {
         if (event.target.files && event.target.files[0]) {
-            const reader = new FileReader();
-            reader.addEventListener('load', () => {
-                this.setState({
-                    tempImageFile: reader.result
-                });
-            });
-            reader.readAsDataURL(event.target.files[0]);
+            this.setState({ tempImageFile: event.target.files[0] });
         }
         $('#picture-upload').val(null);
     }
@@ -267,10 +261,10 @@ class TestimonialForm extends Component {
                 </section>
                 <ImageCropModal 
                 aspect={1/1}
-                pictureFile={tempImageFile} 
+                imageFile={tempImageFile} 
                 onFinishImageCropping={this.handleFinishImageCropping.bind(this)}
-                onResetTempPictureFile={this.handleResetTempPictureFile} />
-
+                onResetTempPictureFile={this.handleResetTempPictureFile} 
+                />
             </React.Fragment>
         );
     }
