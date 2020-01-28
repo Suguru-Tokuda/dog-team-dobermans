@@ -158,7 +158,7 @@ class ImageCropModal extends Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={this.handleCancelBtnClicked}>Cancel</button>
-                            <button type="button" className="btn btn-primary" onClick={this.handleRotate}><i className="fa fa-rotate-right"></i>{` Rotate`}</button>
+                            <button type="button" className="btn btn-primary" onClick={this.handleRotate}><i className="fa fa-rotate-right"></i></button>
                             <button type="button" className="btn btn-success" disabled={croppedURL === '' || croppedURL === null} onClick={this.handleCropBtnClicked}>Finish</button>
                         </div>
                     </div>
