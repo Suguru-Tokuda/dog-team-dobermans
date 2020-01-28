@@ -352,10 +352,6 @@ export const puppy = functions.https.onRequest((request, response) => {
                             .catch(err => {
                                 response.status(500).send(err);
                             });
-                    } else if (path === '/transaction') {
-                        // const buyerID = data.buyerID;
-                        // const payment = data.payment;
-                        // admin.firestore().collection('puppies').doc(puppyID)
                     }
                 } else if (request.method === 'PUT') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
