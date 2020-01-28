@@ -376,7 +376,7 @@ export const puppy = functions.https.onRequest((request, response) => {
                             const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
                             puppyRef.delete()
                                 .then(() => {
-                                    response.status(200);
+                                    response.sendStatus(200);
                                 })
                                 .catch(err => {
                                     response.sendStatus(500).send(err);
