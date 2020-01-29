@@ -24,3 +24,5 @@ yarn-error.log*
 
 functions/src/*.json
 src/api.json
+
+.firebase
