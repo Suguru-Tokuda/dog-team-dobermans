@@ -51,7 +51,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                         </body>
                     </html>
         `;
-        sendEmail('suguru.tokuda@gmail.com', 'New Testimonial Submitted', htmlBody)
+        sendEmail('dogTeam@dogteamdobermans.com', 'New Testimonial Submitted', htmlBody)
             .then(() => {
                 resolve();
             })
