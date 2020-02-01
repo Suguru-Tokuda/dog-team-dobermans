@@ -23,7 +23,7 @@ class Main extends Component {
             .catch(err => {
                 console.log(err);
             });
-        ParentService.getLiveParentsForLimit(3)
+        ParentService.getLiveParentsForLimit(4)
             .then(res => {
                 this.setState({ parents: res.data });
             })
@@ -77,19 +77,34 @@ class Main extends Component {
         const { parents } = this.state;
         if (parents.length > 0) {
             const items = parents.map(parent => {
-                let imageUrl = '';
-                if (typeof parent.pictures !== 'undefined' && parent.pictures.length > 0) {
-                    imageUrl = parent.pictures[0].url;
-                }
                 return (
-                    <div className="col-lg-4" key={`our-dog-${parent.parentID}`}>
-                        <Link to={`/our-dogs/${parent.parentID}`}>
-                            <div style={{backgroundImage: `url(${imageUrl})`}} className="item d-flex align-items-end">
-                                <div className="content">
-                                    <h3 className="h5">{parent.name}</h3>
+                    <div key={`parent-${parent.parentID}`} className="item">
+                        <div className="product is-gray">
+                            <div className="image d-flex align-items-center justify-content-center">
+                                {typeof parent.pictures !== 'undefined' && parent.pictures.length > 0 && (
+                                    <img src={parent.pictures[0].url} alt={parent.pictures[0].reference} className="img-fluid"/>
+                                )}
+                                {(typeof parent.pictures === 'undefined' || (typeof parent.pictures !== 'undefined' && parent.pictures.length === 0)) && (
+                                    <React.Fragment>
+                                        <p>
+                                            <i className="fa fa-photo" style={{fontSize: '100px'}}></i>
+                                            {` `}
+                                            <i className="fa fa-ban" style={{fontSize: '50px'}}></i>
+                                        </p>
+                                    </React.Fragment>
+                                )}
+                                <div className="hover-overlay d-flex align-items-center justify-content-center">
+                                    <div className="CTA d-flex align-items-center justify-content-center">
+                                        <Link to={`/our-dogs/${parent.parentID}`} className="visit-product active"><i className="fa fa-search"></i>View</Link>
+                                    </div>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
+                        <div className="title">
+                            <Link to={`/our-dogs/${parent.parentID}`}>
+                                <h3 className="h6 text-uppercase no-margin-bottom text-center">{parent.name}</h3>
+                            </Link>
+                        </div>
                     </div>
                 );
             });
@@ -97,9 +112,11 @@ class Main extends Component {
                 <section className="categories">
                     <div className="container">
                         <header className="text-center">
-                            <h2 className="text-uppercase">Our Dogs</h2>
+                            <h2 className="text-uppercase">
+                                Our Dogs
+                            </h2>
                         </header>
-                        <div className="row text-left">
+                        <div data-slider-id="1" className="owl-carousel">
                             {items}
                         </div>
                     </div>
@@ -117,7 +134,18 @@ class Main extends Component {
                     <div key={`puppy-${puppy.puppyID}`} className="item">
                         <div className="product is-gray">
                             <div className="image d-flex align-items-center justify-content-center">
-                                <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
+                                {typeof puppy.pictures !== 'undefined' && puppy.pictures.length > 0 && (
+                                    <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid"/>
+                                )}
+                                {(typeof puppy.pictures === 'undefined' || (typeof puppy.pictures !== 'undefined' && puppy.pictures.length === 0)) && (
+                                    <React.Fragment>
+                                        <p>
+                                            <i className="fa fa-photo" style={{fontSize: '100px'}}></i>
+                                            {` `}
+                                            <i className="fa fa-ban" style={{fontSize: '50px'}}></i>
+                                        </p>
+                                    </React.Fragment>
+                                )}
                                 <div className="hover-overlay d-flex align-items-center justify-content-center">
                                     <div className="CTA d-flex align-items-center justify-content-center">
                                         <Link to={`/puppies/${puppy.puppyID}`} className="visit-product active"><i className="fa fa-search"></i>View</Link>
@@ -141,7 +169,7 @@ class Main extends Component {
                                 Pupppies
                             </h2>
                         </header>
-                        <div data-slider-id="1" className="owl-carousel">
+                        <div data-slider-id="2" className="owl-carousel">
                             {items}
                         </div>
                     </div>
@@ -183,7 +211,7 @@ class Main extends Component {
                     <div className="container position-relative text-white text-center">
                         <div className="row">
                             <div className="col-xl-7 mx-auto">
-                                <h1 className="text-uppercase text-shadow letter-spacing-0 mb-4">Dog Team Dobermans</h1>
+                                <h1 className="text-uppercase text-shadow letter-spacing mb-4">Dog Team Dobermans</h1>
                                 <hr className="bg-light m-5"></hr>
                                 <p className="lead mb-5">We breed quality dobermans.</p>
                             </div>
