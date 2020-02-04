@@ -84,7 +84,7 @@ class ContactuUs extends Component {
                                     <i className="fa fa-phone"></i>
                                 </div>
                                 <h3>Phone</h3>
-                                <p>Inqueries by phone calls are available between 9am to 5pm from Monday to Friday.</p>
+                                <p>Inqueries by phone calls are available between 9am to 5pm from Monday to Saturday.</p>
                                 <p><strong><a href={`tel:${phone}`}>{phone}</a></strong></p>
                             </div>
                         <div className="col-md-4">
@@ -92,7 +92,7 @@ class ContactuUs extends Component {
                                 <i className="fa fa-envelope-o"></i>
                             </div>
                             <h3>Email</h3>
-                            <p>Please feel free to reach out to us for inquiries about doberman puppies.</p>
+                            <p>Please feel free to contact us regarding Doberman puppies.</p>
                             <p><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
                             </div>
                         </div>

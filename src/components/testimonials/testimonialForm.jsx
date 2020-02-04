@@ -169,6 +169,8 @@ class TestimonialForm extends Component {
                 .finally(() => {
                     this.setState({ loading: false });
                 });
+        } else {
+            this.setState({ validations });
         }
     }
 
