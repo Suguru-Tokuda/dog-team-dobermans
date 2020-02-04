@@ -749,31 +749,47 @@ export const testimonials = functions.https.onRequest((request, response) => {
         const path = request.path;
         const method = request.method;
         if (typeof query.key === 'undefined') {
-                response.status(400).send('Missing API key');
+            response.status(400).send('Missing API key');
         } else if (query.key === getAPIKEY()) {
             if (path === '/') {
                 if (method === 'GET') {
-                    admin.firestore().collection('testimonials').get()
-                        .then(querySnapshot => {
-                            const testimonialsArr: any = [];
-                            if (querySnapshot.size > 0) {
-                                querySnapshot.forEach((doc) => {
-                                    const testimonial = doc.data();
-                                    testimonial.testimonialID = doc.id;
-                                    if (typeof query.approved !== 'undefined' && query.approved === 'true') {
-                                        if (testimonial.approved === true) {
+                    if (query.testimonialID) {
+                        const testimonialID = query.testimonialID;
+                        if (typeof testimonialID !== 'undefined') {
+                                admin.firestore().collection('testimonials').doc(testimonialID).get()
+                                    .then(doc => {
+                                        const retVal = doc.data();
+                                        response.status(200).send(retVal);
+                                    })
+                                    .catch(err => {
+                                        response.status(500).send(err);
+                                    });
+                        } else {
+                            response.status(500).send('Missing testimonialID');
+                        }
+                    } else {
+                        admin.firestore().collection('testimonials').get()
+                            .then(querySnapshot => {
+                                const testimonialsArr: any = [];
+                                if (querySnapshot.size > 0) {
+                                    querySnapshot.forEach((doc) => {
+                                        const testimonial = doc.data();
+                                        testimonial.testimonialID = doc.id;
+                                        if (typeof query.approved !== 'undefined' && query.approved === 'true') {
+                                            if (testimonial.approved === true) {
+                                                testimonialsArr.push(testimonial);
+                                            }
+                                        } else {
                                             testimonialsArr.push(testimonial);
                                         }
-                                    } else {
-                                        testimonialsArr.push(testimonial);
-                                    }
-                                });
-                            }
-                            response.status(200).send(testimonialsArr)
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
+                                    });
+                                }
+                                response.status(200).send(testimonialsArr)
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    }
                 } else if (method === 'POST') {
                     const data = request.body;
                     admin.firestore().collection('testimonials').add(data)
@@ -789,6 +805,8 @@ export const testimonials = functions.https.onRequest((request, response) => {
                     const testimonialID = query.testimonialID;
                     if (typeof testimonialID !== 'undefined' && testimonialID.length > 0) {
                         const data = request.body;
+                        if (data.testimonialID)
+                            delete data.testimonialID;
                         const testimonialRef = admin.firestore().collection('testimonials').doc(testimonialID);
                         testimonialRef.set(data, { merge: true })
                             .then(() => {
@@ -942,6 +960,8 @@ export const waitList = functions.https.onRequest((request, response) => {
                     const waitRequestID = query.waitRequestID;
                     if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
                         const data = request.body;
+                        if (data.waitRequestID)
+                            delete data.waitRequestID;
                         const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
                         waitRequestRef.set(data, { merge: true })
                             .then(() => {
@@ -956,16 +976,19 @@ export const waitList = functions.https.onRequest((request, response) => {
                         response.status(400).send('Missing waitRequestID');
                     }
                 } else if (method === 'DELETE') {
-                    const waitRequestID = query.waitRequestID;
-                    if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
-                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
-                        waitRequestRef.delete()
-                            .then(() => {
-                                response.sendStatus(200);
-                            })
-                            .catch(err => {
-                                response.status(500).send(err);
+                    const waitRequestIDs: Array<string> = request.body.waitRequestIDs;
+                    if (typeof waitRequestIDs !== 'undefined' && waitRequestIDs.length > 0) {
+                        try {
+                            waitRequestIDs.forEach(async (waitRequestID) => {
+                                if (typeof waitRequestID !== 'undefined') {
+                                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                                    await waitRequestRef.delete();
+                                }
                             });
+                            response.sendStatus(200);
+                        } catch (err) {
+                            response.status(500).send(err);
+                        }
                     } else {
                         response.status(400).send('Invalid ID');
                     }
