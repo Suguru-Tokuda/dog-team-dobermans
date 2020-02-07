@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
+import UtilService from '../../services/utilService';
 import WaitListForm from './waitListForm';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
 import * as api from '../../api.json';
@@ -85,7 +86,7 @@ class ContactuUs extends Component {
                                 </div>
                                 <h3>Phone</h3>
                                 <p>Inqueries by phone calls are available between 9am to 5pm from Monday to Friday.</p>
-                                <p><strong><a href={`tel:${phone}`}>{phone}</a></strong></p>
+                                <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
                             </div>
                         <div className="col-md-4">
                             <div className="contact-icon">
