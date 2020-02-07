@@ -148,7 +148,13 @@ class ParentDetail extends Component {
                 </React.Fragment> 
             );
         } else {
-            return null;
+            return (
+                <p className="text-center">
+                    <i className="fa fa-photo" style={{fontSize: '100px'}}></i>
+                    {' '}
+                    <i className="fa fa-ban" style={{fontSize: '50px'}}></i>
+                </p>
+            );
         }
     }
 

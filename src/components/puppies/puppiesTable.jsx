@@ -110,7 +110,18 @@ class PuppiesTable extends Component {
                                 {puppy.sold === true && ( 
                                     <div className="ribbon ribbon-danger text-uppercase">Sold</div>
                                 )}
-                                <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
+                                {typeof puppy.pictures !== 'undefined' && puppy.pictures.length > 0 && (
+                                    <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
+                                )}
+                                {(typeof puppy.pictures === 'undefined' || (typeof puppy.pictures !== 'undefined' && puppy.pictures.length === 0)) && (
+                                    <React.Fragment>
+                                        <p>
+                                            <i className="fa fa-photo" style={{fontSize: '100px'}}></i>
+                                            {' '}
+                                            <i className="fa fa-ban" style={{fontSize: '50px'}}></i>
+                                        </p>
+                                    </React.Fragment>
+                                )}
                                 <div className="hover-overlay d-flex align-items-center justify-content-center">
                                     <Link className="visit-product active" to={`/puppies/${puppy.puppyID}`}><i className="icon-search"></i>View</Link>
                                 </div>
