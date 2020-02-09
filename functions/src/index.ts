@@ -229,6 +229,8 @@ export const puppies = functions.https.onRequest((request, response) => {
                                 puppyData.buyerID = transactionData.buyerID;
                                 puppyData.paidAmount += transactionData.paidAmount;
                                 puppyData.sold = true;
+                                if (puppyData.soldDate === null)
+                                    puppyData.soldDate = new Date();
                                 await puppyRef.set(puppyData, { merge: true });
                             }
                         })
@@ -606,7 +608,7 @@ export const buyer = functions.https.onRequest((request, response) => {
 });
 
 export const buyers = functions.https.onRequest((request, response) => {
-    corsHeader(request, response, () => {
+    corsHeader(request, response, async () => {
         const query = request.query;
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
@@ -614,21 +616,42 @@ export const buyers = functions.https.onRequest((request, response) => {
             if (query.key !== getAPIKEY()) {
                 response.status(400).send('Incorrect API key');
             } else if (query.key === getAPIKEY()) {
-                admin.firestore().collection('buyers').get()
-                    .then(querySnapshot => {
-                        const buysersArr: any = [];
-                        if (querySnapshot.size > 0) {
-                            querySnapshot.forEach((doc) => {
-                                const retVal = doc.data();
-                                retVal.buyerID = doc.id;
-                                buysersArr.push(retVal);
-                            });
-                        }
-                        response.status(200).send(buysersArr);
-                    })
-                    .catch(err => {
-                        response.status(500).send(err);
-                    });
+                try {
+                    const buyersQuerySnapshot = await admin.firestore().collection('buyers').get();
+                    const buyersArray: any = [];
+                    if (buyersQuerySnapshot.size > 0) {
+                        buyersQuerySnapshot.forEach(async (buyerDoc) => {
+                            const retVal = buyerDoc.data();
+                            retVal.buyerID = buyerDoc.id;
+                            let hasPartialPayment = false;
+                            const puppiesData: any[] = [];
+                            admin.firestore().collection('puppies').where('buyerID', '==', retVal.buyerID).get()
+                                .then(puppiesSnapshot => {
+                                    if (puppiesSnapshot.size > 0) {
+                                        puppiesSnapshot.forEach(puppyDoc => {
+                                            const puppyDataPiece = puppyDoc.data();
+                                            puppyDataPiece.puppyID = puppyDoc.id;
+                                            puppiesData.push(puppyDataPiece);
+                                            if (puppyDataPiece.price !== puppyDataPiece.paidAmount)
+                                                hasPartialPayment = true;
+                                        });
+                                    }
+                                    retVal.hasPartialPayment = hasPartialPayment;
+                                    retVal.puppies = puppiesData;
+                                    buyersArray.push(retVal);
+                                    if (buyersArray.length === buyersQuerySnapshot.size) {
+                                        response.status(200).send(buyersArray);
+                                    }        
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                });
+                        });
+                    }
+                }
+                catch (err) {
+                    response.status(500).send(err);
+                }
             }
         }
     });
