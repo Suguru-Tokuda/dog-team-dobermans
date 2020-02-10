@@ -102,15 +102,14 @@ class TestimonialForm extends Component {
     }
 
     handleFinishImageCropping = (newFile) => {
-        const { selections, validations } = this.state;
+        const { selections } = this.state;
         selections.picture = newFile;
         const newImageURL = URL.createObjectURL(newFile);
         const { imageURL } = this.state;
         if (imageURL !== '') {
             URL.revokeObjectURL(imageURL);
         }
-        delete validations.picture;
-        this.setState({ selections, validations, imageURL: newImageURL });
+        this.setState({ selections, imageURL: newImageURL });
     }
 
     handleResetTempPictureFile = () => {
@@ -124,12 +123,9 @@ class TestimonialForm extends Component {
         let isValid = true;
         const selectionKeys = Object.keys(selections);
         selectionKeys.forEach(key => {
-            if (selections[key] === '' || selections[key] === null) {
+            if (selections[key] === '' || selections[key] === null && key !== 'picture') {
                 isValid = false;
-                if (key === 'picture')
-                    validations[key] = `Select ${key}`;
-                else
-                    validations[key] = `Enter ${key}`;
+                validations[key] = `Enter ${key}`;
             } else {
                 delete validations[key];
             }
@@ -227,17 +223,11 @@ class TestimonialForm extends Component {
                                     </div>
                                     <div className="row">
                                         <div className="col-sm-6">
-                                            <label>Picture of you and your dog</label><br />
+                                            <label>Picture of your dog (optional)</label><br />
                                             <label htmlFor="picture-upload" className="btn btn-primary">
                                                 <i className="fa fa-picture-o"></i> Select
                                             </label>
                                             <input id="picture-upload" type="file" accept="image/*" onChange={this.handleImageChange} />
-                                            {formSubmitted === true && validations.picture && (
-                                                <React.Fragment>
-                                                    <br />
-                                                    <small className="text-danger">Select picture</small>
-                                                </React.Fragment>
-                                            )}
                                         </div>
                                         {imageURL !== '' && (
                                             <div className="col-sm-6">
