@@ -144,13 +144,13 @@ class ImageCropModal extends Component {
                             <div className="row">
                                 <div className="col-6">
                                     <div className="img-container">
-                                        <img id="originalImage" src={imageURL} />
+                                        <img id="originalImage" src={imageURL} alt={imageURL} />
                                     </div>
                                 </div>
                                 <div className="col-6">
                                     {croppedURL !== null && (
                                         <div className="img-container">
-                                            <img src={croppedURL} />
+                                            <img src={croppedURL} alt={croppedURL} />
                                         </div>
                                     )}
                                 </div>
