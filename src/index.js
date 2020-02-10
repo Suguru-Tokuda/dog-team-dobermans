@@ -11,6 +11,7 @@ import 'owl.carousel/dist/assets/owl.carousel.css';
 import 'toastr/build/toastr.min.css';
 import './assets/css/style.default.css';
 import 'cropperjs/dist/cropper.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import './index.css';
 import 'jquery';
 import 'popper.js';

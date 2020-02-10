@@ -105,6 +105,17 @@ class WaitListForm extends Component {
         this.setState({ selections, validations });
     }
 
+    handleSelectExpectedPurchaseDate = (expectedPurchaseDate) => {
+        const { selections, validations } = this.state;
+        selections.expectedPurchaseDate = expectedPurchaseDate;
+        if (expectedPurchaseDate !== null) {
+            validations.expectedPurchaseDate = '';
+        } else {
+            validations.expectedPurchaseDate = 'Enter expected purchase date';
+        }
+        this.setState({ selections, validations });
+    }
+
     handleSetMessage = (event) => {
         const message = event.target.value;
         const { selections, validations } = this.state;
@@ -173,7 +184,7 @@ class WaitListForm extends Component {
 
     render() {
         const { selections, validations, loading, formSubmitted } = this.state;
-        const { firstName, lastName, email, phone, message, color } = selections;
+        const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
         return (
             <section>
                 <div className="container">
@@ -234,6 +245,11 @@ class WaitListForm extends Component {
                                             {formSubmitted === true && validations.color && (
                                                     <small className="text-danger">{validations.color}</small>
                                             )}
+                                        </div>
+                                        <div className="col-sm-6">
+                                            <label className="form-label">Expected Purchase Date *</label><br/>
+                                            <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} />
+                                            <br />{formSubmitted === true && validations.expectedPurchaseDate && (<small className="text-danger">{validations.expectedPurchaseDate}</small>)}
                                         </div>
                                     </div>
                                     <div className="form-group">
