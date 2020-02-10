@@ -3,6 +3,7 @@ import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import ValidationService from '../../services/validationService';
 import WaitListService from '../../services/waitListService';
 import toastr from 'toastr';
+import DatePicker from 'react-datepicker';
 
 class WaitListForm extends Component {
     state = {
@@ -13,6 +14,7 @@ class WaitListForm extends Component {
             phone: '',
             message: '',
             color: '',
+            expectedPurchaseDate: null
         },
         validations: {},
         formSubmitted: false,
@@ -136,12 +138,16 @@ class WaitListForm extends Component {
         let isValid = true;
         const selectionKeys = Object.keys(selections);
         selectionKeys.forEach(key => {
-            if (selections[key] === '') {
+            if (selections[key] === '' || selections[key] === null) {
                 isValid = false;
-                if (key === 'color')
+                if (key === 'color') {
                     validations[key] = `Select ${key}`;
-                else
+
+                } else if (key === 'expectedPurchaseDate') {
+                    validations[key] = `Select Expected Purchase Date`;
+                } else {
                     validations[key] = `Enter ${key}`;
+                }
             } else {
                 delete validations[key];
             }
@@ -158,9 +164,9 @@ class WaitListForm extends Component {
             }
         });
         if (isValid === true) {
-            const { firstName, lastName, email, phone, message, color } = selections;
+            const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
             this.setState({ loading: true });
-            WaitListService.createWaitRequest(firstName, lastName, email.toLowerCase(), phone, message, color, new Date())
+            WaitListService.createWaitRequest(firstName, lastName, email.toLowerCase(), phone, message, color, expectedPurchaseDate, new Date())
                 .then(() => {
                     toastr.success('Request submitted!');
                     const selections = {
@@ -170,6 +176,7 @@ class WaitListForm extends Component {
                         phone: '',
                         message: '',
                         color: '',
+                        expectedPurchaseDate: null
                     };
                     this.setState({selections, formSubmitted: false });
                 })
@@ -248,7 +255,7 @@ class WaitListForm extends Component {
                                         </div>
                                         <div className="col-sm-6">
                                             <label className="form-label">Expected Purchase Date *</label><br/>
-                                            <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} />
+                                            <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} minDate={new Date()} />
                                             <br />{formSubmitted === true && validations.expectedPurchaseDate && (<small className="text-danger">{validations.expectedPurchaseDate}</small>)}
                                         </div>
                                     </div>
