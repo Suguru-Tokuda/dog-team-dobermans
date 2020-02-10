@@ -20,7 +20,8 @@ class ContactuUs extends Component {
         lastName: '',
         phone: '',
         state: '',
-        street: ''
+        street: '',
+        zip: ''
     };
 
     componentDidMount() {
@@ -34,7 +35,8 @@ class ContactuUs extends Component {
                     lastName: contactInfo.lastName,
                     phone: contactInfo.phone,
                     state: contactInfo.state,
-                    street: contactInfo.street
+                    street: contactInfo.street,
+                    zip: contactInfo.zip
                 });
             })
             .catch(err => {
@@ -67,8 +69,8 @@ class ContactuUs extends Component {
     }
 
     getMain() {
-        const { city, email, phone, state, street } = this.state;
-        if (city !== '' && email !== '' && phone !== '' && state !== '' && street !== '') {
+        const { city, email, phone, state, street, zip } = this.state;
+        if (city !== '' && email !== '' && phone !== '' && state !== '' && street !== '' && zip !== '') {
             return (
                 <section className="contact">
                     <div className="container">
@@ -78,7 +80,7 @@ class ContactuUs extends Component {
                                     <i className="fa fa-map-o"></i>
                                 </div>
                                 <h3>Address</h3>
-                                <p>{street}<br/>{city} {state}</p>
+                                <p>{street}<br/>{city} {state}<br/>{zip}</p>
                             </div>
                             <div className="col-md-4">
                                 <div className="contact-icon">
