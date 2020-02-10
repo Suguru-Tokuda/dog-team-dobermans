@@ -143,7 +143,14 @@ class TestimonialForm extends Component {
         if (isValid === true) { 
             const { firstName, lastName, dogName, email, message, picture } = selections;
             this.setState({ loading: true });
-            const image = await TestimonialService.uploadPicture(picture, dogName);
+            let image = null;
+            if (picture !== null) {
+                try {
+                    image = await TestimonialService.uploadPicture(picture, dogName);
+                } catch (err) {
+                    console.log(err);
+                }
+            }
             TestimonialService.createTestimonial(firstName, lastName, dogName, email.toLowerCase(), message, image, new Date())
                 .then(() => {
                     toastr.success('Thanks for submitting a testimonial! We will review it within a coule business days.');
