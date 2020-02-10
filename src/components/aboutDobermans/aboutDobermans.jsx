@@ -8,6 +8,7 @@ class AboutDobermans extends Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         AboutDobermanService.getAboutDobermans()
             .then(res => {
                 this.setState({

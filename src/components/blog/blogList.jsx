@@ -11,6 +11,7 @@ class BlogList extends Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         BlogService.getAllBlogs()
             .then(res => {
                 this.setState({ blogs: res.data });

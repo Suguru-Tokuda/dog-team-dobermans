@@ -16,6 +16,7 @@ class Main extends Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         PuppyService.getLivePuppiesForLimit(10)
             .then(res => {
                 this.setState({ puppies: res.data });

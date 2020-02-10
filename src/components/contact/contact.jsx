@@ -25,6 +25,7 @@ class ContactuUs extends Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         ContactService.getContact()
             .then(res => {
                 const contactInfo = res.data;

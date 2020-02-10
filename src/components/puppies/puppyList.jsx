@@ -10,7 +10,7 @@ class PuppyList extends Component {
     };
 
     componentDidMount() {
-        PuppyService.getAllPuppies()
+        PuppyService.getAllLivePuppies()
             .then(res => {
                 this.setState({ puppies: res.data });
             })

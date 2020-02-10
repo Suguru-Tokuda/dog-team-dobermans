@@ -123,7 +123,7 @@ class TestimonialForm extends Component {
         let isValid = true;
         const selectionKeys = Object.keys(selections);
         selectionKeys.forEach(key => {
-            if (selections[key] === '' || selections[key] === null && key !== 'picture') {
+            if ((selections[key] === '' || selections[key] === null) && key !== 'picture') {
                 isValid = false;
                 validations[key] = `Enter ${key}`;
             } else {

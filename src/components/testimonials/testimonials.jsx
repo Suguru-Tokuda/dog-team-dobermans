@@ -4,6 +4,10 @@ import TestimonialList from './testimonialList';
 import TestimonialForm from './testimonialForm';
 
 class Testimonials extends Component {
+    componentDidMount() {
+        window.scrollTo(0, 0);
+    }
+    
     getHeader() {
         return (
             <section className="hero hero-page gray-bg padding-small">
