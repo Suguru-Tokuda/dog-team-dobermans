@@ -19,7 +19,7 @@ function getConfig() {
     return parsedJSON.office;
 }
 
-function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string, picture: any) {
+function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string) {
     return new Promise((resolve, reject) => {
         const htmlBody = `
                     <!DOCTYPE html>
@@ -42,10 +42,6 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                                 <tr>
                                     <th>Dog name</th>
                                     <td>${dogName}</td>
-                                </tr>
-                                <tr>
-                                    <th>Picture</th>
-                                    <td><img src="${picture.url}" alt="${picture.reference}" /></td>
                                 </tr>
                             </table>
                         </body>
@@ -821,8 +817,8 @@ export const testimonials = functions.https.onRequest((request, response) => {
                     const data = request.body;
                     admin.firestore().collection('testimonials').add(data)
                         .then(async () => {
-                            const { firstName, lastName, dogName, email, picture } = data;
-                            await notifyNewTestimonial(firstName, lastName, dogName, email, picture);
+                            const { firstName, lastName, dogName, email } = data;
+                            await notifyNewTestimonial(firstName, lastName, dogName, email);
                             response.sendStatus(201);
                         })
                         .catch(err => {
@@ -1009,7 +1005,11 @@ export const waitList = functions.https.onRequest((request, response) => {
                             waitRequestIDs.forEach(async (waitRequestID) => {
                                 if (typeof waitRequestID !== 'undefined') {
                                     const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
-                                    await waitRequestRef.delete();
+                                    try {
+                                        await waitRequestRef.delete();
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
                                 }
                             });
                             response.sendStatus(200);
