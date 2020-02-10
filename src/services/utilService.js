@@ -23,7 +23,7 @@ export default class UtilService {
         if (typeof phone !== 'undefined' && phone !== null) {
             const firstPart = phone.substring(0, 3);
             const secondPart = phone.substring(3, 6);
-            const thirdPart = phone.substirng(6, 10);
+            const thirdPart = phone.substring(6, 10);
             return `${firstPart}-${secondPart}-${thirdPart}`;
         } else {
             return '';
