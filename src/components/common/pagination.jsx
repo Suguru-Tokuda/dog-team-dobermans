@@ -89,28 +89,28 @@ class Pagination extends Component {
         if (this.state.totalItems > 0) {
             const paginationItems = this.state.paginationInfo.pages.map(page => 
                 <li key={page} className="page-item" onClick={() => this.handlePageChange(page)}>
-                    <a href="/#" className={`page-link ${this.getPageItemClass(page)}`}>{page}</a>
+                    <a className={`page-link ${this.getPageItemClass(page)}`}>{page}</a>
                 </li>
             );
             return (
                 <nav aria-label="pagination" className="d-flex justify-content-center">
                     <ul className="pagination pagination-custom">
                         <li className="page-item" onClick={() => this.handlePageChange(1)}>
-                            <a href="/#" className={`page-link ${this.getFirstBtnClass()}`} aria-label="First">First</a>
+                            <a className={`page-link ${this.getFirstBtnClass()}`} aria-label="First">First</a>
                         </li>
                         <li className="page-item" onClick={() => this.handlePageChange(this.state.currentPage - 1)}>
-                            <a href="/#" className={`page-link ${this.getFirstBtnClass()}`}>
+                            <a className={`page-link ${this.getFirstBtnClass()}`}>
                                 <span aria-hidden="true">«</span>
                             </a>
                         </li>
                         {paginationItems}
                         <li className="page-item" onClick={() => this.handlePageChange(this.state.currentPage + 1)}>
-                            <a href="/#" className={`page-link ${this.getLastBtnClass()}`}>
+                            <a className={`page-link ${this.getLastBtnClass()}`}>
                                 <span aria-hidden="true">»</span>
                             </a>
                         </li>
                         <li className="page-item" onClick={() => this.handlePageChange(this.state.paginationInfo.totalPages)}>
-                            <a href="/#" className={`page-link ${this.getLastBtnClass()}`}>Last</a>
+                            <a className={`page-link ${this.getLastBtnClass()}`}>Last</a>
                         </li>
                     </ul>
                 </nav>

@@ -138,7 +138,7 @@ class WaitListForm extends Component {
         let isValid = true;
         const selectionKeys = Object.keys(selections);
         selectionKeys.forEach(key => {
-            if (selections[key] === '' || selections[key] === null) {
+            if ((selections[key] === '' || selections[key] === null) && key !== 'color') {
                 isValid = false;
                 if (key === 'color') {
                     validations[key] = `Select ${key}`;
@@ -193,7 +193,7 @@ class WaitListForm extends Component {
         const { selections, validations, loading, formSubmitted } = this.state;
         const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
         return (
-            <section>
+            <section id="waitListForm">
                 <div className="container">
                     <header className="mb-5">
                         <h2 className="heading-line">Wait list form</h2>
@@ -244,14 +244,11 @@ class WaitListForm extends Component {
                                     </div>
                                     <div className="row">
                                         <div className="col-sm-6">
-                                            <label htmlFor="color" className={`form-label`}>Color *</label>
-                                            <select className={`form-control ${this.getFormClass('color')}`} name="color" id="color" value={color} onChange={this.handleSetColor}>
+                                            <label htmlFor="color" className={`form-label`}>Color</label>
+                                            <select className={`form-control`} name="color" id="color" value={color} onChange={this.handleSetColor}>
                                                 <option>--Select color for puppy--</option>
                                                 {this.getColorOptions()}
                                             </select>
-                                            {formSubmitted === true && validations.color && (
-                                                    <small className="text-danger">{validations.color}</small>
-                                            )}
                                         </div>
                                         <div className="col-sm-6">
                                             <label className="form-label">Expected Purchase Date *</label><br/>

@@ -30,7 +30,7 @@ class OurTeam extends Component {
                             <h3 className="h5">{member.name}</h3>
                             <p className="role">{member.title}</p>
                             <div className="text">
-                                <p>{member.description}</p>
+                                <p style={{textAlign: "left"}}>{member.description}</p>
                             </div>
                         </div>
                     </div>

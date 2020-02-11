@@ -76,12 +76,12 @@ class PuppiesTable extends Component {
         const { paginationInfo } = this.state;
         return (
             <header className="d-flex justify-content-between align-items-start">
-                <span className="visible-items">
+                {/* <span className="visible-items">
                     {`Showing `}
                     <strong>{`${paginationInfo.startIndex + 1}-${paginationInfo.endIndex + 1}`}</strong>
                     {` of `}
                     <strong>{`${paginationInfo.totalItems}`}</strong>
-                </span>
+                </span> */}
             </header>
         );
     }

@@ -92,7 +92,7 @@ class TestimonialsTable extends Component {
                 return (
                     <div className="row review" key={`testimonial-${i}`}>
                         <div className="col-3 text-center">
-                            {typeof testimonial.picture !== 'undefined' && testimonial.picture !== null (
+                            {testimonial.picture !== 'undefined' && testimonial.picture !== null && (
                                 <img src={testimonial.picture.url} alt={testimonial.picture.reference} className="review-image" />
                             )}
                             <span>{moment(testimonial.created).format('MMM YYYY').toUpperCase()}</span>

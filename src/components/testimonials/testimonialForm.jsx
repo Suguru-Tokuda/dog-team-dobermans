@@ -182,7 +182,7 @@ class TestimonialForm extends Component {
         const { firstName, lastName, dogName, email, message } = selections;
         return (
             <React.Fragment>
-                <section>
+                <section id="testimonialForm">
                     <header><h2 className="heading-line">Testimonial form</h2></header>
                     <div className="row">
                         <div className="col-md-7">
@@ -249,7 +249,7 @@ class TestimonialForm extends Component {
                                             <small className="text-danger">{validations.message}</small>
                                         )}
                                     </div>
-                                    <LaddaButton className="btn btn-primary" loading={loading} onClick={this.handleSubmitForm} data-size={S} data-style={SLIDE_LEFT}>Send Request</LaddaButton>
+                                    <LaddaButton className="btn btn-primary" loading={loading} onClick={this.handleSubmitForm} data-size={S} data-style={SLIDE_LEFT}>Send Testimonial</LaddaButton>
                                 </div>
                             </form>
                         </div>

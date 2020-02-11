@@ -5,6 +5,7 @@ import * as serviceWorker from './serviceWorker';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 import 'bootstrap-select/dist/css/bootstrap-select.min.css';
 import 'nouislider/distribute/nouislider.min.css';
 import 'owl.carousel/dist/assets/owl.carousel.css';

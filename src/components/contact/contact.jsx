@@ -5,6 +5,7 @@ import UtilService from '../../services/utilService';
 import WaitListForm from './waitListForm';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
 import * as api from '../../api.json';
+import $ from 'jquery';
 
 function Map() {
     return <GoogleMap defaultZoom={12} defaultCenter={{ lat: 39.891180, lng: -89.854590 }} ><Marker position={{ lat: 39.891180, lng: -89.854590 }} /></GoogleMap>;
@@ -51,7 +52,7 @@ class ContactuUs extends Component {
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-1">
-                            <h1>Contact</h1>
+                            <h1>Contact / Request a Puppy</h1>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
@@ -76,29 +77,36 @@ class ContactuUs extends Component {
                 <section className="contact">
                     <div className="container">
                         <div className="row">
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                                 <div className="contact-icon">
-                                    <i className="fa fa-map-o"></i>
+                                    <i className="far fa-map"></i>
                                 </div>
                                 <h3>Address</h3>
                                 <p>{street}<br/>{city} {state}<br/>{zip}</p>
                             </div>
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                                 <div className="contact-icon">
                                     <i className="fa fa-phone"></i>
                                 </div>
                                 <h3>Phone</h3>
-                                <p>Inqueries by phone calls are available between 9am to 5pm from Monday to Saturday.</p>
+                                <p>You may contact us Monday-Saturday from 9am - 6pm</p>
                                 <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
 
                             </div>
-                        <div className="col-md-4">
+                            <div className="col-md-3">
                             <div className="contact-icon">
-                                <i className="fa fa-envelope-o"></i>
+                                <i className="far fa-envelope"></i>
                             </div>
                             <h3>Email</h3>
                             <p>Please feel free to contact us regarding Doberman puppies.</p>
                             <p><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
+                            </div>
+                            <div className="col-md-3">
+                                <div className="contact-icon">
+                                    <i className="fas fa-dog"></i>
+                                </div>
+                                <h3>Request</h3>
+                                <p>Please <a style={{color: 'purple'}} onClick={this.handleToNavigateToTheForm}>click here</a> to scroll to the bottom of this page to request that you be added to our wait list</p>
                             </div>
                         </div>
                     </div>
@@ -120,6 +128,14 @@ class ContactuUs extends Component {
                 />
             </div>
         );
+    }
+
+    handleToNavigateToTheForm = () => {
+        $(document).ready(() => {
+            $('html, body').animate({
+                scrollTop: $('#waitListForm').offset().top
+            }, 1000)
+        });
     }
 
     render() {

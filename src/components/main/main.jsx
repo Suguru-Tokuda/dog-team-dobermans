@@ -17,20 +17,20 @@ class Main extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
-        PuppyService.getLivePuppiesForLimit(10)
-            .then(res => {
-                this.setState({ puppies: res.data });
-            })
-            .catch(err => {
-                console.log(err);
-            });
-        ParentService.getLiveParentsForLimit(4)
-            .then(res => {
-                this.setState({ parents: res.data });
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        // PuppyService.getLivePuppiesForLimit(10)
+        //     .then(res => {
+        //         this.setState({ puppies: res.data });
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //     });
+        // ParentService.getLiveParentsForLimit(4)
+        //     .then(res => {
+        //         this.setState({ parents: res.data });
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //     });
         HomepageContentsService.getHomepageContents()
             .then(async (res) => {
                 const homepageContentsData = res.data;
@@ -122,7 +122,7 @@ class Main extends Component {
                         </div>
                     </div>
                 </section>
-            )
+            );
         }
         return null;
     }
@@ -214,13 +214,13 @@ class Main extends Component {
                             <div className="col-xl-7 mx-auto">
                                 <h1 className="text-uppercase text-shadow letter-spacing mb-4">Dog Team Dobermans</h1>
                                 <hr className="bg-light m-5"></hr>
-                                <p className="lead mb-5">We breed quality dobermans.</p>
+                                <p className="lead mb-5">We breed quality Dobermans.</p>
                             </div>
                         </div>
                     </div>
                 </section>
-                {this.getOurDogs()}
-                {this.getPuppies()}
+                {/* {this.getOurDogs()}
+                {this.getPuppies()} */}
                 {this.getBanner()}
                 {news !== '' && (
                     <section className="blog">
