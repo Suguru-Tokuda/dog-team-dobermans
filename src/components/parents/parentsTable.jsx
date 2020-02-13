@@ -79,9 +79,9 @@ class ParentsTable extends Component {
             <header className="d-flex justify-content-between align-items-start">
                 {/* <span className="visible-items">
                     {`Showing `}
-                    <strong>{`${paginationInfo.startIndex + 1}-${paginationInfo.endIndex + 1}`}</strong>
+                    <strong>{`${paginationInfo.startIndex + 1} to ${paginationInfo.endIndex + 1}`}</strong>
                     {` of `}
-                    <strong>{`${paginationInfo.totalItems}`}</strong>
+                    <strong>{`${paginationInfo.totalItems} results`}</strong>
                 </span> */}
             </header>
         );

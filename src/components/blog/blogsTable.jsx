@@ -119,7 +119,7 @@ class BlogsTable extends Component {
                                 <p>{blog.message}</p>
                                 <Link className="read-more" to={`/blog/${blog.blogID}`}>
                                     Read More
-                                    <i className="fa fa-long-arrow-right"></i>
+                                    <i className="fas fa-long-arrow-alt-right"></i>
                                 </Link>
                             </div>
                         </div>
