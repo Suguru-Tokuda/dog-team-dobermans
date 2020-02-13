@@ -2,17 +2,24 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PuppiesTable from './puppiesTable';
 import PuppyService from '../../services/puppyService';
+import HomepageContentsService from '../../services/homepageContentsService';
 
 class PuppyList extends Component {
     state = {
         puppies: [],
+        puppyUnavailableMessage: '',
         loaded: false
     };
 
     componentDidMount() {
-        PuppyService.getAllLivePuppies()
+        const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyUnavailableMessage()];
+        Promise.all(promises)
             .then(res => {
-                this.setState({ puppies: res.data });
+                console.log(res);
+                this.setState({ 
+                    puppies: res[0].data, 
+                    puppyUnavailableMessage: res[1].data
+                 });
             })
             .catch(err => {
                 console.log(err);
@@ -47,11 +54,11 @@ class PuppyList extends Component {
     }
 
     getPuppyList() {
-        const { puppies, loaded } = this.state;
+        const { puppies, puppyUnavailableMessage, loaded } = this.state;
         if (puppies.length > 0 && loaded === true) {
             return <PuppiesTable {...this.props} puppies={puppies} />;
         } else if (puppies.length === 0 && loaded === true) {
-            return <p style={{marginTop: "100px", marginBottom: "500px"}}>No puppies available at the moment...</p>
+            return <div style={{marginTop: "100px", marginBottom: "500px"}} dangerouslySetInnerHTML={{__html: puppyUnavailableMessage }}></div>
         } else {
             return <div style={{marginTop: "800px"}}></div>;
         }
