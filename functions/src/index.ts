@@ -81,39 +81,51 @@ export const homepageContents = functions.https.onRequest((request, response) =>
     corsHeader(request, response, () => {
         const query = request.query;
         const method = request.method;
+        const path = request.path;
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else {
             if (query.key !== getAPIKEY()) {
                 response.status(400).send('Incorrect API key');
             } else if (query.key === getAPIKEY()) {
-                if (method === 'GET') {
-                    admin.firestore().collection('homepageContents').get()
-                        .then(querySnapshot => {
-                            if (querySnapshot.size > 0) {
-                                response.status(200).send(querySnapshot.docs[0].data());
-                            } else {
-                                response.sendStatus(200);
-                            }
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
-                } else if (method === 'PUT') {
-                    const homepageContentData = request.body;
-                    admin.firestore().collection('homepageContents').get()
-                        .then(async (querySnapshot) => {
-                            if (querySnapshot.size > 0) {
-                                const homepageContentID = querySnapshot.docs[0].id;
-                                const homepageContentRef = admin.firestore().collection('homepageContents').doc(homepageContentID);
-                                homepageContentRef.set(homepageContentData, { merge: true })
-                                    .then(() => {
-                                        response.sendStatus(200);        
-                                    })
-                                    .catch(err => {
-                                        response.status(500).send(err);
-                                    });
-                            } else {
+                if (path === '/') {
+                    if (method === 'GET') {
+                        admin.firestore().collection('homepageContents').get()
+                            .then(querySnapshot => {
+                                if (querySnapshot.size > 0) {
+                                    response.status(200).send(querySnapshot.docs[0].data());
+                                } else {
+                                    response.sendStatus(200);
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    } else if (method === 'PUT') {
+                        const homepageContentData = request.body;
+                        admin.firestore().collection('homepageContents').get()
+                            .then(async (querySnapshot) => {
+                                if (querySnapshot.size > 0) {
+                                    const homepageContentID = querySnapshot.docs[0].id;
+                                    const homepageContentRef = admin.firestore().collection('homepageContents').doc(homepageContentID);
+                                    homepageContentRef.set(homepageContentData, { merge: true })
+                                        .then(() => {
+                                            response.sendStatus(200);        
+                                        })
+                                        .catch(err => {
+                                            response.status(500).send(err);
+                                        });
+                                } else {
+                                    admin.firestore().collection('homepageContents').add(homepageContentData)
+                                        .then(() => {
+                                            response.sendStatus(200);
+                                        })
+                                        .catch(err => {
+                                            response.status(500).send(err);
+                                        });
+                                }
+                            })
+                            .catch(() => {
                                 admin.firestore().collection('homepageContents').add(homepageContentData)
                                     .then(() => {
                                         response.sendStatus(200);
@@ -121,19 +133,20 @@ export const homepageContents = functions.https.onRequest((request, response) =>
                                     .catch(err => {
                                         response.status(500).send(err);
                                     });
+                            });
+                    } else {
+                        response.status(404).send('Unsupported method');
+                    }
+                } else if (path === '/puppyUnavailableMessage') {
+                    admin.firestore().collection('homepageContents').get()
+                        .then(querySnapshot => {
+                            if (querySnapshot.size > 0) {
+                                response.status(200).send(querySnapshot.docs[0].data().puppyUnavailableMessage);
                             }
                         })
-                        .catch(() => {
-                            admin.firestore().collection('homepageContents').add(homepageContentData)
-                                .then(() => {
-                                    response.sendStatus(200);
-                                })
-                                .catch(err => {
-                                    response.status(500).send(err);
-                                });
+                        .catch(err => {
+                            response.status(500).send(err);
                         });
-                } else {
-                    response.status(404).send('Unsupported method');
                 }
             }
         }
