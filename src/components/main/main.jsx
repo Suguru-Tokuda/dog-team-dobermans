@@ -8,6 +8,8 @@ import $ from 'jquery';
 
 class Main extends Component {
     state = {
+        title: '',
+        description: '',
         videoSrc: '',
         news: '',
         banner: null,
@@ -35,7 +37,11 @@ class Main extends Component {
             .then(async (res) => {
                 const homepageContentsData = res.data;
                 if (typeof homepageContentsData.backgroundVideo !== 'undefined') {
-                    this.setState({ videoSrc: homepageContentsData.backgroundVideo.url })
+                    this.setState({ 
+                        title: homepageContentsData.title,
+                        description: homepageContentsData.description,
+                        videoSrc: homepageContentsData.backgroundVideo.url
+                     });
                 }
                 if (typeof homepageContentsData.news !== 'undefined') {
                     if (homepageContentsData.news !== '<p><br></p>')
