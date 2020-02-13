@@ -38,8 +38,8 @@ class Main extends Component {
                 const homepageContentsData = res.data;
                 if (typeof homepageContentsData.backgroundVideo !== 'undefined') {
                     this.setState({ 
-                        title: homepageContentsData.title,
-                        description: homepageContentsData.description,
+                        title: homepageContentsData.backgroundVideo.title,
+                        description: homepageContentsData.backgroundVideo.description,
                         videoSrc: homepageContentsData.backgroundVideo.url
                      });
                 }
@@ -210,7 +210,7 @@ class Main extends Component {
     }
 
     render() {
-        const { videoSrc, news } = this.state;
+        const { title, description, videoSrc, news } = this.state;
         return (
             <div>
                 <section className="hero-video">
@@ -218,9 +218,9 @@ class Main extends Component {
                     <div className="container position-relative text-white text-center">
                         <div className="row">
                             <div className="col-xl-7 mx-auto">
-                                <h1 className="text-uppercase text-shadow letter-spacing mb-4">Dog Team Dobermans</h1>
+                                <h1 className="text-uppercase text-shadow letter-spacing mb-4">{title}</h1>
                                 <hr className="bg-light m-5"></hr>
-                                <p className="lead mb-5">We breed quality Dobermans.</p>
+                                <p className="lead mb-5">{description}</p>
                             </div>
                         </div>
                     </div>
