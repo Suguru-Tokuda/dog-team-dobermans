@@ -83,6 +83,7 @@ class ContactuUs extends Component {
                                 </div>
                                 <h3>Address</h3>
                                 <p>{street}<br/>{city} {state}<br/>{zip}</p>
+                                <a href="https://goo.gl/maps/ZDt8tCAdYn1tXR1g7" target="_"><strong>Google Maps</strong></a>
                             </div>
                             <div className="col-md-3">
                                 <div className="contact-icon">

@@ -196,7 +196,7 @@ class WaitListForm extends Component {
             <section id="waitListForm">
                 <div className="container">
                     <header className="mb-5">
-                        <h2 className="heading-line">Wait list form</h2>
+                        <h2 className="heading-line">Doberman Puppy Wait List Form</h2>
                     </header>
                     <div className="row">
                         <div className="col-md-7">
@@ -268,7 +268,7 @@ class WaitListForm extends Component {
                             </form>
                         </div>
                         <div className="col-md-5">
-                            <p>If you'd like to send a request us for a puppy, please fill out the form. When we have puppies with the color you pick and any other preference, we will contact you.</p>
+                            <p>If you'd like to send a request us for a Doberman puppy, please fill out the form. When we have puppies that match your preferences, we will contact you.</p>
                         </div>
                     </div>
                 </div>
