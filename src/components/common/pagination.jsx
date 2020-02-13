@@ -86,14 +86,21 @@ class Pagination extends Component {
     }
 
     getPagination = () => {
+        const { paginationInfo } = this.state;
         if (this.state.totalItems > 0) {
+            let navStyle = null;
+            if (paginationInfo.totalPages === 1) {
+                navStyle = {
+                    visibility: 'hidden'
+                };
+            }
             const paginationItems = this.state.paginationInfo.pages.map(page => 
                 <li key={page} className="page-item" onClick={() => this.handlePageChange(page)}>
                     <a className={`page-link ${this.getPageItemClass(page)}`}>{page}</a>
                 </li>
             );
             return (
-                <nav aria-label="pagination" className="d-flex justify-content-center">
+                <nav aria-label="pagination" className="d-flex justify-content-center" style={navStyle}>
                     <ul className="pagination pagination-custom">
                         <li className={`page-item ${this.getFirstBtnClass()}`} onClick={() => this.handlePageChange(1)}>
                             <a className={`page-link`} aria-label="First">First</a>
