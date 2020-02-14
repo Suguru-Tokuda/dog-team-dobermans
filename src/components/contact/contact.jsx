@@ -107,7 +107,7 @@ class ContactuUs extends Component {
                                     <i className="fas fa-dog"></i>
                                 </div>
                                 <h3>Request</h3>
-                                <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to scroll to the bottom of this page to request that you be added to our wait list</p>
+                                <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> jump to the Doberman Puppy Wait List Form.</p>
                             </div>
                         </div>
                     </div>
