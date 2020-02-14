@@ -14,7 +14,8 @@ class Main extends Component {
         news: '',
         banner: null,
         puppies: [],
-        parents: []
+        parents: [],
+        loaded: false
     };
 
     componentDidMount() {
@@ -54,6 +55,9 @@ class Main extends Component {
             .catch(err => {
                 console.log(err);
                 toastr.error('There was an error in loading the home page data');
+            })
+            .finally(() => {
+                this.setState({ loaded: true });
             });
     };
 
@@ -210,36 +214,42 @@ class Main extends Component {
     }
 
     render() {
-        const { title, description, videoSrc, news } = this.state;
-        return (
-            <div>
-                <section className="hero-video">
-                    <video muted autoPlay loop playsInline src={videoSrc} className="bg-video"></video>
-                    <div className="container position-relative text-white text-center">
-                        <div className="row">
-                            <div className="col-xl-7 mx-auto">
-                                <h1 className="text-uppercase text-shadow letter-spacing mb-4">{title}</h1>
-                                <hr className="bg-light m-5"></hr>
-                                <p className="lead mb-5">{description}</p>
+        const { title, description, videoSrc, news, loaded } = this.state;
+        if (loaded === true) {
+            return (
+                    <div>
+                        {videoSrc !== '' && (
+                            <section className="hero-video">
+                                <video muted autoPlay loop playsInline src={videoSrc} className="bg-video"></video>
+                                <div className="container position-relative text-white text-center">
+                                    <div className="row">
+                                        <div className="col-xl-7 mx-auto">
+                                            <h1 className="text-uppercase text-shadow letter-spacing mb-4">{title}</h1>
+                                            <hr className="bg-light m-5"></hr>
+                                            <p className="lead mb-5">{description}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+                    {/* {this.getOurDogs()}
+                    {this.getPuppies()} */}
+                    {this.getBanner()}
+                    {news !== '' && (
+                        <section className="blog">
+                            <div className="container">
+                            <header className="text-center">
+                                <h2 className="text-uppercase">News</h2>
+                            </header>
+                                <div dangerouslySetInnerHTML={{ __html: news }} />
                             </div>
-                        </div>
-                    </div>
-                </section>
-                {/* {this.getOurDogs()}
-                {this.getPuppies()} */}
-                {this.getBanner()}
-                {news !== '' && (
-                    <section className="blog">
-                        <div className="container">
-                        <header className="text-center">
-                            <h2 className="text-uppercase">News</h2>
-                        </header>
-                            <div dangerouslySetInnerHTML={{ __html: news }} />
-                        </div>
-                    </section>
-                )}
-            </div>
-        );
+                        </section>
+                    )}
+                </div>
+            );
+        } else {
+            return <div style={{marginTop: '500px'}}></div>;
+        }
     }
 }
 
