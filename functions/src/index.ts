@@ -649,6 +649,9 @@ export const buyers = functions.https.onRequest((request, response) => {
                             buyerToPush.hasPartialPayment = hasPartialPayment;
                             buyersArray.push(buyerToPush);
                         }
+                        buyersArray.sort((a: any, b: any) => {
+                            return a.firstName > b.firstName ? 1 : a.firstName < b.firstName ? -1 :0;
+                        });
                         response.status(200).send(buyersArray);
                     }
                 }
