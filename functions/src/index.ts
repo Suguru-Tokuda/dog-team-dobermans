@@ -630,36 +630,26 @@ export const buyers = functions.https.onRequest((request, response) => {
                     const buyersQuerySnapshot = await admin.firestore().collection('buyers').get();
                     const buyersArray: any = [];
                     if (buyersQuerySnapshot.size > 0) {
-                        buyersQuerySnapshot.forEach(async (buyerDoc) => {
-                            const retVal = buyerDoc.data();
-                            retVal.buyerID = buyerDoc.id;
+                        for (const buyerDoc of buyersQuerySnapshot.docs) {
+                            const buyerToPush = buyerDoc.data();
+                            buyerToPush.buyerID = buyerDoc.id;
+                            const puppiesQuerySnapshot = await admin.firestore().collection('puppies').where('buyerID', '==', buyerDoc.id).select().get();
+                            const puppiesArray: any = [];
                             let hasPartialPayment = false;
-                            const puppiesData: any[] = [];
-                            admin.firestore().collection('puppies').where('buyerID', '==', retVal.buyerID).get()
-                                .then(puppiesSnapshot => {
-                                    if (puppiesSnapshot.size > 0) {
-                                        puppiesSnapshot.forEach(puppyDoc => {
-                                            const puppyDataPiece = puppyDoc.data();
-                                            puppyDataPiece.puppyID = puppyDoc.id;
-                                            puppiesData.push(puppyDataPiece);
-                                            if (puppyDataPiece.price !== puppyDataPiece.paidAmount)
-                                                hasPartialPayment = true;
-                                        });
-                                    }
-                                    retVal.hasPartialPayment = hasPartialPayment;
-                                    retVal.puppies = puppiesData;
-                                    buyersArray.push(retVal);
-                                    if (buyersArray.length === buyersQuerySnapshot.size) {
-                                        buyersArray.sort((a: any, b: any) => {
-                                            return (a.firstName > b.firstName ? 1 : (a.firstName < b.firstName ? -1 : 0));
-                                        });
-                                        response.status(200).send(buyersArray);
-                                    }        
-                                })
-                                .catch(err => {
-                                    response.status(500).send(err);
-                                });
-                        });
+                            if (puppiesQuerySnapshot.size > 0) {
+                                for (const puppyDoc of puppiesQuerySnapshot.docs) {
+                                    const puppyToPush = puppyDoc.data();
+                                    puppyToPush.puppyID = puppyDoc.id;
+                                    if (puppyToPush.price !== puppyToPush.paidAmount)
+                                        hasPartialPayment = true;
+                                    puppiesArray.push(puppyToPush);
+                                }
+                            }
+                            buyerToPush.puppies = puppiesArray;
+                            buyerToPush.hasPartialPayment = hasPartialPayment;
+                            buyersArray.push(buyerToPush);
+                        }
+                        response.status(200).send(buyersArray);
                     }
                 }
                 catch (err) {
