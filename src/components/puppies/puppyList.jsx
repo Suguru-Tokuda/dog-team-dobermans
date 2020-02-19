@@ -15,7 +15,6 @@ class PuppyList extends Component {
         const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyUnavailableMessage()];
         Promise.all(promises)
             .then(res => {
-                console.log(res);
                 this.setState({ 
                     puppies: res[0].data, 
                     puppyUnavailableMessage: res[1].data
