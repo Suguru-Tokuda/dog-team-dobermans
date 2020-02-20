@@ -49,6 +49,7 @@ class ImageCropModal extends Component {
             .on('shown.bs.modal', () => {
                 cropper = new Cropper(image, {
                     aspectRatio: this.state.aspectRatio,
+                    preview: '.preview',
                     cropend() {
                         if (cropper) {
                             cropper.getCroppedCanvas().toBlob((blob) => {
@@ -148,11 +149,7 @@ class ImageCropModal extends Component {
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    {croppedURL !== null && (
-                                        <div className="img-container">
-                                            <img src={croppedURL} alt={croppedURL} />
-                                        </div>
-                                    )}
+                                    <div className="preview"></div>
                                 </div>
                             </div>
                         </div>

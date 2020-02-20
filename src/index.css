@@ -73,3 +73,19 @@ nav.navbar a.nav-link.active {
     letter-spacing: 0.1em;
   }
 }
+
+@media screen and (max-width: 991px) {
+  .preview {
+    overflow: hidden;
+    width: 200px; 
+    height: 200px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .preview {
+    overflow: hidden;
+    width: 350px; 
+    height: 350px;
+  }
+}
