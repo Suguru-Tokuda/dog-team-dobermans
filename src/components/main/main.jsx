@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import ImageGallery from 'react-image-gallery';
 import HomepageContentsService from '../../services/homepageContentsService';
-import PuppyService from '../../services/puppyService';
-import ParentService from '../../services/parentService';
+// import PuppyService from '../../services/puppyService';
+// import ParentService from '../../services/parentService';
 import toastr from 'toastr';
 import $ from 'jquery';
 
@@ -15,6 +16,7 @@ class Main extends Component {
         banner: null,
         puppies: [],
         parents: [],
+        galleryImages: [],
         loaded: false
     };
 
@@ -51,6 +53,9 @@ class Main extends Component {
                 if (typeof homepageContentsData.banner !== 'undefined') {
                     this.setState({ banner: homepageContentsData.banner });
                 }
+                if (homepageContentsData.galleryImages) {
+                    this.setState({ galleryImages: homepageContentsData.galleryImages });
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -61,28 +66,29 @@ class Main extends Component {
             });
     };
 
-    componentDidUpdate() {
-        $(document).ready(function () {
-            $('.owl-carousel').owlCarousel({ 
-                margin: 10, 
-                responsiveClass: true,
-                responsive: {
-                    0: {
-                        items: 1,
-                        nav: false
-                    },
-                    768: {
-                        items: 2,
-                        nav: false
-                    },
-                    992: {
-                        items: 4,
-                        nav: false
-                    }
-                } 
-            });
-        });
-    }
+    // componentDidUpdate() {
+    //     $(document).ready(function () {
+    //         $('.owl-carousel').owlCarousel({ 
+    //             margin: 10, 
+    //             autoHeight: true,
+    //             responsiveClass: true,
+    //             responsive: {
+    //                 0: {
+    //                     items: 1,
+    //                     nav: false
+    //                 },
+    //                 768: {
+    //                     items: 2,
+    //                     nav: false
+    //                 },
+    //                 992: {
+    //                     items: 4,
+    //                     nav: false
+    //                 }
+    //             } 
+    //         });
+    //     });
+    // }
 
     getOurDogs() {
         const { parents } = this.state;
@@ -213,6 +219,29 @@ class Main extends Component {
         }
     }
 
+    renderGalleryImages() {
+        const { galleryImages } = this.state;
+        if (galleryImages.length > 0) {
+            const imageObjects = galleryImages.map(image => {
+                return {
+                    original: image.url,
+                    thumbnail: image.url,
+                    originalAlt: image.reference,
+                    thumbnailAlt: image.reference
+                }
+            });
+            return (
+                <section className="gray-bg">
+                    <div className="container">
+                        <ImageGallery items={imageObjects} autoPlay={true} slideInterval={3500} />
+                    </div>
+                </section>
+            );
+        } else { 
+            return null;
+        }
+    }
+
     render() {
         const { title, description, videoSrc, news, loaded } = this.state;
         if (loaded === true) {
@@ -234,8 +263,9 @@ class Main extends Component {
                         )}
                     {/* {this.getOurDogs()}
                     {this.getPuppies()} */}
+                    {this.renderGalleryImages()}
                     {this.getBanner()}
-                    {news !== '' && (
+                    {/* {news !== '' && (
                         <section className="blog">
                             <div className="container">
                             <header className="text-center">
@@ -244,7 +274,7 @@ class Main extends Component {
                                 <div dangerouslySetInnerHTML={{ __html: news }} />
                             </div>
                         </section>
-                    )}
+                    )} */}
                 </div>
             );
         } else {
