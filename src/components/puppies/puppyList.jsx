@@ -55,11 +55,9 @@ class PuppyList extends Component {
     }
 
     getPuppyList() {
-        const { puppies, puppyUnavailableMessage, loaded } = this.state;
+        const { puppies, loaded } = this.state;
         if (puppies.length > 0 && loaded === true) {
             return <PuppiesTable {...this.props} puppies={puppies} />;
-        } else if (puppies.length === 0 && loaded === true) {
-            return <div style={{marginTop: "100px", marginBottom: "500px"}} dangerouslySetInnerHTML={{__html: puppyUnavailableMessage }}></div>
         } else {
             return <div style={{marginTop: "800px"}}></div>;
         }

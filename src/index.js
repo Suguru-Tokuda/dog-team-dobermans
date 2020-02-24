@@ -8,6 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import 'bootstrap-select/dist/css/bootstrap-select.min.css';
 import 'nouislider/distribute/nouislider.min.css';
 import 'owl.carousel/dist/assets/owl.carousel.css';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import 'toastr/build/toastr.min.css';
 import './assets/css/style.default.css';
 import 'cropperjs/dist/cropper.css';

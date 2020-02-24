@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import HomepageContentsService from '../../services/homepageContentsService';
-import PuppyService from '../../services/puppyService';
-import ParentService from '../../services/parentService';
 import ImageGallery from 'react-image-gallery';
+import HomepageContentsService from '../../services/homepageContentsService';
+import ImageGallery from 'react-image-gallery';
+// import PuppyService from '../../services/puppyService';
+// import ParentService from '../../services/parentService';
 import toastr from 'toastr';
-import $ from 'jquery';
 
 class Main extends Component {
     state = {
@@ -66,28 +66,29 @@ class Main extends Component {
             });
     };
 
-    componentDidUpdate() {
-        $(document).ready(function () {
-            $('.owl-carousel').owlCarousel({ 
-                margin: 10, 
-                responsiveClass: true,
-                responsive: {
-                    0: {
-                        items: 1,
-                        nav: false
-                    },
-                    768: {
-                        items: 2,
-                        nav: false
-                    },
-                    992: {
-                        items: 4,
-                        nav: false
-                    }
-                } 
-            });
-        });
-    }
+    // componentDidUpdate() {
+    //     $(document).ready(function () {
+    //         $('.owl-carousel').owlCarousel({ 
+    //             margin: 10, 
+    //             autoHeight: true,
+    //             responsiveClass: true,
+    //             responsive: {
+    //                 0: {
+    //                     items: 1,
+    //                     nav: false
+    //                 },
+    //                 768: {
+    //                     items: 2,
+    //                     nav: false
+    //                 },
+    //                 992: {
+    //                     items: 4,
+    //                     nav: false
+    //                 }
+    //             } 
+    //         });
+    //     });
+    // }
 
     getOurDogs() {
         const { parents } = this.state;
@@ -232,7 +233,7 @@ class Main extends Component {
             return (
                 <section className="gray-bg">
                     <div className="container">
-                        <ImageGallery items={imageObjects} slideInterval={3500} />
+                        <ImageGallery items={imageObjects} slideInterval={3500} autoPlay={true} />
                     </div>
                 </section>
             );
