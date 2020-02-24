@@ -11,7 +11,7 @@ export default class HomepageContentsService {
         return axios.get(this.getServiceBase());
     }
 
-    static getPuppyUnavailableMessage() {
-        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}homepageContents/puppyUnavailableMessage?key=${api.API_KEY}`);
+    static getPuppyMessage() {
+        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}homepageContents/puppyMessage?key=${api.API_KEY}`);
     }
 }

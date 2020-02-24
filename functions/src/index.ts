@@ -137,11 +137,11 @@ export const homepageContents = functions.https.onRequest((request, response) =>
                     } else {
                         response.status(404).send('Unsupported method');
                     }
-                } else if (path === '/puppyUnavailableMessage') {
+                } else if (path === '/puppyMessage') {
                     admin.firestore().collection('homepageContents').get()
                         .then(querySnapshot => {
                             if (querySnapshot.size > 0) {
-                                response.status(200).send(querySnapshot.docs[0].data().puppyUnavailableMessage);
+                                response.status(200).send(querySnapshot.docs[0].data().puppyMessage);
                             }
                         })
                         .catch(err => {

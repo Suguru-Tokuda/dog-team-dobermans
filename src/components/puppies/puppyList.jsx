@@ -7,17 +7,17 @@ import HomepageContentsService from '../../services/homepageContentsService';
 class PuppyList extends Component {
     state = {
         puppies: [],
-        puppyUnavailableMessage: '',
+        puppyMessage: '',
         loaded: false
     };
 
     componentDidMount() {
-        const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyUnavailableMessage()];
+        const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyMessage()];
         Promise.all(promises)
             .then(res => {
                 this.setState({ 
                     puppies: res[0].data, 
-                    puppyUnavailableMessage: res[1].data
+                    puppyMessage: res[1].data
                  });
             })
             .catch(err => {
@@ -29,12 +29,14 @@ class PuppyList extends Component {
     }
 
     getHeader() {
+        const { puppyMessage } = this.state;
         return (
             <section className="hero hero-page gray-bg padding-small">
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-1">
                             <h1>Puppies</h1>
+                            <p className="lead text-muted" dangerouslySetInnerHTML={{__html: puppyMessage }}></p>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">

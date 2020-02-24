@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -13,6 +12,7 @@ import 'toastr/build/toastr.min.css';
 import './assets/css/style.default.css';
 import 'cropperjs/dist/cropper.css';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import './index.css';
 import 'jquery';
 import 'popper.js';
