@@ -74,7 +74,7 @@ class ParentsTable extends Component {
     }
 
     getHeader() {
-        const { paginationInfo } = this.state;
+        // const { paginationInfo } = this.state;
         return (
             <header className="d-flex justify-content-between align-items-start">
                 {/* <span className="visible-items">

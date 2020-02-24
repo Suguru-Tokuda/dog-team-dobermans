@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ImageGallery from 'react-image-gallery';
 import HomepageContentsService from '../../services/homepageContentsService';
-import ImageGallery from 'react-image-gallery';
 // import PuppyService from '../../services/puppyService';
 // import ParentService from '../../services/parentService';
 import toastr from 'toastr';
