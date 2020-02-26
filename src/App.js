@@ -11,8 +11,18 @@ import Blog from './components/blog/blog';
 import AboutUs from './components/aboutUs/aboutUs';
 import Contact from './components/contact/contact';
 import PageNotFound from './components/common/pageNotFound';
+import $ from 'jquery';
 
 class App extends Component {
+
+  componentDidMount() {
+    $(document).ready(() => {
+      const navMain = $('#navbarCollapse');
+      navMain.on('click', () => {
+        navMain.collapse('hide');
+      });
+    });
+  }
 
   render() {
     return (
