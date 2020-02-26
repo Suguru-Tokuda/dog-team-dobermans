@@ -18,7 +18,8 @@ class App extends Component {
   componentDidMount() {
     $(document).ready(() => {
       const navMain = $('#navbarCollapse');
-      navMain.on('click', () => {
+      const root = $('#root');
+      root.on('click', () => {
         navMain.collapse('hide');
       });
     });
