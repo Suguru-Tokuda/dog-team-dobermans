@@ -10,6 +10,7 @@ class ParentList extends Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         ParentService.getAllParents()
             .then(res => {
                 this.setState({ parents: res.data });

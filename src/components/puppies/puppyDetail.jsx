@@ -38,6 +38,7 @@ class PuppyDetail extends Component {
 
     componentDidMount() {
         const { puppyID } = this.state;
+        window.scrollTo(0, 0);
         PuppyService.getPuppy(puppyID)
             .then(res => {
                 if (Object.keys(res.data).length === 0) {

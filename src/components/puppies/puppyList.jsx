@@ -13,6 +13,7 @@ class PuppyList extends Component {
 
     componentDidMount() {
         const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyMessage()];
+        window.scrollTo(0, 0);
         Promise.all(promises)
             .then(res => {
                 this.setState({ 

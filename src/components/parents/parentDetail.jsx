@@ -30,6 +30,7 @@ class ParentDetail extends Component {
     }
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         const { parentID } = this.state;
         ParentService.getParent(parentID)
             .then(res => {

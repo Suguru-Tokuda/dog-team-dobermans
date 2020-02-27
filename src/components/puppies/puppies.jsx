@@ -4,10 +4,6 @@ import PuppyList from './puppyList';
 import PuppyDetail from './puppyDetail';
 
 class Puppies extends Component {
-    componentDidUpdate() {
-        window.scrollTo(0, 0);
-    }
-
     render() {
         return (
             <React.Fragment>
