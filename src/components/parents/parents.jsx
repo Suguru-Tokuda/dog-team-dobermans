@@ -4,7 +4,7 @@ import ParentList from './parentList';
 import ParentDetail from './parentDetail';
 
 class Parents extends Component {
-    componentDidMount() {
+    componentDidUpdate() {
         window.scrollTo(0, 0);
     }
     

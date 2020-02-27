@@ -4,6 +4,10 @@ import BlogDetail from './blogDetail';
 import BlogList from './blogList';
 
 class Blog extends Component {
+    componentDidUpdate() {
+        window.scrollTo(0, 0);
+    }
+
     render() {
         return (
             <React.Fragment>
