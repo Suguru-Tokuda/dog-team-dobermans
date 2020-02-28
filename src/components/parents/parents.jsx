@@ -4,10 +4,6 @@ import ParentList from './parentList';
 import ParentDetail from './parentDetail';
 
 class Parents extends Component {
-    componentDidMount() {
-        window.scrollTo(0, 0);
-    }
-    
     render() {
         return (
             <React.Fragment>

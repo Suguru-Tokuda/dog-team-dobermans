@@ -13,7 +13,7 @@ class PuppiesTable extends Component {
             startIndex: 0,
             endIndex: 0,
             maxPages: 5,
-            pageSize: 25,
+            pageSize: 9,
             totalItems: 0
         },
         gridSearch: '',

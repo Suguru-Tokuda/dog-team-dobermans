@@ -5,7 +5,7 @@ import TestimonialForm from './testimonialForm';
 import $ from 'jquery';
 
 class Testimonials extends Component {
-    componentDidMount() {
+    componentDidUpdate() {
         window.scrollTo(0, 0);
     }
     

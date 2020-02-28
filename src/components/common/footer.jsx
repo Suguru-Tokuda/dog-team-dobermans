@@ -24,7 +24,7 @@ export default class Footer extends Component {
                                     <li><Link to="/blog">Blog</Link></li>
                                     <li><Link to="/testimonials">Testimonials</Link></li>
                                     <li><Link to="/about-us">About Us</Link></li>
-                                    <li><Link to="/contact">Contact</Link></li>
+                                    <li><Link to="/contact">Contact/Request a Puppy</Link></li>
                                 </ul>
                             </div>
                         </div>
