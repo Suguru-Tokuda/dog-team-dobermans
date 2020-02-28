@@ -4,6 +4,7 @@ import * as cors from 'cors';
 import * as nodemailer from 'nodemailer';
 import * as api from '../src/api.json';
 import * as config from '../src/config.json';
+import * as moment from 'moment';
 
 admin.initializeApp(functions.config().firease);
 
@@ -54,6 +55,57 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
             .catch(() => {
                 reject();
             });
+    });
+}
+
+function sendNotificationForWaitList(firstName: string, lastName: string, email: string, phone: string, message: string, color: string, expectedPurchaseDate: string) {
+    let colorPref = color === undefined || color === null || color === '' ? 'No Preference' : color;
+    return new Promise((resolve, reject) => {
+        const htmlBody = `
+            <!DOCTYPE html>
+                <body>
+                    <h3>New Request for Puppy!</h3>
+                    <br /><br />
+                    <table>
+                        <tr>
+                            <th>First Name</th>
+                            <td>${firstName}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Name</th>
+                            <td>${lastName}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td><a href="mailto:${email}">${email}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td><a href="tel:${phone}">${phone}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Message</th>
+                            <td>${message}</td>
+                        </tr>
+                        <tr>
+                            <th>Color</th>
+                            <td>${colorPref}</td>
+                        </tr>
+                        <tr>
+                            <th>Expected Purchase Date</th>
+                            <td>${moment(expectedPurchaseDate).format('MM/DD/YYYY')}</td>                            
+                        </tr>
+                    </table>
+                </body>
+            </html>
+        `;
+        sendEmail('dogTeam@dogteamdobermans.com', 'New Puppy Request Created', htmlBody)
+        .then(() => {
+            resolve();
+        })
+        .catch(() => {
+            reject();
+        });
     });
 }
 
@@ -974,12 +1026,17 @@ export const waitList = functions.https.onRequest((request, response) => {
                         .catch(err => {
                             response.status(500).send(err);
                         });
-
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
                     admin.firestore().collection('waitList').add(data)
-                        .then(() => {
+                        .then(async () => {
+                            try {
+                                const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = data;
+                                await sendNotificationForWaitList(firstName, lastName, email, phone, message, color, expectedPurchaseDate);
+                            } catch (err) {
+                                console.log(err);
+                            }
                             response.sendStatus(201);
                         })
                         .catch((err => {
