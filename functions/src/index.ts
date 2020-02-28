@@ -99,7 +99,7 @@ function sendNotificationForWaitList(firstName: string, lastName: string, email:
                 </body>
             </html>
         `;
-        sendEmail('dogTeam@dogteamdobermans.com', 'New Puppy Request Created', htmlBody)
+        sendEmail('dogTeam@dogteamdobermans.com', `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
         .then(() => {
             resolve();
         })
