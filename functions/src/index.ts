@@ -29,19 +29,19 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                             <br /><br />
                             <table>
                                 <tr>
-                                    <th>First name</th>
+                                    <th style="text-align: left;">First name</th>
                                     <td>${firstName}</td>
                                 </tr>
                                 <tr>
-                                    <th>Last Name</th>
+                                    <th style="text-align: left;">Last Name</th>
                                     <td>${lastName}</td>
                                 </tr>
                                 <tr>
-                                    <th>Email</th>
+                                    <th style="text-align: left;">Email</th>
                                     <td><a href="mailto:${email}">${email}</a></td>
                                 </tr>
                                 <tr>
-                                    <th>Dog name</th>
+                                    <th style="text-align: left;">Dog name</th>
                                     <td>${dogName}</td>
                                 </tr>
                             </table>
@@ -68,31 +68,31 @@ function sendNotificationForWaitList(firstName: string, lastName: string, email:
                     <br /><br />
                     <table>
                         <tr>
-                            <th>First Name</th>
+                            <th style="text-align: left;">First Name</th>
                             <td>${firstName}</td>
                         </tr>
                         <tr>
-                            <th>Last Name</th>
+                            <th style="text-align: left;">Last Name</th>
                             <td>${lastName}</td>
                         </tr>
                         <tr>
-                            <th>Email</th>
+                            <th style="text-align: left;">Email</th>
                             <td><a href="mailto:${email}">${email}</a></td>
                         </tr>
                         <tr>
-                            <th>Phone</th>
+                            <th style="text-align: left;">Phone</th>
                             <td><a href="tel:${phone}">${phone}</a></td>
                         </tr>
                         <tr>
-                            <th>Message</th>
+                            <th style="text-align: left;">Message</th>
                             <td>${message}</td>
                         </tr>
                         <tr>
-                            <th>Color</th>
+                            <th style="text-align: left;">Color</th>
                             <td>${colorPref}</td>
                         </tr>
                         <tr>
-                            <th>Expected Purchase Date</th>
+                            <th style="text-align: left;">Expected Purchase Date</th>
                             <td>${moment(expectedPurchaseDate).format('MM/DD/YYYY')}</td>                            
                         </tr>
                     </table>
