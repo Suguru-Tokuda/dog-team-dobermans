@@ -208,7 +208,7 @@ class PuppyDetail extends Component {
                                             <td>{color}</td>
                                         </tr>
                                         <tr>
-                                            <th>Weight (lbs)</th>
+                                            <th>Weight (lb)</th>
                                             <td>{weight}</td>
                                         </tr>
                                         <tr>
@@ -239,7 +239,7 @@ class PuppyDetail extends Component {
                                                             <td>{dad.color}</td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Weight (lbs)</th>
+                                                            <th>Weight (lb)</th>
                                                             <td>{dad.weight}</td>
                                                         </tr>
                                                         <tr>
@@ -272,7 +272,7 @@ class PuppyDetail extends Component {
                                                             <td>{mom.color}</td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Weight (lbs)</th>
+                                                            <th>Weight (lb)</th>
                                                             <td>{mom.weight}</td>
                                                         </tr>
                                                         <tr>

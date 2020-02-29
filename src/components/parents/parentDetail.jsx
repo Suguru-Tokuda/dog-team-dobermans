@@ -183,7 +183,7 @@ class ParentDetail extends Component {
                                             <td>{color}</td>
                                         </tr>
                                         <tr>
-                                            <th>Weight (lbs)</th>
+                                            <th>Weight (lb)</th>
                                             <td>{weight}</td>
                                         </tr>
                                         <tr>
