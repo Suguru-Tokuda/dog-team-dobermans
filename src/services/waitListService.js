@@ -7,18 +7,7 @@ export default class WaitListService {
         return `${SessionInfoService.getBaseUrlForAPI()}waitList`;
     }
 
-    static createWaitRequest(firstName, lastName, email, phone, message, color, expectedPurchaseDate, date) {
-        const data = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phone: phone,
-            message: message,
-            color: color,
-            expectedPurchaseDate: expectedPurchaseDate,
-            created: date,
-            notified: null
-        };
+    static createWaitRequest(data) {
         return axios.post(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
     }
 }

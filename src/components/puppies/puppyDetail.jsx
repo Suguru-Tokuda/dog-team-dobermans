@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import PuppyRequestModal from './puppyRequestModal';
 import PageNotFound from '../common/pageNotFound';
 import PuppyService from '../../services/puppyService';
 import $ from 'jquery';
@@ -8,6 +9,7 @@ import toastr from 'toastr';
 
 class PuppyDetail extends Component {
     state = {
+        puppyData: {},
         description: '',
         dateOfBirth: null,
         name: '',
@@ -50,6 +52,7 @@ class PuppyDetail extends Component {
                         mom: puppyData.mom
                     };
                     this.setState({
+                        puppyData: puppyData,
                         name: puppyData.name,
                         description: puppyData.description,
                         dateOfBirth: puppyData.dateOfBirth,
@@ -173,6 +176,11 @@ class PuppyDetail extends Component {
                                 </ul>
                             </div>
                             <p>{description}</p>
+                            {sold === false && (
+                                <ul>
+                                    <button type="button" className="btn btn-template wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
+                                </ul>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -301,14 +309,19 @@ class PuppyDetail extends Component {
         }
     }
 
+    handleInquireBtnClicked = () => {
+        $('#puppyRequestModal').modal('show');
+    }
+
     render() {
-        const { puppyFound, pageLoaded } = this.state;
+        const { puppyFound, puppyData, pageLoaded } = this.state;
         if (puppyFound === true && pageLoaded === true) {
             return (
                 <React.Fragment>
                     {this.getHeader()}
                     {this.getDetailsSection()}
                     {this.getAdditionalInfoSection()}
+                    <PuppyRequestModal puppyData={puppyData} />
                 </React.Fragment>
             );
         } else if (puppyFound === false && pageLoaded === true) {

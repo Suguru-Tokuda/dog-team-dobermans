@@ -58,8 +58,29 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
     });
 }
 
-function sendNotificationForWaitList(firstName: string, lastName: string, email: string, phone: string, message: string, color: string, expectedPurchaseDate: string) {
-    let colorPref = color === undefined || color === null || color === '' ? 'No Preference' : color;
+async function sendNotificationForWaitList(firstName: string, lastName: string, email: string, phone: string, message: string, puppyID: string, color: string, expectedPurchaseDate: string) {
+    let puppyData: any, puppyRows: string;
+    let puppyColor = color;
+    try {
+        if (puppyID !== undefined) {
+            const puppyDoc = await admin.firestore().collection('puppies').doc(puppyID).get();
+            puppyData = puppyDoc.data();
+            puppyColor = puppyData.color;
+            puppyRows = `
+                <tr>
+                    <th style="text-align: left;">PuppyID</th>
+                    <td>${puppyID}</td>
+                </tr>
+                <tr>
+                    <th style="text-align: left;">Name</th>
+                    <td>${puppyData.name}</td>
+                </tr>
+            `;
+        }
+    } catch (err) {
+        console.log(err);
+    }
+    let colorPref = puppyColor === undefined || puppyColor === null || puppyColor === '' ? 'No Preference' : puppyColor;
     return new Promise((resolve, reject) => {
         const htmlBody = `
             <!DOCTYPE html>
@@ -87,6 +108,7 @@ function sendNotificationForWaitList(firstName: string, lastName: string, email:
                             <th style="text-align: left;">Message</th>
                             <td>${message}</td>
                         </tr>
+                        ${puppyRows}
                         <tr>
                             <th style="text-align: left;">Color</th>
                             <td>${colorPref}</td>
@@ -1000,14 +1022,23 @@ export const waitList = functions.https.onRequest((request, response) => {
                             });
                     } else {
                         admin.firestore().collection('waitList').get()
-                        .then(querySnapshot => {
+                        .then(async querySnapshot => {
                             if (querySnapshot.size > 0) {
                                 const retVal = [] as any;
-                                querySnapshot.forEach((doc) => {
-                                    const waitRequest = doc.data();
-                                    waitRequest.waitRequestID = doc.id;
+                                for (const waitRequestDoc of querySnapshot.docs) {
+                                    const waitRequest = waitRequestDoc.data();
+                                    waitRequest.waitRequestID = waitRequestDoc.id;
+                                    if (waitRequest.puppyID) {
+                                        try {
+                                            const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
+                                            const puppyData: any = puppyDoc.data();
+                                            waitRequest.puppyName = puppyData.name;
+                                        } catch (err) {
+                                            console.log(err);
+                                        }
+                                    }
                                     retVal.push(waitRequest);
-                                });
+                                }
                                 response.status(200).send(retVal);
                             } else {
                                 response.status(200).send([]);
@@ -1022,8 +1053,8 @@ export const waitList = functions.https.onRequest((request, response) => {
                     admin.firestore().collection('waitList').add(data)
                         .then(async () => {
                             try {
-                                const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = data;
-                                await sendNotificationForWaitList(firstName, lastName, email, phone, message, color, expectedPurchaseDate);
+                                const { firstName, lastName, email, phone, message, color, expectedPurchaseDate, puppyID } = data;
+                                await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color, expectedPurchaseDate);
                             } catch (err) {
                                 console.log(err);
                             }

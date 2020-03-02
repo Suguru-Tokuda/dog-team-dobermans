@@ -31,7 +31,6 @@ class WaitListForm extends Component {
         return types.map(type => <option value={type} key={type}>{type}</option>);
     }
 
-
     getFormClass(key) {
         const { formSubmitted, validations } = this.state;
         return formSubmitted === true && typeof validations[key] !== 'undefined' && validations[key].length > 0 ? 'is-invalid' : '';
@@ -142,7 +141,6 @@ class WaitListForm extends Component {
                 isValid = false;
                 if (key === 'color') {
                     validations[key] = `Select ${key}`;
-
                 } else if (key === 'expectedPurchaseDate') {
                     validations[key] = `Select Expected Purchase Date`;
                 } else {
@@ -166,7 +164,18 @@ class WaitListForm extends Component {
         if (isValid === true) {
             const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
             this.setState({ loading: true });
-            WaitListService.createWaitRequest(firstName, lastName, email.toLowerCase(), phone, message, color, expectedPurchaseDate, new Date())
+            const waitRequestData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                message: message,
+                color: color,
+                expectedPurchaseDate: expectedPurchaseDate,
+                created: new Date(),
+                notified: null
+            };
+            WaitListService.createWaitRequest(waitRequestData)
                 .then(() => {
                     toastr.success('Request submitted!');
                     const selections = {
