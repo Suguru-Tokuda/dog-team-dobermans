@@ -255,7 +255,7 @@ class WaitListForm extends Component {
                                         <div className="col-sm-6">
                                             <label htmlFor="color" className={`form-label`}>Color</label>
                                             <select className={`form-control`} name="color" id="color" value={color} onChange={this.handleSetColor}>
-                                                <option>--Select color for puppy--</option>
+                                                <option value="">--Select color for puppy--</option>
                                                 {this.getColorOptions()}
                                             </select>
                                         </div>
