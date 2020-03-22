@@ -1039,6 +1039,9 @@ export const waitList = functions.https.onRequest((request, response) => {
                                     }
                                     retVal.push(waitRequest);
                                 }
+                                retVal.sort((a: any, b: any) => { 
+                                    return a.created > b.created ? -1 : (a.created < b.created ? 1 : 0);
+                                });
                                 response.status(200).send(retVal);
                             } else {
                                 response.status(200).send([]);
