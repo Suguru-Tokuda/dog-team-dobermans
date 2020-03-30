@@ -270,6 +270,9 @@ export const puppies = functions.https.onRequest((request, response) => {
                                 }
                             }
                         }
+                        puppyArr.sort((a: any, b: any) => {
+                            return a.dateOfBirth < b.dateOfBirth ? 1 : a.dateOfBirth > b.dateOfBirth ? -1 : 0;
+                        });
                         response.status(200).send(puppyArr);
                     })
                     .catch(err => {
