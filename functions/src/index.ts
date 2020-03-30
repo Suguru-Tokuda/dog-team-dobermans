@@ -676,6 +676,36 @@ export const buyer = functions.https.onRequest((request, response) => {
                     .catch(err => {
                         response.status(500).send(err);
                     });
+            } else if (path === '/check-email-availability') {
+                if (method === 'POST') {
+                    const data = request.body;
+                    if (data.email && data.buyerID) {
+                        admin.firestore().collection('buyers').where('email', '==', data.email).get()
+                            .then(querySnapshot => {
+                                if (querySnapshot.size === 0) {
+                                    response.status(200).send(true);
+                                } else {
+                                    const buyerIDToCheck = querySnapshot.docs[0].id;
+                                    if (data.buyerID === buyerIDToCheck)
+                                        response.status(200).send(true);
+                                    response.status(200).send(false);
+                                }
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    } else if (data.email) {
+                        admin.firestore().collection('buyers').where('email', '==', data.email).get()
+                            .then(querySnapshot => {
+                                response.status(200).send(querySnapshot.size === 0);
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
+                    }
+                } else {
+                    response.status(400).send('Unsupported method');
+                }
             }
         }
     });
