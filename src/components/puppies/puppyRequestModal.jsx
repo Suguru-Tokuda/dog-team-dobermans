@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import ValidationService from '../../services/validationService';
 import WaitListService from '../../services/waitListService';
+import ConstantsService from '../../services/contactService';
 import DatePicker from 'react-datepicker';
 import toastr from 'toastr';
 import $ from 'jquery';
@@ -14,6 +15,8 @@ export default class PuppyRequestModal extends Component {
             lastName: '',
             email: '',
             phone: '',
+            city: '',
+            state: '',
             message: '',
             expectedPurchaseDate: null
         },
@@ -30,6 +33,11 @@ export default class PuppyRequestModal extends Component {
     getFormClass(key) {
         const { formSubmitted, validations } = this.state;
         return formSubmitted === true && typeof validations[key] !== 'undefined' && validations[key].length > 0 ? 'is-invalid' : '';
+    }
+
+    getStateOptions() {
+        const states = ConstantsService.getStates();
+        return states.map(state => <option value={state.abbreviation} key={state.abbreviation}>{`${state.abbreviation} - ${state.name}`}</option>);
     }
 
     handleSetFirstName = (event) => {
@@ -103,6 +111,30 @@ export default class PuppyRequestModal extends Component {
         this.setState({ selections, validations });
     }
 
+    handleSetState = (event) => {
+        const { selections, validations } = this.state;
+        const state = event.target.value;
+        if (state !== '') {
+            delete validations.state;
+        } else {
+            validations.state = 'Select state';
+        }
+        selections.state = event.target.value;
+        this.setState({ selections });
+    }
+
+    handleSetCity = (event) => {
+        const { selections, validations } = this.state;
+        const city = event.target.value;
+        if (city !== '') {
+            delete validations.city;
+        } else {
+            validations.city = 'Enter city';
+        }
+        selections.city = city;
+        this.setState({ selections, validations });
+    }
+
     handleSelectExpectedPurchaseDate = (expectedPurchaseDate) => {
         const { selections, validations } = this.state;
         selections.expectedPurchaseDate = expectedPurchaseDate;
@@ -136,16 +168,19 @@ export default class PuppyRequestModal extends Component {
                 delete validations[key];
             }
         }
+        console.log(validations);
         if (isValid === true) {
-            const { firstName, lastName, email, phone, message, expectedPurchaseDate } = selections;
+            const { firstName, lastName, email, phone, city, state, message, expectedPurchaseDate } = selections;
             const { puppyID } = puppyData;
             this.setState({ loading: true });
             const waitRequest = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email.toLowerCase(),
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                email: email.trim().toLowerCase(),
                 phone: phone,
-                message: message,
+                message: message.trim(),
+                city: city.trim(),
+                state: state,
                 puppyID: puppyID,
                 created: new Date(),
                 color: puppyData.color,
@@ -161,6 +196,8 @@ export default class PuppyRequestModal extends Component {
                             lastName: '',
                             email: '',
                             phone: '',
+                            city: '',
+                            state: '',
                             message: '',
                             expectedPurchaseDate: null
                         },
@@ -180,7 +217,7 @@ export default class PuppyRequestModal extends Component {
 
     render() {
         const { puppyData, selections, validations, formSubmitted, loading } = this.state;
-        const { firstName, lastName, email, phone, message, expectedPurchaseDate } = selections;
+        const { firstName, lastName, email, phone, city, state, message, expectedPurchaseDate } = selections;
         return (
             <div className="modal fade" id="puppyRequestModal" role="dialog" aria-hidden="true">
                 <div className="modal-dialog modal-lg" role="document">
@@ -256,6 +293,29 @@ export default class PuppyRequestModal extends Component {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="row">
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="city" className="form-label">City *</label>
+                                                <input type="text" name="city" id="city" placeholder="Enter city" className={`form-control ${this.getFormClass('city')}`} value={city} onChange={this.handleSetCity} />
+                                                {formSubmitted === true && validations.city && (
+                                                    <small className="text-danger">{validations.city}</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="state" className="form-label">State *</label>
+                                                <select className={`form-control ${this.getFormClass('state')}`} value={state} onChange={this.handleSetState}>
+                                                    <option value="">--Select State --</option>
+                                                    {this.getStateOptions()}
+                                                </select>
+                                                {formSubmitted === true && validations.state && (
+                                                    <small className="text-danger">{validations.state}</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 <div className="row">
                                     <div className="col-sm-6">
                                         <label className="form-label">Expected Purchase Date *</label><br/>

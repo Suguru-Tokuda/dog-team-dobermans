@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import ValidationService from '../../services/validationService';
 import WaitListService from '../../services/waitListService';
+import ConstantsService from '../../services/contactService';
 import toastr from 'toastr';
 import DatePicker from 'react-datepicker';
 
@@ -12,6 +13,8 @@ class WaitListForm extends Component {
             lastName: '',
             email: '',
             phone: '',
+            city: '',
+            state: '',
             message: '',
             color: '',
             expectedPurchaseDate: null
@@ -29,6 +32,11 @@ class WaitListForm extends Component {
     getTypeOptions() {
         const types = ["American", "European"];
         return types.map(type => <option value={type} key={type}>{type}</option>);
+    }
+
+    getStateOptions() {
+        const states = ConstantsService.getStates();
+        return states.map(state => <option value={state.abbreviation} key={state.abbreviation}>{`${state.abbreviation} - ${state.name}`}</option>);
     }
 
     getFormClass(key) {
@@ -103,6 +111,30 @@ class WaitListForm extends Component {
             validations.phone = 'Enter phone number';
         }
         selections.phone = phone;
+        this.setState({ selections, validations });
+    }
+
+    handleSetState = (event) => {
+        const { selections, validations } = this.state;
+        const state = event.target.value;
+        if (state !== '') {
+            delete validations.state;
+        } else {
+            validations.state = 'Select state';
+        }
+        selections.state = event.target.value;
+        this.setState({ selections });
+    }
+
+    handleSetCity = (event) => {
+        const { selections, validations } = this.state;
+        const city = event.target.value;
+        if (city !== '') {
+            delete validations.city;
+        } else {
+            validations.city = 'Enter city';
+        }
+        selections.city = city;
         this.setState({ selections, validations });
     }
 
@@ -183,6 +215,8 @@ class WaitListForm extends Component {
                         lastName: '',
                         email: '',
                         phone: '',
+                        city: '',
+                        state: '',
                         message: '',
                         color: '',
                         expectedPurchaseDate: null
@@ -200,7 +234,7 @@ class WaitListForm extends Component {
 
     render() {
         const { selections, validations, loading, formSubmitted } = this.state;
-        const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
+        const { firstName, lastName, email, phone, city, state, message, color, expectedPurchaseDate } = selections;
         return (
             <section id="waitListForm">
                 <div className="container">
@@ -247,6 +281,29 @@ class WaitListForm extends Component {
                                                 <input type="text" name="phone" id="phone" placeholder="Enter your phone number" className={`form-control ${this.getFormClass('phone')}`} value={phone} onChange={this.handleSetPhone} />
                                                 {formSubmitted === true && validations.phone && (
                                                     <small className="text-danger">{validations.phone}</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="city" className="form-label">City *</label>
+                                                <input type="text" name="city" id="city" placeholder="Enter city" className={`form-control ${this.getFormClass('city')}`} value={city} onChange={this.handleSetCity} />
+                                                {formSubmitted === true && validations.city && (
+                                                    <small className="text-danger">{validations.city}</small>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-6">
+                                            <div className="form-group">
+                                                <label htmlFor="state" className="form-label">State *</label>
+                                                <select className={`form-control ${this.getFormClass('state')}`} value={state} onChange={this.handleSetState}>
+                                                    <option value="">--Select State --</option>
+                                                    {this.getStateOptions()}
+                                                </select>
+                                                {formSubmitted === true && validations.state && (
+                                                    <small className="text-danger">{validations.state}</small>
                                                 )}
                                             </div>
                                         </div>
