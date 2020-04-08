@@ -14,6 +14,7 @@ class PuppyDetail extends Component {
         dateOfBirth: null,
         name: '',
         price: 0,
+        paidAmount: 0,
         color: '',
         weight: 0,
         gender: '',
@@ -57,6 +58,7 @@ class PuppyDetail extends Component {
                         description: puppyData.description,
                         dateOfBirth: puppyData.dateOfBirth,
                         price: puppyData.price,
+                        paidAmount: puppyData.paidAmount,
                         color: puppyData.color,
                         weight: puppyData.weight,
                         gender: puppyData.gender,
@@ -157,14 +159,17 @@ class PuppyDetail extends Component {
     }
 
     getDetailsSection() {
-        const { name, description, price, sold } = this.state;
+        const { name, description, price, paidAmount, sold } = this.state;
         return (
             <section className="product-details">
                 <div className="container">
                     <div className="row">
                         <div className="product-images col-lg-6">
-                            {sold === true && (
-                                <div className="ribbon-danger text-uppercase">Sold</div>
+                            {paidAmount > 0 && paidAmount === price && ( 
+                                <div className="ribbon ribbon-primary text-uppercase">Adopted</div>
+                            )}
+                            {paidAmount > 0 && paidAmount < price && (
+                                <div className="ribbon ribbon-success text-uppercase">Pending</div>
                             )}
                             {this.getImageCarousel()}
                         </div>
