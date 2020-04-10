@@ -194,13 +194,15 @@ class WaitListForm extends Component {
             }
         });
         if (isValid === true) {
-            const { firstName, lastName, email, phone, message, color, expectedPurchaseDate } = selections;
+            const { firstName, lastName, email, state, city, phone, message, color, expectedPurchaseDate } = selections;
             this.setState({ loading: true });
             const waitRequestData = {
-                firstName: firstName,
-                lastName: lastName,
+                firstName: `${firstName.trim().substring(0, 1).toUpperCase()}${firstName.trim().substring(1)}`,
+                lastName: `${lastName.trim().substring(0, 1).toUpperCase()}${lastName.trim().substring(1)}`,
                 email: email,
                 phone: phone,
+                state: state,
+                city: `${city.trim().substring(0, 1).toUpperCase()}${city.trim().substring(1)}`,
                 message: message,
                 color: color,
                 expectedPurchaseDate: expectedPurchaseDate,

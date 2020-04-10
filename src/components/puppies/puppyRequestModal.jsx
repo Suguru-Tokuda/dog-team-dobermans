@@ -174,12 +174,12 @@ export default class PuppyRequestModal extends Component {
             const { puppyID } = puppyData;
             this.setState({ loading: true });
             const waitRequest = {
-                firstName: firstName.trim(),
-                lastName: lastName.trim(),
+                firstName: `${firstName.trim().substring(0, 1).toUpperCase()}${firstName.trim().substring(1)}`,
+                lastName: `${lastName.trim().substring(0, 1).toUpperCase()}${lastName.trim().substring(1)}`,
                 email: email.trim().toLowerCase(),
                 phone: phone,
                 message: message.trim(),
-                city: city.trim(),
+                city: `${city.trim().substring(0, 1).toUpperCase()}${city.trim().substring(1)}`,
                 state: state,
                 puppyID: puppyID,
                 created: new Date(),
