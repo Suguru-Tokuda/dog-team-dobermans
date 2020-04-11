@@ -907,6 +907,9 @@ export const testimonials = functions.https.onRequest((request, response) => {
                                         }
                                     });
                                 }
+                                testimonialsArr.sort((a: any, b: any) => {
+                                    return a.created > b.created ? 1 : a.created < b.created ? -1 : 0;
+                                });
                                 response.status(200).send(testimonialsArr)
                             })
                             .catch(err => {
