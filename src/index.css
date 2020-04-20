@@ -37,6 +37,10 @@ input[type="file"] {
   }
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 nav.navbar {
   background: #7559A6;
   /* background: #D4AF37; */
