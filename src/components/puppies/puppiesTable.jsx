@@ -107,8 +107,11 @@ class PuppiesTable extends Component {
                     <div key={`puppy-${i}`} className="item col-xl-4 col-md-6">
                         <div className="product is-gray">
                             <div className="image d-flex align-items-center justify-content-center">
-                                {puppy.sold === true && ( 
-                                    <div className="ribbon ribbon-danger text-uppercase">Sold</div>
+                                {puppy.paidAmount > 0 && puppy.paidAmount === puppy.price && ( 
+                                    <div className="ribbon ribbon-primary text-uppercase">Adopted</div>
+                                )}
+                                {puppy.paidAmount > 0 && puppy.paidAmount < puppy.price && (
+                                    <div className="ribbon ribbon-success text-uppercase">Pending</div>
                                 )}
                                 {typeof puppy.pictures !== 'undefined' && puppy.pictures.length > 0 && (
                                     <img src={puppy.pictures[0].url} alt={puppy.pictures[0].reference} className="img-fluid" />
