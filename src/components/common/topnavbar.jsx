@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { NavLink, Link } from 'react-router-dom';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
+import ReactTooltip from 'react-tooltip';
 
-export default class Topnavbar extends Component {
+class Topnavbar extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+    
     render() {
         return(
             <header className="header">
@@ -40,9 +47,44 @@ export default class Topnavbar extends Component {
                                 </li>
                             </ul>
                         </div>
+                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row">
+                            <div className="user">
+                                <a id="account" href="/puppy-requests">
+                                    <i className="fab fa-facebook-messenger" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
+                                    <ReactTooltip />
+                                </a>
+                            </div>
+                            <div className="user ml-3">
+                                <a id="account" href="/account" style={{ color: 'white' }}>
+                                    <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
+                                    <ReactTooltip />
+                                </a>
+                            </div>
+                            <div className="ml-3">
+                                {(this.props.authenticated === false) && (
+                                    <Link style={{ color: 'white' }} to="/account/login">Login</Link>
+                                )}
+                                {(this.props.authenticated === true) && (
+                                    <a onClick={this.props.logout} style={{ color: 'white' }}>Logout</a>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </nav>
             </header>
         );
     }
 }
+
+const mapLoginStateToProps = state => ({
+    authenticated: state.login
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        logout: () => dispatch({ type: 'SIGN_OUT' })
+    };
+}
+
+export default connect(mapLoginStateToProps, mapDispatchToProps)(Topnavbar);

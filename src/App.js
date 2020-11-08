@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import firebase from 'firebase/app';
 import Main from './components/main/main';
 import TopNavbar from './components/common/topnavbar';
 import Footer from './components/common/footer';
@@ -10,18 +12,30 @@ import Testimonials from './components/testimonials/testimonials';
 import Blog from './components/blog/blog';
 import AboutUs from './components/aboutUs/aboutUs';
 import Contact from './components/contact/contact';
+import { Account } from './components/account';
+import { PuppyRequests } from './components/puppyRequests'
 import PageNotFound from './components/common/pageNotFound';
 import $ from 'jquery';
 
 class App extends Component {
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount(props) {
     $(document).ready(() => {
       const navMain = $('#navbarCollapse');
       const root = $('#root');
       root.on('click', () => {
         navMain.collapse('hide');
       });
+    });
+
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.props.setUser(user);
+      }
     });
   }
 
@@ -38,6 +52,8 @@ class App extends Component {
             <Route path="/blog" render={(props) => <Blog {...props} />} />
             <Route path="/about-us" render={(props) => <AboutUs {...props} />} />
             <Route path="/contact" render={(props) => <Contact {...props} />} />
+            <Route path="/account" render={(props) => <Account {...props} />} />
+            <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
             <Route component={PageNotFound} />
           </Switch>
         <Footer />
@@ -47,4 +63,17 @@ class App extends Component {
 
 }
 
-export default App;
+const mapStateToProps = state => ({
+  user: state.user,
+  login: state.login
+});
+
+const mapDispatchToProps = dispatch => {
+  return {
+    login: () => dispatch({ type: 'SIGN_IN' }),
+    logout: () => dispatch({ type: 'SIGN_OUT' }),
+    setUser: (user) => dispatch({ type: 'SET_USER', user: user })
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

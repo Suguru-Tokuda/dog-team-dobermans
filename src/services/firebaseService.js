@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/storage';
+import 'firebase/auth';
 import * as api from '../api.json';
 
 const firebaseConfig = {
@@ -15,7 +16,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const storage = firebase.storage();
+const provider = new firebase.auth.FacebookAuthProvider();
+
 
 export {
-    storage, firebase as default
+    storage, 
+    provider,
+    firebase as default
 };
