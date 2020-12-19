@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Spinner from 'react-spinkit';
 import firebase from 'firebase/app';
 import Main from './components/main/main';
 import TopNavbar from './components/common/topnavbar';
@@ -12,18 +13,53 @@ import Testimonials from './components/testimonials/testimonials';
 import Blog from './components/blog/blog';
 import AboutUs from './components/aboutUs/aboutUs';
 import Contact from './components/contact/contact';
+import LoginSignUp from './components/account/loginSignUp';
 import { Account } from './components/account';
-import { PuppyRequests } from './components/puppyRequests'
+import { PuppyRequests } from './components/puppyRequests';
+import PuppyRequest from './components/puppyRequest';
 import PageNotFound from './components/common/pageNotFound';
+import userService from './services/userService';
 import $ from 'jquery';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-  }
 
-  componentDidMount(props) {
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        this.props.showLoading({reset: false, count: 1 });
+    
+        try {
+          const res = await userService.getUser(user.uid);
+          const userData = res.data;
+    
+          const { buyerID, firstName, lastName, phone, email, city, state } = userData;
+    
+          this.props.setUser({
+              userID: buyerID,
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              phone: phone,
+              city: city,
+              state: state
+          });
+          
+          this.props.checkUser();          
+          this.props.login();
+
+        } catch (err) {
+          console.log(err);
+        } finally {
+          this.props.doneLoading();
+        }
+      }
+    });
+  }
+  
+
+  componentDidMount() {
     $(document).ready(() => {
       const navMain = $('#navbarCollapse');
       const root = $('#root');
@@ -31,18 +67,28 @@ class App extends Component {
         navMain.collapse('hide');
       });
     });
+  }
 
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.props.setUser(user);
-      }
-    });
+  showSpinner = () => {
+    if (this.props.loadCount > 0) {
+      return (
+        <div className="centered-spinner">
+          <Spinner name="line-spin-fade-loader" color="purple"/>
+        </div>
+      );
+    }
+  }
+
+  getUIBlockerClass = () => {
+    return (this.props.loadCount > 0 ? 'block-screen': '');
   }
 
   render() {
     return (
       <BrowserRouter>
+      <div className={this.getUIBlockerClass()}>
         <TopNavbar />
+          {this.showSpinner()}
           <Switch>
             <Route path="/" exact render={(props) => <Main {...props} />} />
             <Route path="/about-dobermans" exact render={(props) => <AboutDobermans {...props} />} />
@@ -54,9 +100,12 @@ class App extends Component {
             <Route path="/contact" render={(props) => <Contact {...props} />} />
             <Route path="/account" render={(props) => <Account {...props} />} />
             <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
+            <Route path="/puppy-request" render={(props) => <PuppyRequest {...props} />} />
+            <Route path="/login" render={(props) => <LoginSignUp {...props} />} />
             <Route component={PageNotFound} />
           </Switch>
         <Footer />
+      </div>
       </BrowserRouter>
     );
   }
@@ -65,14 +114,20 @@ class App extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
-  login: state.login
+  authenticated: state.authenticated,
+  loadCount: state.loadCount,
+  userChecked: state.userChecked
 });
 
 const mapDispatchToProps = dispatch => {
   return {
     login: () => dispatch({ type: 'SIGN_IN' }),
     logout: () => dispatch({ type: 'SIGN_OUT' }),
-    setUser: (user) => dispatch({ type: 'SET_USER', user: user })
+    checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+    setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+    getUser: () => dispatch({ type: 'GET_USER' }),
+    showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+    doneLoading: () => dispatch({ type: 'DONE_LOADING' })
   };
 }
 

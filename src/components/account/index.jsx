@@ -10,9 +10,10 @@ export class Account extends Component {
 
     render() {
         return (
-            <React.Fragment>
-                <Route path="/account/login" exact render={(props) => <LoginSignUp {...props} />} />
-            </React.Fragment>
-        )
+            null
+            // <React.Fragment>
+            //     <Route path="/account/edit" exact render={(props) => <LoginSignUp {...props} />} />
+            // </React.Fragment>
+        );
     }
 }

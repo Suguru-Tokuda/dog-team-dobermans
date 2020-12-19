@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ImageGallery from 'react-image-gallery';
 import HomepageContentsService from '../../services/homepageContentsService';
-// import PuppyService from '../../services/puppyService';
-// import ParentService from '../../services/parentService';
 import toastr from 'toastr';
+import { connect } from 'react-redux';
 
 class Main extends Component {
     state = {
@@ -21,20 +20,9 @@ class Main extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
-        // PuppyService.getLivePuppiesForLimit(10)
-        //     .then(res => {
-        //         this.setState({ puppies: res.data });
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     });
-        // ParentService.getLiveParentsForLimit(4)
-        //     .then(res => {
-        //         this.setState({ parents: res.data });
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     });
+
+        this.props.showLoading({ reset: false, count: 1 });
+
         HomepageContentsService.getHomepageContents()
             .then(async (res) => {
                 const homepageContentsData = res.data;
@@ -62,32 +50,10 @@ class Main extends Component {
             })
             .finally(() => {
                 this.setState({ loaded: true });
+                
+                this.props.doneLoading();
             });
     };
-
-    // componentDidUpdate() {
-    //     $(document).ready(function () {
-    //         $('.owl-carousel').owlCarousel({ 
-    //             margin: 10, 
-    //             autoHeight: true,
-    //             responsiveClass: true,
-    //             responsive: {
-    //                 0: {
-    //                     items: 1,
-    //                     nav: false
-    //                 },
-    //                 768: {
-    //                     items: 2,
-    //                     nav: false
-    //                 },
-    //                 992: {
-    //                     items: 4,
-    //                     nav: false
-    //                 }
-    //             } 
-    //         });
-    //     });
-    // }
 
     getOurDogs() {
         const { parents } = this.state;
@@ -177,6 +143,7 @@ class Main extends Component {
                     </div>
                 );
             });
+
             return (
                 <section className="men-collection gray-bg">
                     <div className="container">
@@ -220,6 +187,7 @@ class Main extends Component {
 
     renderImageGalley = () => {
         const { galleryImages } = this.state;
+
         if (galleryImages.length > 0) {
             const imageObjects = galleryImages.map(image => {
                 return {
@@ -243,6 +211,7 @@ class Main extends Component {
 
     render() {
         const { title, description, videoSrc, news, loaded } = this.state;
+
         if (loaded === true) {
             return (
                     <div>
@@ -260,20 +229,8 @@ class Main extends Component {
                                 </div>
                             </section>
                         )}
-                    {/* {this.getOurDogs()}
-                    {this.getPuppies()} */}
                     {this.renderImageGalley()}
                     {this.getBanner()}
-                    {/* {news !== '' && (
-                        <section className="blog">
-                            <div className="container">
-                            <header className="text-center">
-                                <h2 className="text-uppercase">News</h2>
-                            </header>
-                                <div dangerouslySetInnerHTML={{ __html: news }} />
-                            </div>
-                        </section>
-                    )} */}
                 </div>
             );
         } else {
@@ -282,4 +239,23 @@ class Main extends Component {
     }
 }
 
-export default Main;
+const mapStateToProps = state => ({
+  user: state.user,
+  authenticated: state.authenticated,
+  loadCount: state.loadCount,
+  userChecked: state.userChecked
+});
+
+const mapDispatchToProps = dispatch => {
+  return {
+    login: () => dispatch({ type: 'SIGN_IN' }),
+    logout: () => dispatch({ type: 'SIGN_OUT' }),
+    checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+    setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+    getUser: () => dispatch({ type: 'GET_USER' }),
+    showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+    doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

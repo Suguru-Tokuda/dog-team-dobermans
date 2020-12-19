@@ -8,8 +8,6 @@ class Messages extends Component {
     constructor(props) {
         super(props);
 
-        console.log("messages")
-
         for (let i = 0, max = 10; i < max; i++) {
             this.state.messages.push({
                 sender: 'Bob',

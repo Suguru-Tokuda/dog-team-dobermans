@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
-import WaitListForm from './waitListForm';
+import WaitListForm from '../puppyRequest/puppyRequeestForm';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
 import * as api from '../../api.json';
 import $ from 'jquery';
@@ -52,7 +52,7 @@ class ContactuUs extends Component {
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-1">
-                            <h1>Contact / Request a Puppy</h1>
+                            <h1>Contact</h1>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
@@ -145,7 +145,6 @@ class ContactuUs extends Component {
                 {this.getHeader()}
                 {this.getMain()}
                 {this.getMap()}
-                <WaitListForm />
             </React.Fragment>
         )
     }

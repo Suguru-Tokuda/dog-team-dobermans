@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import waitListService from '../../services/waitListService';
 
 class PuppyRequestList extends Component {
 
-    state = {};
+    state = {
+        userID: ''
+    };
 
     constructor(props) {
         super(props);
-        console.log('')
     }
 
     componentDidMount() {
@@ -69,4 +72,10 @@ class PuppyRequestList extends Component {
     }
 }
 
-export default PuppyRequestList;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated
+});
+
+
+export default connect(mapStateToProps)(PuppyRequestList);

@@ -5,9 +5,12 @@ import * as siteLogo from '../../assets/img/site_logo.PNG';
 import ReactTooltip from 'react-tooltip';
 
 class Topnavbar extends Component {
-
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        console.log(this.props);
     }
     
     render() {
@@ -43,17 +46,24 @@ class Topnavbar extends Component {
                                     <NavLink className="nav-link" activeClassName="active" to="/about-us">About us</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink className="nav-link" activeClassName="active" to="/contact">Contact / Request a Puppy</NavLink>
+                                    <NavLink className="nav-link" activeClassName="active" to="/contact">Contact</NavLink>
                                 </li>
+                                {(this.props.authenticated === true) && (
+                                    <li className="nav-item">
+                                        <NavLink className="nav-link" activeClassName="active" to="/puppy-request">Request a Puppy</NavLink>
+                                    </li>
+                                )}
                             </ul>
                         </div>
                         <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row">
-                            <div className="user">
-                                <a id="account" href="/puppy-requests">
-                                    <i className="fab fa-facebook-messenger" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
-                                    <ReactTooltip />
-                                </a>
-                            </div>
+                            {(this.props.authenticated === true) && (
+                                <div className="user">
+                                    <a id="account" href="/puppy-requests">
+                                        <i className="fab fa-facebook-messenger" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
+                                        <ReactTooltip />
+                                    </a>
+                                </div>
+                            )}
                             <div className="user ml-3">
                                 <a id="account" href="/account" style={{ color: 'white' }}>
                                     <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
@@ -62,10 +72,10 @@ class Topnavbar extends Component {
                             </div>
                             <div className="ml-3">
                                 {(this.props.authenticated === false) && (
-                                    <Link style={{ color: 'white' }} to="/account/login">Login</Link>
+                                    <Link style={{ color: 'white' }} to="/login">Login</Link>
                                 )}
                                 {(this.props.authenticated === true) && (
-                                    <a onClick={this.props.logout} style={{ color: 'white' }}>Logout</a>
+                                    <a onClick={this.props.logout} style={{ color: 'white', cursor: 'pointer' }}>Logout</a>
                                 )}
                             </div>
                         </div>
@@ -76,8 +86,8 @@ class Topnavbar extends Component {
     }
 }
 
-const mapLoginStateToProps = state => ({
-    authenticated: state.login
+const mapStateToProps = state => ({
+    authenticated: state.authenticated
 });
 
 const mapDispatchToProps = dispatch => {
@@ -87,4 +97,4 @@ const mapDispatchToProps = dispatch => {
     };
 }
 
-export default connect(mapLoginStateToProps, mapDispatchToProps)(Topnavbar);
+export default connect(mapStateToProps, mapDispatchToProps)(Topnavbar);

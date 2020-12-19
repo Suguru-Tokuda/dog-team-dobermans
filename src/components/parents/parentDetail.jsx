@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import PageNotFound from '../common/pageNotFound';
 import ParentService from '../../services/parentService';
 import moment from 'moment';
@@ -32,6 +33,8 @@ class ParentDetail extends Component {
     componentDidMount() {
         window.scrollTo(0, 0);
         const { parentID } = this.state;
+
+        this.props.showLoading({ reset: false, count: 1 });
         ParentService.getParent(parentID)
             .then(res => {
                 if (Object.keys(res.data).length === 0) {
@@ -56,6 +59,8 @@ class ParentDetail extends Component {
             })
             .finally(() => {
                 this.setState({ pageLoaded: true });
+
+                this.props.doneLoading();
             });
     }
 
@@ -227,4 +232,18 @@ class ParentDetail extends Component {
     }
 }
 
-export default ParentDetail;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ParentDetail);

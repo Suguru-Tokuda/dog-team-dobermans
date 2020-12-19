@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import firebase from 'firebase/app';
 import { provider } from '../../services/firebaseService';
+import { Redirect } from 'react-router-dom';
 
 class BreefSignUp extends Component {
 
@@ -60,19 +61,18 @@ class BreefSignUp extends Component {
                 if (userInfo.additionalUserInfo.isNewUser === true) {
 
                 } else {
-                    
+                    // check if there was a previousURL from props.
+                    if (this.props.urlToRedirect) {
+                        return <Redirect to={this.props.urlToRedirect} />;
+                    } else {
+                        // redirect to the main page
+                        return <Redirect to="/" />;
+                    }
                 }
 
             } catch (err) {
-
+                console.log(err);
             }
-            firebase.auth().signInWithPopup(provider)
-                .then(res => {
-
-                })
-                .catch(err => {
-
-                });
         }
     }
 
@@ -119,7 +119,7 @@ class BreefSignUp extends Component {
                                 <button 
                                     type="button" 
                                     className="btn btn-facebook"
-                                    onClick={this.handleFaceBookSignUp}
+                                    onClick={this.handleFaceBookSignIn}
                                 >
                                     <i className="fab fa-facebook-f"></i>
                                     Sign up with Facebook</button>

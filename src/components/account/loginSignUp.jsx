@@ -4,9 +4,17 @@ import Login from './login';
 import SignUp from './signUp';
 
 class LoginSignUp extends Component {
+    state = {
+        previousUrl: ''
+    }
 
     constructor(props) {
         super(props);
+
+        console.log(this.props);
+
+        if (props.location.state && props.location.state.previousUrl)
+            this.state.previousUrl = props.location.state.previousUrl;
     }
 
     renderHeader = () => {
@@ -20,7 +28,7 @@ class LoginSignUp extends Component {
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
                                 <li className="breadcrumb-item">
-                                    <Link to="/">Home</Link>
+                                    <Link to={"/"}>Home</Link>
                                 </li>
                                 <li className="breadcrumb-item active">
                                     Account
@@ -41,10 +49,10 @@ class LoginSignUp extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                                <Login />
+                                <Login {...this.props} urlToRedirect={this.state.previousUrl} />
                             </div>
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                                <SignUp />
+                                <SignUp {...this.props} urlToRedirect={this.state.previousUrl} />
                             </div>    
                         </div>
                     </div>

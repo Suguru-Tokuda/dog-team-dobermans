@@ -155,3 +155,20 @@ nav.navbar a.nav-link.active {
   -webkit-box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
   box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
 }
+
+.centered-spinner {
+  position: absolute;
+  height: 200px;
+  width: 200px;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+  background-size: 200%;
+  z-index: 1;
+}
+
+.block-screen {
+  pointer-events: none;
+  opacity: 0.4;
+}
