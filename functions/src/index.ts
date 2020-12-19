@@ -50,7 +50,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
         `;
         sendEmail('dogTeam@dogteamdobermans.com', 'New Testimonial Submitted', htmlBody)
             .then(() => {
-                resolve();
+                resolve(1);
             })
             .catch(() => {
                 reject();
@@ -80,7 +80,9 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
     } catch (err) {
         console.log(err);
     }
-    let colorPref = puppyColor === undefined || puppyColor === null || puppyColor === '' ? 'No Preference' : puppyColor;
+
+    const colorPref = puppyColor === undefined || puppyColor === null || puppyColor === '' ? 'No Preference' : puppyColor;
+
     return new Promise((resolve, reject) => {
         const htmlBody = `
             <!DOCTYPE html>
@@ -121,9 +123,10 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
                 </body>
             </html>
         `;
+
         sendEmail('dogTeam@dogteamdobermans.com', `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
         .then(() => {
-            resolve();
+            resolve(1);
         })
         .catch(() => {
             reject();
