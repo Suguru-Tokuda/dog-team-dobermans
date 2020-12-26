@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
 
-export default class Footer extends Component {
+class Footer extends Component {
     render() {
         return (
             <footer className="main-footer">
@@ -24,7 +25,10 @@ export default class Footer extends Component {
                                     <li><Link to="/blog">Blog</Link></li>
                                     <li><Link to="/testimonials">Testimonials</Link></li>
                                     <li><Link to="/about-us">About Us</Link></li>
-                                    <li><Link to="/contact">Contact/Request a Puppy</Link></li>
+                                    <li><Link to="/contact">Contact</Link></li>
+                                    {this.props.authenticated && (
+                                        <li><Link to="/puppy-request">Request a Puppy</Link></li>
+                                    )}
                                 </ul>
                             </div>
                         </div>
@@ -34,3 +38,23 @@ export default class Footer extends Component {
         );
     }
 }
+
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Footer);
