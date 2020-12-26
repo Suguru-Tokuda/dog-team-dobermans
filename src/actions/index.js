@@ -17,6 +17,12 @@ export const setUser = (user) => {
     };
 }
 
+export const resetUser = () => {
+    return {
+        type: 'RESET_USER'
+    };
+}
+
 export const checkUser = () => {
     return {
         type: 'USER_CHECKED'
@@ -44,3 +50,15 @@ export const doneLoading = (resetAll) => {
     };
 }
 
+export const setRedirectURL = (url) => {
+    return {
+        type: 'SET_REDIRECT_URL',
+        url: url
+    }
+}
+
+export const resetRedirectURL = () => {
+    return {
+        type: 'RESET_REDIRECT_URL'
+    }
+}
