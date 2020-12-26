@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import firebase from 'firebase/app';
-import { Redirect } from 'react-router-dom';
 import { provider } from '../../services/firebaseService';
 import { connect } from 'react-redux';
 import userService from '../../services/userService';
 import utilService from '../../services/utilService';
+import toastr from 'toastr';
 
 class Login extends Component {
     state = {
@@ -14,8 +14,49 @@ class Login extends Component {
 
     constructor(props) {
         super(props);
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+              this.props.showLoading({reset: false, count: 1 });
+      
+              try {
+                const res = await userService.getUser(user.uid);
+                const userData = res.data;
+          
+                const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
+                const { emailVerified } = user;
+      
+                this.props.setUser({
+                    userID: buyerID,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    city: city,
+                    state: state,
+                    statusID: statusID,
+                    currentUser: user,
+                    emailVerified: emailVerified,
+                    registrationCompleted: registrationCompleted
+                });
+                
+                this.props.checkUser();          
+                this.props.login();
 
-        console.log(this.props);
+                if (this.props.redirectURL) {
+                  this.props.history.push(this.props.redirectURL);
+                  this.props.resetRedirectURL();
+                } else if (this.props.urlToRedirect) {
+                    this.props.history.push(this.props.urlToRedirect);
+                    this.props.resetRedirectURL();  
+                }
+      
+              } catch (err) {
+                console.log(err);
+              } finally {
+                this.props.doneLoading();
+              }
+            }
+          });
     }
 
     handleEmailChanged = (e) => {
@@ -38,13 +79,24 @@ class Login extends Component {
 
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then(async res => {
-                    await this.populateUser(res.user.uid);
+                    await this.populateUser(res.user);
+                    this.props.login();
                 })
                 .catch(err => {
-
+                    if (err.message) {
+                        toastr.error(err.message);
+                    } else {
+                        toastr.error('There was an error in loggin in.');
+                    }
                 })
                 .finally(() => {
                     this.props.doneLoading();
+                    if (this.props.urlToRedirect) {
+                        this.props.history.push(this.props.urlToRedirect);
+                    } else {
+                        // redirect to the main page
+                        this.props.history.push('/');
+                    }
                 });
         }
     }
@@ -64,7 +116,7 @@ class Login extends Component {
                 // redirect to the user registration page.
             } else {
                 // get user info from the api, then set the user info to the global state.
-                await this.populateUser(userInfo.user.uid);
+                await this.populateUser(userInfo.user);
 
                 this.props.login();
                 if (this.props.urlToRedirect) {
@@ -81,13 +133,15 @@ class Login extends Component {
         }
     }
 
-    populateUser(userID) {
+    populateUser(user) {
+        const { uid } = user;
+
         return new Promise((resolve, reject) => {
-            userService.getUser(userID)
+            userService.getUser(uid)
                 .then(res => {
                     const userData = res.data;
 
-                    const { buyerID, firstName, lastName, phone, email, city, state } = userData;
+                    const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
 
                     this.props.setUser({
                         userID: buyerID,
@@ -96,7 +150,11 @@ class Login extends Component {
                         email: email,
                         phone: phone,
                         city: city,
-                        state: state
+                        state: state,
+                        statusID: statusID,
+                        currentUser: user,
+                        emailVerified: user.emailVerified,
+                        registrationCompleted: registrationCompleted
                     });
 
                     resolve();
@@ -157,15 +215,19 @@ class Login extends Component {
 
 const mapStateToProps = state => ({
     user: state.user,
-    authenticated: state.authenticated
+    authenticated: state.authenticated,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
 });
 
 const mapDispatchToProps = dispatch => {
     return {
         login: () => dispatch({ type: 'SIGN_IN' }),
         setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        checkUser: () => dispatch({ type: 'USER_CHECKED' }),
         showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
-        doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
     };
 }
 
