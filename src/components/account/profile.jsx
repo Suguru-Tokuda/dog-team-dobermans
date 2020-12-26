@@ -80,6 +80,8 @@ class Profile extends Component {
         firebase.auth().signOut()
             .then(() => {
                 this.props.logout();
+                this.props.resetUser();
+                this.props.resetRedirectURL();
             })
             .catch(() => {
 
@@ -146,6 +148,7 @@ const mapStateToProps = state => ({
     return {
       login: () => dispatch({ type: 'SIGN_IN' }),
       logout: () => dispatch({ type: 'SIGN_OUT' }),
+      resetUser: () => dispatch({ type: 'RESET_USER' }),
       checkUser: () => dispatch({ type: 'USER_CHECKED' }),
       setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
       getUser: () => dispatch({ type: 'GET_USER' }),
