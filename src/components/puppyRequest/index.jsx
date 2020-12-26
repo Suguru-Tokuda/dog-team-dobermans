@@ -63,7 +63,7 @@ class PuppyRequest extends Component {
             <React.Fragment>
                 {this.getHeader()}
                 {(this.props.userChecked === true && this.props.authenticated === true) && (
-                    <PuppyRequestForm />
+                    <PuppyRequestForm {...this.props} />
                 )} 
                 {(this.props.userChecked === true && this.props.authenticated === false) && (
                     this.getLoginButton()
