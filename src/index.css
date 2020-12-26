@@ -7,6 +7,10 @@ code {
     monospace;
 }
 
+select {
+  height: 42px !important;
+}
+
 .owl-carousel .item img{
   display: block;
   width: 100%;
@@ -35,6 +39,10 @@ input[type="file"] {
   section.divider {
     height: 800px;
   }
+}
+
+.error {
+  border: 1px solid #d9534f;
 }
 
 .pointer {
