@@ -14,12 +14,14 @@ import Blog from './components/blog/blog';
 import AboutUs from './components/aboutUs/aboutUs';
 import Contact from './components/contact/contact';
 import LoginSignUp from './components/account/loginSignUp';
-import { Account } from './components/account';
-import { PuppyRequests } from './components/puppyRequests';
+import Profile from './components/account/profile';
+import EmailVerifixation from './components/account/emailVerification';
+import PuppyRequests from './components/puppyRequests';
 import PuppyRequest from './components/puppyRequest';
 import PageNotFound from './components/common/pageNotFound';
 import userService from './services/userService';
 import $ from 'jquery';
+import UserRegistration from './components/account/userRegistration';
 
 class App extends Component {
 
@@ -28,14 +30,16 @@ class App extends Component {
 
     firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
+
         this.props.showLoading({reset: false, count: 1 });
-    
+
         try {
           const res = await userService.getUser(user.uid);
           const userData = res.data;
     
-          const { buyerID, firstName, lastName, phone, email, city, state } = userData;
-    
+          const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
+          const { emailVerified } = user;
+
           this.props.setUser({
               userID: buyerID,
               firstName: firstName,
@@ -43,12 +47,15 @@ class App extends Component {
               email: email,
               phone: phone,
               city: city,
-              state: state
+              state: state,
+              statusID: statusID,
+              currentUser: user,
+              emailVerified: emailVerified,
+              registrationCompleted: registrationCompleted
           });
           
           this.props.checkUser();          
           this.props.login();
-
         } catch (err) {
           console.log(err);
         } finally {
@@ -57,7 +64,6 @@ class App extends Component {
       }
     });
   }
-  
 
   componentDidMount() {
     $(document).ready(() => {
@@ -98,10 +104,12 @@ class App extends Component {
             <Route path="/blog" render={(props) => <Blog {...props} />} />
             <Route path="/about-us" render={(props) => <AboutUs {...props} />} />
             <Route path="/contact" render={(props) => <Contact {...props} />} />
-            <Route path="/account" render={(props) => <Account {...props} />} />
+            <Route path="/profile" render={(props) => <Profile {...props} />} />
             <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
             <Route path="/puppy-request" render={(props) => <PuppyRequest {...props} />} />
             <Route path="/login" render={(props) => <LoginSignUp {...props} />} />
+            <Route path="/email-verifiation" render={(props) => <EmailVerifixation {...props} />} />
+            <Route path="/user-registration"render={(props) => <UserRegistration {...props} />} />
             <Route component={PageNotFound} />
           </Switch>
         <Footer />
@@ -116,7 +124,8 @@ const mapStateToProps = state => ({
   user: state.user,
   authenticated: state.authenticated,
   loadCount: state.loadCount,
-  userChecked: state.userChecked
+  userChecked: state.userChecked,
+  redirectURL: state.redirectURL
 });
 
 const mapDispatchToProps = dispatch => {
@@ -127,7 +136,8 @@ const mapDispatchToProps = dispatch => {
     setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
     getUser: () => dispatch({ type: 'GET_USER' }),
     showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
-    doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+    doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+    resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
   };
 }
 
