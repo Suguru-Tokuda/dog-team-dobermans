@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import toastr from 'toastr';
+import moment from 'moment';
 import waitListService from '../../services/waitListService';
 
 class PuppyRequestList extends Component {
 
     state = {
-        userID: ''
+        userID: '',
+        waitRequestList: [],
+        dataLoaded: false
     };
 
     constructor(props) {
@@ -14,7 +18,28 @@ class PuppyRequestList extends Component {
     }
 
     componentDidMount() {
+        if (this.props.authenticated === true) {
+            this.props.showLoading({ reset: false, count: 1 });
 
+            waitListService.getWaitRequestList(this.props.user.userID)
+                .then(res => {
+                    this.setState({
+                        userID: this.props.user.userID,
+                        waitRequestList: res.data
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                    toastr.error('There was an error in loading wait requests data.');
+                })
+                .finally(() => {
+                    this.setState({ dataLoaded: true });
+                    this.props.doneLoading({ reset: false });
+                });
+        } else {
+            this.props.setRedirectURL('/puppy-requests');
+            this.props.history.push('/login');
+        }
     }
 
     getHeader() {
@@ -41,31 +66,57 @@ class PuppyRequestList extends Component {
         );
     }
 
+    renderRequestRows() {
+        const { waitRequestList } = this.state;
+
+        if (waitRequestList.length > 0) {
+            const rows = waitRequestList.map(req => {
+                return (
+                <tr key={req.waitRequestID}>
+                    <td>{moment(req.created).format('MM/DD/YYYY')}</td>
+                    <td>{req.color}</td>
+                    <td><Link className="btn btn-primary" to={`/puppy-requests/${req.waitRequestID}`}>Messages</Link></td>
+                </tr>);
+            });
+
+            return rows;
+        } else {
+            return null;
+        }
+    }
+
     render() {
+        const { waitRequestList, dataLoaded } = this.state;
+
         return (
             <React.Fragment>
                 {this.getHeader()}
-                <div class="container">
-                    <div class="talbe-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Date Created</th>
-                                    <th>Color</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>09/21/2020</td>
-                                    <td>Black and Tan</td>
-                                    <td>
-                                        <Link class="btn btn-primary" to="/puppy-requests/someID">View</Link>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div className="container mt-5 mb-5">
+                    {dataLoaded && waitRequestList.length > 0 && (
+                        <div className="talbe-responsive">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date Created</th>
+                                        <th>Color</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.renderRequestRows()}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    {dataLoaded && waitRequestList.length === 0 && (
+                        <div className="row">
+                            <div className="col-xs-12">
+                                <div className="text-center">
+                                    <h3>No requests have been submitted.</h3>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </React.Fragment>
         );
@@ -77,5 +128,14 @@ const mapStateToProps = state => ({
     authenticated: state.authenticated
 });
 
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        setRedirectURL: (url) => dispatch({ type: 'SET_REDIRECT_URL', url: url })
+    };
+}
 
-export default connect(mapStateToProps)(PuppyRequestList);
+export default connect(mapStateToProps, mapDispatchToProps)(PuppyRequestList);
