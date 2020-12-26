@@ -11,8 +11,6 @@ class LoginSignUp extends Component {
     constructor(props) {
         super(props);
 
-        console.log(this.props);
-
         if (props.location.state && props.location.state.previousUrl)
             this.state.previousUrl = props.location.state.previousUrl;
     }
