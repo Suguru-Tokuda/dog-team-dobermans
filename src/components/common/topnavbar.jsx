@@ -3,14 +3,28 @@ import { connect } from 'react-redux';
 import { NavLink, Link } from 'react-router-dom';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
 import ReactTooltip from 'react-tooltip';
+import firebase from '../../services/firebaseService';
 
 class Topnavbar extends Component {
     constructor(props) {
         super(props);
     }
 
-    componentDidMount() {
-        console.log(this.props);
+    handleLogoutClicked = () => {
+        this.props.showLoading({ reset: true, count: 1 });
+
+        firebase.auth().signOut()
+            .then(() => {
+                this.props.logout();
+                this.props.resetUser();
+                this.props.resetRedirectURL();
+            })
+            .catch(() => {
+                
+            })
+            .finally(() => {
+                this.props.doneLoading({ reset: true });
+            });
     }
     
     render() {
@@ -58,24 +72,26 @@ class Topnavbar extends Component {
                         <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row">
                             {(this.props.authenticated === true) && (
                                 <div className="user">
-                                    <a id="account" href="/puppy-requests">
+                                    <Link id="account" to="/puppy-requests">
                                         <i className="fab fa-facebook-messenger" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
                                         <ReactTooltip />
-                                    </a>
+                                    </Link>
                                 </div>
                             )}
-                            <div className="user ml-3">
-                                <a id="account" href="/account" style={{ color: 'white' }}>
-                                    <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
-                                    <ReactTooltip />
-                                </a>
-                            </div>
+                            {(this.props.authenticated === true) && (
+                                <div className="user ml-3">
+                                    <Link id="account" to="/profile" style={{ color: 'white' }}>
+                                        <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
+                                        <ReactTooltip />
+                                    </Link>
+                                </div>
+                            )}
                             <div className="ml-3">
                                 {(this.props.authenticated === false) && (
                                     <Link style={{ color: 'white' }} to="/login">Login</Link>
                                 )}
                                 {(this.props.authenticated === true) && (
-                                    <a onClick={this.props.logout} style={{ color: 'white', cursor: 'pointer' }}>Logout</a>
+                                    <a onClick={this.handleLogoutClicked} style={{ color: 'white', cursor: 'pointer' }}>Logout</a>
                                 )}
                             </div>
                         </div>
@@ -93,7 +109,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => {
     return {
         login: () => dispatch({ type: 'SIGN_IN' }),
-        logout: () => dispatch({ type: 'SIGN_OUT' })
+        logout: () => dispatch({ type: 'SIGN_OUT' }),
+        resetUser: () => dispatch({ type: 'RESET_USER' }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
     };
 }
 
