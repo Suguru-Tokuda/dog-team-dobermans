@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import firebase from 'firebase/app';
 import { provider } from '../../services/firebaseService';
 import { Redirect } from 'react-router-dom';
+import userService from '../../services/userService';
+import toastr from 'toastr';
 
 class BreefSignUp extends Component {
 
@@ -31,21 +33,27 @@ class BreefSignUp extends Component {
 
         if (email && email.length > 0 && password && password.length) {
             try {
-                const res = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const res = await firebase.auth().createUserWithEmailAndPassword(email.trim().toLowerCase(), password);
+                const currentUser = res.user;
 
-                const currentUser = firebase.auth().currentUser;
+                const createUserData = {
+                    userID: currentUser.uid,
+                    email: email.trim().toLowerCase(),
+                    statusID: 1
+                };
+
+                await userService.createUser(createUserData);
 
                 if (currentUser.sendEmailVerification) {
-                    currentUser.sendEmailVerification()
-                        .then(res => {
-                            console.log(res);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
+                    await currentUser.sendEmailVerification();
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
                 }
             } catch (err) {
-                console.log(err);
+                if (err.message) {
+                    toastr.error(err.message);
+                } else {
+                    toastr.error('Theere was an error in creating an account.');
+                }
             }
         }
     }
@@ -57,19 +65,19 @@ class BreefSignUp extends Component {
         if (isDesktop === true) {
             try {
                 const userInfo = await firebase.auth().signInWithPopup(provider);
-
-                if (userInfo.additionalUserInfo.isNewUser === true) {
-
-                } else {
-                    // check if there was a previousURL from props.
-                    if (this.props.urlToRedirect) {
-                        return <Redirect to={this.props.urlToRedirect} />;
-                    } else {
-                        // redirect to the main page
-                        return <Redirect to="/" />;
-                    }
+                
+                if (!userInfo.user.emailVerified) {
+                    await userInfo.user.sendEmailVerification();
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
                 }
 
+                // check if there was a previousURL from props.
+                if (this.props.urlToRedirect) {
+                    return <Redirect to={this.props.urlToRedirect} />;
+                } else {
+                    // redirect to the main page
+                    return <Redirect to="/" />;
+                }
             } catch (err) {
                 console.log(err);
             }
