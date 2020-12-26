@@ -11,29 +11,11 @@ export default class UserService {
         return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&buyerID=${userID}`)
     }
 
-    static createUser(firstName, lastName, email, phone, city, state) {
-        const data = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phone: phone,
-            city: city,
-            state: state
-        };
-
-        return axios.post(`${this.getServiceBase()}s?key=${api.API_KEY}`, data);
+    static createUser(data) {
+        return axios.post(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
     }
 
-    static editUser(firstName, lastName, email, phone, city, state) {
-        const data = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phone: phone,
-            city: city,
-            state: state
-        };
-
-        return axios.put(`${this.getServiceBase()}s?key=${api.API_KEY}`, data);
+    static editUser(data) {
+        return axios.put(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
     }
 }
