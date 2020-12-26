@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import PuppyRequestModal from './puppyRequestModal';
 import PageNotFound from '../common/pageNotFound';
@@ -42,6 +43,7 @@ class PuppyDetail extends Component {
     componentDidMount() {
         const { puppyID } = this.state;
         window.scrollTo(0, 0);
+        this.props.showLoading({ reset: true, count: 1});
         PuppyService.getPuppy(puppyID)
             .then(res => {
                 if (Object.keys(res.data).length === 0) {
@@ -77,6 +79,7 @@ class PuppyDetail extends Component {
                 this.setState({ puppyFound: false });
             })
             .finally(() => {
+                this.props.doneLoading({ reset: true });
                 this.setState({ pageLoaded: true });
             });
     }
@@ -90,6 +93,26 @@ class PuppyDetail extends Component {
                 dots: false
             });
         });
+    }
+
+    handleResendVerificationEmailBtnClicked = () => {
+        const { currentUser } = this.props.user;
+
+        if (currentUser && currentUser.sendEmailVerification) {
+            this.props.showLoading({ reset: true, count: 1 });
+
+            currentUser.sendEmailVerification()
+                .then(res => {
+                    console.log(res);
+                    this.setState({ emailVerificationConfirmationMsg: 'Verification Email has been sent. Please check your email and click the link to continue using the site.' });
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    this.props.doneLoading({ reset: true });
+                });
+        }
     }
 
     getHeader() {
@@ -160,6 +183,8 @@ class PuppyDetail extends Component {
 
     getDetailsSection() {
         const { name, description, price, paidAmount, sold } = this.state;
+        const { authenticated, user } = this.props;
+
         return (
             <section className="product-details">
                 <div className="container">
@@ -181,9 +206,19 @@ class PuppyDetail extends Component {
                                 </ul>
                             </div>
                             <p>{description}</p>
-                            {sold === false && (
+                            {(sold === false && authenticated && user.emailVerified) && (
                                 <ul>
                                     <button type="button" className="btn btn-template wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
+                                </ul>
+                            )}
+                            {(sold === false && authenticated && !user.emailVerified) && (
+                                <ul>
+                                    <button type="button" className="btn btn-template wide" onClick={this.handleResendVerificationEmailBtnClicked}>Resend Verification Email</button>
+                                </ul>
+                            )}
+                            {(sold === false && !authenticated) && (
+                                <ul>
+                                    <Link type="button" className="btn btn-template wide" to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname }}}>Login</Link>
                                 </ul>
                             )}
                         </div>
@@ -342,4 +377,25 @@ class PuppyDetail extends Component {
     }
 }
 
-export default PuppyDetail;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    loadCount: state.loadCount,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+  });
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+      login: () => dispatch({ type: 'SIGN_IN' }),
+      logout: () => dispatch({ type: 'SIGN_OUT' }),
+      checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+      setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+      getUser: () => dispatch({ type: 'GET_USER' }),
+      showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+      doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(PuppyDetail);
