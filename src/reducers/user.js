@@ -3,6 +3,9 @@ const userReducer = (state = null, action) => {
         case 'SET_USER':
             state = action.user;
             break;
+        case 'RESET_USER':
+            state = null;
+            break;
     }
 
     return state;
