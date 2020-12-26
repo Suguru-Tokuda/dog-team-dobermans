@@ -14,7 +14,7 @@ import Blog from './components/blog/blog';
 import AboutUs from './components/aboutUs/aboutUs';
 import Contact from './components/contact/contact';
 import LoginSignUp from './components/account/loginSignUp';
-import Profile from './components/account/profile';
+import Account from './components/account/account';
 import EmailVerifixation from './components/account/emailVerification';
 import PuppyRequests from './components/puppyRequests';
 import PuppyRequest from './components/puppyRequest';
@@ -104,7 +104,7 @@ class App extends Component {
             <Route path="/blog" render={(props) => <Blog {...props} />} />
             <Route path="/about-us" render={(props) => <AboutUs {...props} />} />
             <Route path="/contact" render={(props) => <Contact {...props} />} />
-            <Route path="/profile" render={(props) => <Profile {...props} />} />
+            <Route path="/account" render={(props) => <Account {...props} />} />
             <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
             <Route path="/puppy-request" render={(props) => <PuppyRequest {...props} />} />
             <Route path="/login" render={(props) => <LoginSignUp {...props} />} />
