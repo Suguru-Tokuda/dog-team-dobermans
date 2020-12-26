@@ -136,48 +136,48 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
     });
 }
 
-function sendNotificationForWiatListMessage(email: string, senderName: string, waitRequestID: string, toBreeder: boolean) {
-    return new Promise((res, rej) => {
-        if (email && senderName && waitRequestID) {
-            let htmlBody: string = '';
+// function sendNotificationForWiatListMessage(email: string, senderName: string, waitRequestID: string, toBreeder: boolean) {
+//     return new Promise((res, rej) => {
+//         if (email && senderName && waitRequestID) {
+//             let htmlBody: string = '';
 
-            if (toBreeder === false) {
-                htmlBody = `
-                    <!DOCTYPE html>
-                        <body>
-                            <p>Hello ${senderName},<p>
-                            <p>You recieved a new message from the breeder.</p>
-                            <p>Please click the following link to read the message.</p>
-                            <p><a href="https://dogteamdobermans.com/puppy-requests?requestID=${waitRequestID}"</p>
-                            <br /><br />
-                            Dog Team Dobermans
-                        </body>
-                    </html>
-                `;
-            } else {
-                htmlBody = `
-                    <!DOCTYPE html>
-                        <body>
-                            <p>You recieved a new message from ${senderName}.</p>
-                            <p>Please click the following link to read the message.</p>
-                            <p><a href="https://dogteamdobermans-admin.web.app/wait-list/${waitRequestID}"</p>
-                            <br /><br />
-                            Dog Team Dobermans
-                        </body>
-                    </html>
-                `;
-            }
+//             if (toBreeder === false) {
+//                 htmlBody = `
+//                     <!DOCTYPE html>
+//                         <body>
+//                             <p>Hello ${senderName},<p>
+//                             <p>You recieved a new message from the breeder.</p>
+//                             <p>Please click the following link to read the message.</p>
+//                             <p><a href="https://dogteamdobermans.com/puppy-requests/${waitRequestID}"</p>
+//                             <br /><br />
+//                             Dog Team Dobermans
+//                         </body>
+//                     </html>
+//                 `;
+//             } else {
+//                 htmlBody = `
+//                     <!DOCTYPE html>
+//                         <body>
+//                             <p>You recieved a new message from ${senderName}.</p>
+//                             <p>Please click the following link to read the message.</p>
+//                             <p><a href="https://dogteamdobermans-admin.web.app/wait-list/${waitRequestID}"</p>
+//                             <br /><br />
+//                             Dog Team Dobermans
+//                         </body>
+//                     </html>
+//                 `;
+//             }
 
-            sendEmail(email, '', htmlBody)
-                .then(() => {
-                    res(1);
-                })
-                .catch(() => {
-                    rej();
-                })
-        }
-    });
-}
+//             sendEmail(email, '', htmlBody)
+//                 .then(() => {
+//                     res(1);
+//                 })
+//                 .catch(() => {
+//                     rej();
+//                 })
+//         }
+//     });
+// }
 
 function sendEmail(email: string, subject: string, htmlBody: string) {
     const transporter = nodemailer.createTransport({
@@ -661,27 +661,57 @@ export const buyer = functions.https.onRequest((request, response) => {
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
-                    admin.firestore().collection('buyers').add(data)
+                    const userID = data.userID;
+                    const { firstName, lastName, email, phone, state, city } = data;
+                    delete data.userID;
+
+                    data.lastModified = new Date().toISOString();
+
+                    if (firstName && lastName && email && phone && state && city) {
+                        data.registrationCompleted = true;
+                    }
+
+                    // specifies the userID on create.
+                    admin.firestore().collection('buyers').doc(userID).set(data, { merge: true })
                         .then(snapshot => {
                             const retVal = data;
-                            retVal.buyerID = snapshot.id;
                             response.status(201).json(retVal);
                         })
                         .catch(err => {
                             response.sendStatus(500).send(err);
                         });
                 } else if (method === 'PUT') {
-                    if (id.length > 0) {
-                        const data = request.body;
-                        const buyerRef = admin.firestore().collection('buyers').doc(id);
-                        buyerRef.set(data, { merge: true })
-                            .then(snapshot => {
-                                response.status(200).json({id: id, data: data});
-                            })
-                            .catch(err => {
-                                response.sendStatus(500).send(err);
-                            });
+                    const data = request.body;
+                    const userID = data.userID;
+                    const { firstName, lastName, email, phone, state, city } = data;
+                    delete data.userID;
+
+                    data.lastModified = new Date().toISOString();
+
+                    if (firstName && lastName && email && phone && state && city) {
+                        data.registrationCompleted = true;
                     }
+
+                    // specifies the userID on create.
+                    admin.firestore().collection('buyers').doc(userID).set(data, { merge: true })
+                        .then(snapshot => {
+                            const retVal = data;
+                            response.status(201).json(retVal);
+                        })
+                        .catch(err => {
+                            response.sendStatus(500).send(err);
+                        });
+                    // if (id.length > 0) {
+                    //     const data = request.body;
+                    //     const buyerRef = admin.firestore().collection('buyers').doc(id);
+                    //     buyerRef.set(data, { merge: true })
+                    //         .then(snapshot => {
+                    //             response.status(200).json({id: id, data: data});
+                    //         })
+                    //         .catch(err => {
+                    //             response.sendStatus(500).send(err);
+                    //         });
+                    // }
                 } else if (method === 'DELETE') {
                     if (id.length > 0) {
                         const buyerRef = admin.firestore().collection('buyers').doc(id);
@@ -1087,6 +1117,7 @@ export const waitList = functions.https.onRequest((request, response) => {
         const query = request.query;
         const method = request.method;
         const path = request.path;
+
         if (typeof query.key === 'undefined') {
             response.status(400).send('Missing API key');
         } else if (query.key === getAPIKEY()) {
@@ -1099,6 +1130,19 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 let retVal: any = {};
                                 retVal = doc.data();
 
+                                // load puppyName
+                                if (retVal.puppyID) {
+                                    try {
+                                        const puppyDoc = await admin.firestore().collection('puppies').doc(retVal.puppyID).get();
+                                        const puppyData: any = puppyDoc.data();
+                                        puppyData.puppyID = retVal.puppyID;
+                                        retVal.puppy = puppyData;
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                }
+
+                                // load buyer information
                                 if (retVal.userID !== undefined) {
                                     try {
                                         const userDoc = await admin.firestore().collection('buyers').doc(retVal.userID).get();
@@ -1141,12 +1185,9 @@ export const waitList = functions.https.onRequest((request, response) => {
                                         }
 
                                         if (waitRequest.userID) {
-                                            console.log('trying to get buyer here');
                                             try {
-                                                console.log('here');
                                                 const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
                                                 const userData: any = userDoc.data();
-                                                console.log(userData);
             
                                                 const { firstName, lastName, email, phone } = userData;
             
@@ -1175,8 +1216,6 @@ export const waitList = functions.https.onRequest((request, response) => {
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
-
-                    console.log(data);
 
                     admin.firestore().collection('waitList').add(data)
                         .then(async () => {
@@ -1238,6 +1277,41 @@ export const waitList = functions.https.onRequest((request, response) => {
                 } else {
                     response.status(400).send('Unsupported method');
                 }
+            } else if (path === '/getByUserID') {
+                if (method === 'GET') {
+                    const { userID } = query;
+                    const waitListRef = admin.firestore().collection('waitList');
+
+                    try {
+                        const waitListItems = await waitListRef.where('userID', '==', userID).get();
+                        const retVal = [];
+
+                        if (waitListItems.size > 0) {
+                            for (const doc of waitListItems.docs) {
+                                const waitRequest = doc.data();
+
+                                waitRequest.waitRequestID = doc.id;
+
+                                if (waitRequest.puppyID) {
+                                    try {
+                                        const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
+                                        const puppyData: any = puppyDoc.data();
+
+                                        waitRequest.puppy = puppyData;
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                }
+
+                                retVal.push(waitRequest);
+                            }
+                        }
+
+                        response.status(200).send(retVal);
+                    } catch (err) {
+                        response.status(500).send(err);
+                    }
+                }
             } else if (path === '/notify') {
                 if (method === 'POST') {
                     const data = request.body;
@@ -1275,57 +1349,22 @@ export const waitList = functions.https.onRequest((request, response) => {
                 if (path === '/messages') {
                     if (method === 'GET') {
                         // get messages for the recipientID and waitRequestID
-                        const waitRequestID = '';
-                        const recipientID = '';
-                        const userID = query.userID;
-                        let recipient: any = null;
-    
-                        const messagesRefByRecipientID = admin.firestore().collection('messages');
-                        messagesRefByRecipientID.where('waitRequestID', '==', waitRequestID);
-                        messagesRefByRecipientID.where('recipientID', '==', userID);
-
-                        const messagesRefBySenderID = admin.firestore().collection('messages');
-                        messagesRefBySenderID.where('waitRequesetID', '==', waitRequestID);
-                        messagesRefBySenderID.where('senderID', '==', userID);
-    
-                        try {
-                            recipient = await admin.firestore().collection('buyers').doc(recipientID).get();
-                        } catch (err) {
-                            response.status(500).send(err);
-                        }
+                        const waitRequestID = query.waitRequestID;    
+                        const messageRef = admin.firestore().collection('messages');
 
                         try {
-                            let messages = [];
-                            const addedMessageIDs: any[] = [];
-                            const messagesByRecipientID = await messagesRefByRecipientID.get();
-                            const messagesBySenderID = await messagesRefBySenderID.get();
+                            let messages: any[] = [];
+                            const messageSnapshot = await messageRef.where('waitRequestID', '==', waitRequestID).get();
 
-                            if (messagesByRecipientID.size > 0) {
-                                for (const doc of messagesByRecipientID.docs) {
+                            if (messageSnapshot.size > 0) {
+                                for (const doc of messageSnapshot.docs) {
                                     const message = doc.data();
 
                                     message.messageID = doc.id;
-                                    message.recipient = recipient.data();
 
-                                    if (addedMessageIDs.indexOf(doc.id) === -1) {
-                                        messages.push(message);
-                                    }
+                                    messages.push(message);
                                 }
                             }
-
-                            if (messagesBySenderID.size > 0) {
-                                for (const doc of messagesBySenderID.docs) {
-                                    const message = doc.data();
-
-                                    message.messageID = doc.id;
-                                    message.recipient = recipient.data();
-
-                                    if (addedMessageIDs.indexOf(doc.id) === -1) {
-                                        messages.push(message);
-                                    }
-                                }
-                            }
-
 
                             messages = messages.sort((a: any, b: any) => {
                                 return a.sendDate > b.sendDate ? -1 : a.sendDate < b.sendDate ? 1 : 0;
@@ -1336,45 +1375,59 @@ export const waitList = functions.https.onRequest((request, response) => {
                             response.status(500).send(err);
                         }
                     } else if (method === 'POST') {
-                        /*
-                        from the post request, it needs to receives: senderID, receipentID, messageBody
-                        */
-                       const senderID = '';
-                       const recipientID = '';
-        
+                        const { senderID, recipientID, waitRequestID, messageBody } = request.body;
+
                        try {
-                            const sender = await admin.firestore().collection('buyers').doc(senderID).get();
-                            const recipient = await admin.firestore().collection('buyers').doc(recipientID).get();
-                            const recipientData = recipient.data();
+                            // let sender: any, recipient: any, recipientData: any;
+                            // sender = await admin.firestore().collection('buyers').doc(senderID).get();
+                            // const senderData: any = sender.data();
+
+                            // if (isBreeder === true) {
+                            //     recipient = await admin.firestore().collection('buyers').doc(recipientID).get();
+                            //     recipientData = recipient.data();
+                            // }
         
                             const messageData: any = {
-                                senderID: sender.id,
-                                recipientID: recipient.id,
-                                waitRequestID: query.waitRequestID,
-                                messageBody: query.messageBody,
-                                sentDate: new Date(),
-                                lastModified: new Date(),
+                                senderID: senderID,
+                                recipientID: recipientID,
+                                waitRequestID: waitRequestID,
+                                messageBody: messageBody,
+                                sentDate: new Date().toISOString(),
+                                lastModified: new Date().toISOString(),
                                 statusID: 1
                             };
-        
-                            const messagesRef = admin.firestore().collection('messages');
 
+                            const messagesRef = admin.firestore().collection('messages');
                             const snapshot = await messagesRef.add(messageData);
 
                             messageData.messageID = snapshot.id;
 
                             // TODO: send a notification meail to the recipient.
                             // if the recipientID is Bob's, call 
-                            if (recipientData)
-                                await sendNotificationForWiatListMessage(recipientData.email, recipientData.firstName, query.waitRequestID, false);
-
-                            if (recipientData)
-                                await sendNotificationForWiatListMessage('dogteam@dogteamdobermans.com', recipientData.firstName, query.waitRequestID, true);
+                            // if (isBreeder === true) {
+                            //     await sendNotificationForWiatListMessage(recipientData.email, recipientData.firstName, query.waitRequestID, isBreeder);
+                            // } else if (isBreeder === false) {
+                            //     await sendNotificationForWiatListMessage('dogteam@dogteamdobermans.com', senderData.firstName, query.waitRequestID, isBreeder);
+                            // }
 
                             response.status(201).send(messageData);
                        } catch (err) {
-                        response.status(500).send(err);
+                            response.status(500).send(err);
                        }
+                    } else if (method === 'PUT') {
+                        const messageID = query.messageID;
+                        const messageBody = query.messageBody;
+
+                        const messagesRef = admin.firestore().collection('messages').doc(messageID);
+
+                        const data = { messabeBody: messageBody, lastModified: new Date().toISOString() };
+                        messagesRef.set(data, { merge: true })
+                            .then(() => {
+                                response.sendStatus(200);
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
                     }
                 } else if (path === '/messages/update') {
                     // upate a message that's already been sent.
@@ -1405,6 +1458,52 @@ export const waitList = functions.https.onRequest((request, response) => {
                         }
                     } catch (err) {
                         response.status(400).send(err);
+                    }
+                } else if (path === '/messages/markAsRead') {
+                    if (method === 'POST') {
+                        const data = request.body;
+                        const { messageIDs } = data;
+    
+                        for (let i = 0, max = messageIDs.length; i < max; i++) {
+                            const messageRef = admin.firestore().collection('messages').doc(messageIDs[i]);
+    
+                            try {
+                                await messageRef.set({ read: true }, { merge: true });
+                            } catch (err) {
+                                response.status(500).send(err);
+                            }
+                        }
+    
+                        response.sendStatus(204);
+                    }
+                } else if (path === '/messages/getUnreadMessagesByUserID') {
+                    if (method === 'GET') {
+                        const messsagesRef = admin.firestore().collection('messages');
+                        const userID = query.userID;
+
+                        if (userID) {
+                            messsagesRef.where('userID', '==', userID).get()
+                                .then(snapshot => {
+                                    const messages: any[] = [];
+
+                                    if (snapshot.size > 0) {
+                                        for (const messageDoc of snapshot.docs) {
+                                            const message = messageDoc.data();
+                                            message.messageID = messageDoc.id;
+                                            
+                                            if (!message.isRead)
+                                                messages.push(message);
+                                        }
+                                    }
+
+                                    response.status(200).send(messages);
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                })
+                        } else {
+                            response.status(400).send('UserID needs to be sent to get messages.');
+                        }
                     }
                 }
             }
