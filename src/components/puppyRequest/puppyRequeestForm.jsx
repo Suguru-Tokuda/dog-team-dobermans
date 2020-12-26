@@ -9,10 +9,6 @@ import DatePicker from 'react-datepicker';
 
 class PuppyRequestForm extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     state = {
         selections: {
             message: '',
