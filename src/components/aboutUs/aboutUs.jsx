@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import MissionStatements from './missionStatements';
 import OurTeam from './ourTeam';
 import AboutUsService from '../../services/aboutUsService';
+import toastr from 'toastr';
 
 class AboutUs extends Component {
     state = {
