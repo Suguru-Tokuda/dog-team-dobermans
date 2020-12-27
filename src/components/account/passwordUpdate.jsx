@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import firebase from '../../services/firebaseService';
 import toastr from 'toastr';
+import validationService from '../../services/validationService';
 
 class PasswordUpdae extends Component {
     state = {
@@ -98,6 +99,7 @@ class PasswordUpdae extends Component {
         }
 
         isValid = Object.keys(this.state.validation).length === 0;
+        isValid = validationService.validPassword(this.state.form.newPassword);
 
         if (isValid) {
             this.props.showLoading({ reset: true, count: 1 });
