@@ -4,39 +4,13 @@ import { connect } from 'react-redux';
 import firebase from '../../services/firebaseService';
 import BasicInformation from './basicInformation';
 import ProfileEditor from './profileEditor';
+import PasswordUpdate from './passwordUpdate';
 
 class Account extends Component {
 
     state = {
         selectedProfileMenu: ''
     };
-
-    getHeader() {
-        return (
-            <section className="hero hero-page gray-bg padding-small">
-                <div className="container">
-                    <div className="row d-flex">
-                        <div className="col-lg-9 order-2 order-lg-1">
-                            <h1>Account</h1>
-                        </div>
-                        <div className="col-lg-3 text-right order-1 order-lg-2">
-                            <ul className="breadcrumb justify-content-lg-end">
-                                <li className="breadcrumb-item">
-                                    <Link to="/">Home</Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link to="/puppies">Puppies</Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Account
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        );
-    }
 
     getProfileContent() {
         const { selectedProfileMenu } = this.state;
@@ -46,6 +20,8 @@ class Account extends Component {
                 return <BasicInformation {...this.props} />;
             case 'update-profile':
                 return <ProfileEditor {...this.props} />;
+            case 'update-password':
+                return <PasswordUpdate {...this.props} />;
             default:
                 return null;
         }
@@ -57,7 +33,7 @@ class Account extends Component {
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-">
-                            <h1>Profile</h1>
+                            <h1>Account</h1>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
@@ -65,7 +41,7 @@ class Account extends Component {
                                     <Link to="/">Home</Link>
                                 </li>
                                 <li className="breadcrumb-item active">
-                                    Profile
+                                    Account
                                 </li>
                             </ul>
                         </div>
