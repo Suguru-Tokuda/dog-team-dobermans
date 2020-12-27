@@ -27,7 +27,10 @@ class Footer extends Component {
                                     <li><Link to="/about-us">About Us</Link></li>
                                     <li><Link to="/contact">Contact</Link></li>
                                     {this.props.authenticated && (
-                                        <li><Link to="/puppy-request">Request a Puppy</Link></li>
+                                        <React.Fragment>
+                                            <li><Link to="/account">Account</Link></li>
+                                            <li><Link to="/puppy-request">Request a Puppy</Link></li>
+                                        </React.Fragment>
                                     )}
                                 </ul>
                             </div>
