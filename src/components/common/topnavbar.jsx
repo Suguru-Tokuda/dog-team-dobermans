@@ -80,9 +80,16 @@ class Topnavbar extends Component {
                             )}
                             {(this.props.authenticated === true) && (
                                 <div className="user ml-3">
-                                    <Link id="account" to="/profile" style={{ color: 'white' }}>
+                                    <Link id="account" to="/account" style={{ color: 'white' }}>
                                         <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
                                         <ReactTooltip />
+                                    </Link>
+                                </div>
+                            )}
+                            {(!this.props.authenticated) && (
+                                <div className="user ml-3">
+                                    <Link id="sign-up" to="/sign-up" style={{ color: 'white' }}>
+                                        Sign Up
                                     </Link>
                                 </div>
                             )}
