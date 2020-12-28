@@ -18,7 +18,7 @@ export class PuppyRequests extends Component {
     render() {
         const { authenticated, user } = this.props;
 
-        if (authenticated === true && user.emailVerified) {
+        if (authenticated === true && user && user.emailVerified) {
             return (
                 <React.Fragment>
                     <Route path="/puppy-requests" exact render={(props) => <PuppyRequestList {...props} />} />
@@ -28,8 +28,10 @@ export class PuppyRequests extends Component {
         } else if (!authenticated) {
             this.props.setRedirectURL(this.props.location.pathname);
             return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
-        } else if (authenticated && !user.emailVerified) {
+        } else if (authenticated && user && !user.emailVerified) {
             return <Redirect to="/email-verifiation" />;
+        } else {
+            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
         }
     }
 }
