@@ -246,10 +246,20 @@ class ProfileEditor extends Component {
                 this.props.setUser(user);
             } catch (err) {
                 console.log(err);
+
                 if (err.message) {
                     toastr.error(err.message);
                 } else {
                     toastr.error('There was an error in updating profile.');
+                }
+
+                if (err.code && err.code === 'auth/requires-recent-login') {
+                    this.props.setRedirectURL('/account?accountMenu=update-profile');
+                    const { user } = this.props;
+                    user.recentAuthenticationRequired = true;
+
+                    this.props.setUser(user);
+                    this.props.history.push('/login');
                 }
             }
 
@@ -396,6 +406,7 @@ const mapStateToProps = state => ({
       getUser: () => dispatch({ type: 'GET_USER' }),
       showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
       doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      setRedirectURL: (url) => dispatch({ type: 'SET_REDIRECT_URL', url: url }),
       resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
     };
   }
