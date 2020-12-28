@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
-import ValidationService from '../../services/validationService';
+import { connect } from 'react-redux';
 import WaitListService from '../../services/waitListService';
 import ConstantsService from '../../services/contactService';
 import DatePicker from 'react-datepicker';
@@ -85,7 +85,10 @@ class PuppyRequestModal extends Component {
             const { user } = this.props;
             const {  expectedPurchaseDate } = selections;
             const { puppyID } = puppyData;
+
             this.setState({ loading: true });
+            this.props.showLoading({ reset: true, count: 1 });
+
             const waitRequest = {
                 userID: user.userID,
                 puppyID: puppyID,
@@ -94,6 +97,7 @@ class PuppyRequestModal extends Component {
                 notified: null,
                 expectedPurchaseDate: expectedPurchaseDate
             };
+
             WaitListService.createWaitRequest(waitRequest)
                 .then(() => {
                     toastr.success('The inquiry was successfuly sent. We will get back to you within a couple business days.');
@@ -118,6 +122,7 @@ class PuppyRequestModal extends Component {
                 })
                 .finally(() => {
                     this.setState({ loading: false });
+                    this.props.doneLoading({ reset: true });
                 });
         }
     }
@@ -160,69 +165,6 @@ class PuppyRequestModal extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div className="row">
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="firstName" className={`form-label`}>First Name *</label>
-                                            <input type="text" name="firstName" id="firstName" placeholder="Enter your first name" className={`form-control ${this.getFormClass('firstName')}`} value={firstName} onChange={this.handleSetFirstName} />
-                                            {formSubmitted === true && validations.firstName && (
-                                                <small className="text-danger">Enter first name</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="lastName" className={`form-label`}>Last Name *</label>
-                                            <input type="text" name="lastName" id="lastName" placeholder="Enter your last name" className={`form-control ${this.getFormClass('lastName')}`} value={lastName} onChange={this.handleSetLastName} />
-                                            {formSubmitted === true && validations.lastName && (
-                                                <small className="text-danger">Enter last name</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="email" className={`form-label`}>Email *</label>
-                                            <input type="text" name="email" id="email" placeholder="Enter your email" className={`form-control ${this.getFormClass('email')}`} value={email} onChange={this.handleSetEmail} />
-                                            {formSubmitted === true && validations.email && (
-                                                <small className="text-danger">{validations.email}</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="phone" className={`form-label`}>Phone number *</label>
-                                            <input type="text" name="phone" id="phone" placeholder="Enter your phone number" className={`form-control ${this.getFormClass('phone')}`} value={phone} onChange={this.handleSetPhone} />
-                                            {formSubmitted === true && validations.phone && (
-                                                <small className="text-danger">{validations.phone}</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="city" className="form-label">City *</label>
-                                            <input type="text" name="city" id="city" placeholder="Enter city" className={`form-control ${this.getFormClass('city')}`} value={city} onChange={this.handleSetCity} />
-                                            {formSubmitted === true && validations.city && (
-                                                <small className="text-danger">{validations.city}</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-6">
-                                        <div className="form-group">
-                                            <label htmlFor="state" className="form-label">State *</label>
-                                            <select className={`form-control ${this.getFormClass('state')}`} value={state} onChange={this.handleSetState}>
-                                                <option value="">--Select State --</option>
-                                                {this.getStateOptions()}
-                                            </select>
-                                            {formSubmitted === true && validations.state && (
-                                                <small className="text-danger">{validations.state}</small>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div> */}
                                 <div className="row">
                                     <div className="col-sm-6">
                                         <label className="form-label">Expected Purchase Date *</label><br/>
