@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Spinner from 'react-spinkit';
-import firebase from 'firebase/app';
+import firebase from './services/firebaseService';
 import Main from './components/main/main';
 import TopNavbar from './components/common/topnavbar';
 import Footer from './components/common/footer';
@@ -27,11 +27,11 @@ import UserRegistration from './components/account/userRegistration';
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-
+  componentDidMount() {
     firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
+        this.props.checkUser();          
+        this.props.login();
 
         this.props.showLoading({reset: false, count: 1 });
 
@@ -55,9 +55,6 @@ class App extends Component {
               emailVerified: emailVerified,
               registrationCompleted: registrationCompleted
           });
-          
-          this.props.checkUser();          
-          this.props.login();
         } catch (err) {
           console.log(err);
         } finally {
@@ -65,9 +62,7 @@ class App extends Component {
         }
       }
     });
-  }
 
-  componentDidMount() {
     $(document).ready(() => {
       const navMain = $('#navbarCollapse');
       const root = $('#root');
@@ -92,6 +87,8 @@ class App extends Component {
   }
 
   render() {
+    const { authenticated } = this.props;
+
     return (
       <BrowserRouter>
       <div className={this.getUIBlockerClass()}>
