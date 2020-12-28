@@ -20,7 +20,7 @@ export default class WaitListService {
             recipientID: recipientID,
             messageBody: messageBody,
             isBreeder: false,
-            isRead: false
+            read: false
         };
 
         return axios.post(`${this.getServiceBase()}/messages?key=${api.API_KEY}`, data);
