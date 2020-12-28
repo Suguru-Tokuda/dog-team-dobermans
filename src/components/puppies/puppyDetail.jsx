@@ -54,6 +54,7 @@ class PuppyDetail extends Component {
                         dad: puppyData.dad,
                         mom: puppyData.mom
                     };
+
                     this.setState({
                         puppyData: puppyData,
                         name: puppyData.name,
@@ -69,7 +70,8 @@ class PuppyDetail extends Component {
                         momID: puppyData.momID,
                         pictures: puppyData.pictures,
                         parents: parents,
-                        sold: puppyData.sold,
+                        // sold: puppyData.sold,
+                        sold: false,
                         puppyFound: true
                     });
                 }
@@ -103,7 +105,6 @@ class PuppyDetail extends Component {
 
             currentUser.sendEmailVerification()
                 .then(res => {
-                    console.log(res);
                     this.setState({ emailVerificationConfirmationMsg: 'Verification Email has been sent. Please check your email and click the link to continue using the site.' });
                 })
                 .catch(err => {
@@ -206,19 +207,24 @@ class PuppyDetail extends Component {
                                 </ul>
                             </div>
                             <p>{description}</p>
-                            {(sold === false && authenticated && user.emailVerified) && (
+                            {(sold === false && authenticated && user && user.emailVerified && user.registrationCompleted) && (
                                 <ul>
-                                    <button type="button" className="btn btn-template wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
+                                    <button type="button" className="btn btn-primary wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
                                 </ul>
                             )}
-                            {(sold === false && authenticated && !user.emailVerified) && (
+                            {(sold === false && authenticated && user && user.emailVerified && !user.registrationCompleted) && (
                                 <ul>
-                                    <button type="button" className="btn btn-template wide" onClick={this.handleResendVerificationEmailBtnClicked}>Resend Verification Email</button>
+                                    <button type="button" className="btn btn-primary wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
+                                </ul>
+                            )}
+                            {(sold === false && authenticated && user && !user.emailVerified) && (
+                                <ul>
+                                    <button type="button" className="btn btn-primary wide" onClick={this.handleResendVerificationEmailBtnClicked}>Resend Verification Email</button>
                                 </ul>
                             )}
                             {(sold === false && !authenticated) && (
                                 <ul>
-                                    <Link type="button" className="btn btn-template wide" to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname }}}>Login</Link>
+                                    <Link type="button" className="btn btn-primary wide" to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname }}}>Login</Link>
                                 </ul>
                             )}
                         </div>
