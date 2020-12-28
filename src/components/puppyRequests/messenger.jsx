@@ -76,7 +76,7 @@ class Messenger extends Component {
                 <div className="form-grup row">
                     <div className="col-12">
                         <div style={{ padding: '10px'}}>
-                            <textarea className="form-control" rows="10" style={{ resize: 'none' }} value={ messageBody } onChange={ e => this.setState({ messageBody: e.target.value }) }></textarea>
+                            <textarea className="form-control" rows="5" style={{ resize: 'none' }} value={ messageBody } onChange={ e => this.setState({ messageBody: e.target.value }) }></textarea>
                         </div>
                     </div>
                 </div>
