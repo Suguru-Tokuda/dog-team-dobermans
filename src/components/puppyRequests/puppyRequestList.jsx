@@ -75,7 +75,14 @@ class PuppyRequestList extends Component {
                 <tr key={req.waitRequestID}>
                     <td>{moment(req.created).format('MM/DD/YYYY')}</td>
                     <td>{req.color}</td>
-                    <td><Link className="btn btn-primary" to={`/puppy-requests/${req.waitRequestID}`}>Messages</Link></td>
+                    <td>
+                        <Link className="btn btn-primary" to={`/puppy-requests/${req.waitRequestID}`}>
+                            {req.numberOfUnreadMessages > 0 && (
+                                <span className="badge badge-pill badge-light mr-1">{req.numberOfUnreadMessages} New </span>
+                            )}
+                            Messages
+                        </Link>
+                    </td>
                 </tr>);
             });
 
