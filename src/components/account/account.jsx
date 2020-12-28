@@ -12,6 +12,12 @@ class Account extends Component {
         selectedProfileMenu: ''
     };
 
+    componentDidMount() {
+        if (this.props.match && this.props.match.accountMenu) {
+            this.setState({ selectedProfileMenu: this.props.match.accountMenu });
+        }
+    }
+
     getProfileContent() {
         const { selectedProfileMenu } = this.state;
 
@@ -74,6 +80,7 @@ class Account extends Component {
                 
         if (authenticated && user && user.registrationCompleted) {
             const { currentUser } = user;
+
             return (
                 <React.Fragment>
                     {this.getHeader()}
@@ -88,7 +95,7 @@ class Account extends Component {
                                     <nav className="list-group customer-nav">
                                         <a href="#" onClick={() => this.setState({ selectedProfileMenu: 'profile'})} className={`list-group-item d-flex justify-content-between align-items-center ${selectedProfileMenu === 'profile' ? 'active' : '' }`}><i className="fa fa-user"></i> Profile</a>
                                         <a href="#" onClick={() => this.setState({ selectedProfileMenu: 'update-profile'})} className={`list-group-item d-flex justify-content-between align-items-center ${selectedProfileMenu === 'update-profile' ? 'active' : '' }`}><i className="fa fa-info"></i> Update Profile</a>
-                                        {currentUser.providerData[0].providerId !== 'facebook.com' && (
+                                        {currentUser.providerData && currentUser.providerData[0].providerId !== 'facebook.com' && (
                                             <a href="#" onClick={() => this.setState({ selectedProfileMenu: 'update-password'})} className={`list-group-item d-flex justify-content-between align-items-center ${selectedProfileMenu === 'update-password' ? 'active' : '' }`}><i className="fa fa-key"></i> Update Passowrd</a>
                                         )}
                                         <a href="#" onClick={this.handleSignOut} className={`list-group-item d-flex justify-content-between align-items-center`}><i className="fas fa-sign-out-alt"></i> Sign out</a>
