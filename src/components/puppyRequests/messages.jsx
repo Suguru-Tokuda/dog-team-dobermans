@@ -5,7 +5,8 @@ import moment from 'moment';
 class Messages extends Component {
     state = {
         messages: [],
-        userID: ''
+        userID: '',
+        dataLoaded: false
     };
 
     constructor(props) {
@@ -20,16 +21,17 @@ class Messages extends Component {
     }
 
     componentDidUpdate(props) {
-        if (this.props.messages && this.props.messages.length > 0 && JSON.stringify(this.props.messages) !== JSON.stringify(this.state.messages))
-            this.setState({ messages: props.messages })
-    }
+        if (this.props.messages && this.props.messages.length > 0 && JSON.stringify(this.props.messages) !== JSON.stringify(this.state.messages)) {
+            this.setState({ messages: props.messages });
+        }
 
-    handleSentMessageChanged = (e) => {
-
+        if (this.props.dataLoaded !== this.state.dataLoaded) {
+            this.setState({ dataLoaded: this.props.dataLoaded });
+        }
     }
 
     renderMessages = () => {
-        const { messages, userID } = this.state;
+        const { messages, userID, dataLoaded } = this.state;
 
         let retVal;
 
@@ -40,7 +42,7 @@ class Messages extends Component {
                         <div className="row">
                             <div className="col-6">
                                 {(message.senderID !== userID) && (
-                                    <span>From: </span>
+                                    <span>Bob Johnson</span>
                                 )}
                                 {(message.senderID === userID) && (
                                     <span>{this.props.user.firstName} {this.props.user.lastName}</span>
@@ -48,19 +50,23 @@ class Messages extends Component {
                             </div>
                             <div className="col-6">
                                 <div className="float-right">
-                                    { moment(message.sentDate._seconds).format('MM/DD/YYYY hh:mm:ss') }
+                                    { moment(message.sentDate).format('MM/DD/YYYY hh:mm:ss') }
                                 </div>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-12">
-                                <textarea className="form-control" value={message.messageBody} onChange={this.handleSentMessageChanged} rows="7" style={{ resize: 'none', color: '#ffffff', backgroundColor: 'rgba(184, 133, 255, 0.7)' }} readOnly></textarea>
+                                <textarea className="form-control" 
+                                          value={message.messageBody} 
+                                          rows="3" style={ message.senderID !== userID ? { resize: 'none', color: '#ffffff', backgroundColor: 'rgba(184, 133, 255, 0.7)' } : { resize: 'none', 'color': 'black' }} 
+                                          readOnly>        
+                                </textarea>
                             </div>
                         </div>
                     </div>
                 );
             });
-        } else {
+        } else if (messages.length === 0 && dataLoaded) {
             retVal = <div className="text-center"><h3>You have no messages.</h3></div>;
         }
 
