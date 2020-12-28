@@ -36,28 +36,49 @@ class LoginForm extends Component {
                         await userService.editUser(userUpdateData);
                     }
                 }
-      
-                this.props.setUser({
-                    userID: buyerID,
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: user.email,
-                    phone: phone,
-                    city: city,
-                    state: state,
-                    statusID: statusID,
-                    currentUser: user,
-                    emailVerified: emailVerified,
-                    registrationCompleted: registrationCompleted
-                });
+
+                let currentUser;
+
+                if (this.props.user) {
+                    const sessionUser = this.props.user;
+
+                    sessionUser.userID = buyerID;
+                    sessionUser.firstName = firstName;
+                    sessionUser.lastName = lastName;
+                    sessionUser.email = user.email;
+                    sessionUser.phone = phone;
+                    sessionUser.city = city;
+                    sessionUser.state = state;
+                    sessionUser.statusID = statusID;
+                    sessionUser.currentUser = user;
+                    sessionUser.emailVerified = emailVerified;
+                    sessionUser.registrationCompleted = registrationCompleted;
+
+                    currentUser = sessionUser;
+                } else {
+                    currentUser = {
+                        userID: buyerID,
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: user.email,
+                        phone: phone,
+                        city: city,
+                        state: state,
+                        statusID: statusID,
+                        currentUser: user,
+                        emailVerified: emailVerified,
+                        registrationCompleted: registrationCompleted
+                    };
+                }
                 
+                this.props.setUser(currentUser);
                 this.props.checkUser();          
                 this.props.login();
 
-                if (this.props.redirectURL) {
+                if (this.props.redirectURL && !currentUser.recentAuthenticationRequired) {
                   this.props.history.push(this.props.redirectURL);
                   this.props.resetRedirectURL();
-                } else if (this.props.urlToRedirect) {
+                } else if (this.props.urlToRedirect && !currentUser.recentAuthenticationRequired) {
                     this.props.history.push(this.props.urlToRedirect);
                     this.props.resetRedirectURL();  
                 }
@@ -166,7 +187,8 @@ class LoginForm extends Component {
                         statusID: statusID,
                         currentUser: user,
                         emailVerified: user.emailVerified,
-                        registrationCompleted: registrationCompleted
+                        registrationCompleted: registrationCompleted,
+                        recentAuthenticationRequired: false
                     });
 
                     resolve();
