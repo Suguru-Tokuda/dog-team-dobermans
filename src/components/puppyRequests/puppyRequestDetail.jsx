@@ -5,13 +5,15 @@ import Messages from './messages';
 import Messenger from './messenger';
 import waitListService from '../../services/waitListService';
 import toastr from 'toastr';
-import WaitListService from '../../services/waitListService';
+import moment from 'moment';
 
 class PuppyRequestDetail extends Component {
     state = {
         userID: '',
         requestID: '',
-        messages: []
+        request: {},
+        messages: [],
+        dataLoaded: false
     };
 
     constructor(props) {
@@ -29,46 +31,44 @@ class PuppyRequestDetail extends Component {
     }
 
     componentDidMount = async () => {
-        const { requestID, userID } = this.state;
+        const { requestID } = this.state;
+        const { userID } = this.props.user;
 
         window.scrollTo(0, 0);
 
         this.props.showLoading({ reset: false, count: 1 });
 
-        try { 
-            const messagesRes = waitListService.getWaitRequestMessages(requestID);
-            const messages = messagesRes.data;
+            Promise.all([
+                waitListService.getWaitRequestMessages(requestID),
+                waitListService.getWaitRequestList(userID, requestID)
+                ])
+                .then(async res => {
+                    const messages = res[0].data;
 
-            if (messages.length > 0) {
-                const messageIDsMarkAsRead = [];
+                    const waitRequest = res[1].data[0];
 
-                messages.forEach(message => {
-                    if (message.recipientID === this.props.user.userID)
-                        messageIDsMarkAsRead.push(message.messageID);
-                });
+                    if (messages.length > 0) {
+                        const messageIDsMarkAsRead = [];
 
-                if (messageIDsMarkAsRead.length > 0) {
-                    await WaitListService.markMessageAsRead(messageIDsMarkAsRead);
-                }
-            }
-        } catch (err) {
-            console.log(err);
-            toastr.error('There was an error in loading messages.');
-        }
+                        messages.forEach(message => {
+                            if (message.recipientID === this.props.user.userID)
+                                messageIDsMarkAsRead.push(message.messageID);
+                        });
+        
+                        if (messageIDsMarkAsRead.length > 0) {
+                            await waitListService.markMessageAsRead(messageIDsMarkAsRead);
+                        }
+                    }
 
-        waitListService.getWaitRequestMessages(requestID)
-            .then(res => {
-                this.setState({
-                    messages: res.data
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                toastr.error('There was an error in loading messages.');
-            })
-            .finally(() => {
-                this.props.doneLoading({ reset: true });
-            });
+                    this.setState({ request: waitRequest, messages: messages });        
+                })
+                .catch(err => {
+                    toastr.error('There was an error in loading request data.');
+                })
+                .finally(() => {
+                    this.props.doneLoading({ reset: true });
+                    this.setState({ dataLoaded: true });
+                })
     }
 
     getHeader() {
@@ -78,7 +78,7 @@ class PuppyRequestDetail extends Component {
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-1">
-                            <h1>{name}</h1>
+                            <h1>Puppy Request</h1>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
@@ -86,7 +86,7 @@ class PuppyRequestDetail extends Component {
                                     <Link to="/">Home</Link>
                                 </li>
                                 <li className="breadcrumb-item active">
-                                    Puppy Request Request
+                                    Puppy Request
                                 </li>
                             </ul>
                         </div>
@@ -94,6 +94,54 @@ class PuppyRequestDetail extends Component {
                 </div>
             </section>
         );
+    }
+
+    renderRequestDetail = () => {
+        const { request } = this.state;
+
+        if (request && Object.keys(request).length > 0) {
+            return (
+                <div className="container mt-2">
+                    <div className="card">
+                        <div className="card-header">
+                            <h2>Request Summary</h2>
+                        </div>
+                        <div className="card-body">
+                            <div className="form-group row">
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">RequestID</label>
+                                <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
+                                    { request.waitRequestID }
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Request Sent</label>
+                                <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
+                                    { request.created }
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Expected Purchase Date</label>
+                                <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
+                                    { moment(request.expectedPurchaseDate).format('MM/DD/YYYY') }
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Request Message</label>
+                                <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
+                                    { request.message }
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Color Preference</label>
+                                <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
+                                    { request.color }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 
     handleUpdateMessages = (messages) => {
@@ -105,6 +153,7 @@ class PuppyRequestDetail extends Component {
         return (
             <React.Fragment>
                 {this.getHeader()}
+                {this.renderRequestDetail()}
                 <div className="mb-3">
                     <Messenger {...this.props}
                                messages={this.state.messages}
@@ -114,6 +163,7 @@ class PuppyRequestDetail extends Component {
                 </div>
                 <Messages {...this.props} 
                           messages={this.state.messages} 
+                          dataLoaded={this.state.dataLoaded}
                 />
             </React.Fragment>
         );
