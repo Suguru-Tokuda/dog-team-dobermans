@@ -51,12 +51,16 @@ class PuppyRequestDetail extends Component {
                         const messageIDsMarkAsRead = [];
 
                         messages.forEach(message => {
-                            if (message.recipientID === this.props.user.userID)
+                            if (message.recipientID === this.props.user.userID && !message.read)
                                 messageIDsMarkAsRead.push(message.messageID);
                         });
         
                         if (messageIDsMarkAsRead.length > 0) {
-                            await waitListService.markMessageAsRead(messageIDsMarkAsRead);
+                            try {
+                                await waitListService.markMessageAsRead(messageIDsMarkAsRead);
+                            } catch (err) {
+                                console.log(err);
+                            }
                         }
                     }
 
