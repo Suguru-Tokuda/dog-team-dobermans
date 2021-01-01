@@ -1572,20 +1572,47 @@ export const waitList = functions.https.onRequest((request, response) => {
                     if (method === 'GET') {
                         const messsagesRef = admin.firestore().collection('messages');
                         const userID = query.userID;
+                        const limit = query.limit;
 
                         if (userID) {
-                            messsagesRef.where('userID', '==', userID).get()
-                                .then(snapshot => {
-                                    const messages: any[] = [];
+                            messsagesRef.where('recipientID', '==', userID).get()
+                                .then(async snapshot => {
+                                    let messages: any[] = [];
 
                                     if (snapshot.size > 0) {
                                         for (const messageDoc of snapshot.docs) {
                                             const message = messageDoc.data();
                                             message.messageID = messageDoc.id;
-                                            
-                                            if (!message.isRead)
+
+                                            if (!message.read) {
+                                                try {
+                                                    const userSnapshot = await admin.firestore().collection('buyers').doc(message.senderID).get();
+                                                    const sender = userSnapshot.data();
+                                                    message.sender = sender;
+                                                } catch (err) {
+                                                    console.log(err);
+                                                }
+                                                
                                                 messages.push(message);
+                                            }
                                         }
+                                    }
+
+                                    messages = messages.sort((a, b) => {
+                                        const dateA = new Date(a.sentDate);
+                                        const dateB = new Date(b.sentDate);
+
+                                        return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
+                                    });
+
+                                    let retVal: any[] = [];
+
+                                    if (limit) {
+                                        for (let i = 0, max = limit; i < max; i++) {
+                                            retVal.push(messages[i]);
+                                        }
+                                    } else {
+                                        retVal = messages;
                                     }
 
                                     response.status(200).send(messages);
@@ -1596,6 +1623,102 @@ export const waitList = functions.https.onRequest((request, response) => {
                         } else {
                             response.status(400).send('UserID needs to be sent to get messages.');
                         }
+                    }
+                } else if (path === '/messages/getByUserID') {
+                    if (method === 'GET') {
+                        const messsagesRef = admin.firestore().collection('messages');
+                        const userID = query.userID;
+                        const limit = query.limit;
+
+                        if (userID) {
+                            messsagesRef.where('recipientID', '==', userID).get()
+                                .then(async snapshot => {
+                                    let messages: any[] = [];
+
+                                    if (snapshot.size > 0) {
+                                        for (const messageDoc of snapshot.docs) {
+                                            const message = messageDoc.data();
+                                            message.messageID = messageDoc.id;
+
+                                            try {
+                                                const userSnapshot = await admin.firestore().collection('buyers').doc(message.senderID).get();
+                                                const sender = userSnapshot.data();
+                                                message.sender = sender;
+                                            } catch (err) {
+                                                console.log(err);
+                                            }
+                                            
+                                            messages.push(message);
+                                        }
+                                    }
+
+                                    messages = messages.sort((a, b) => {
+                                        const dateA = new Date(a.sentDate);
+                                        const dateB = new Date(b.sentDate);
+
+                                        return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
+                                    });
+
+                                    let retVal: any[] = [];
+
+                                    if (limit) {
+                                        for (let i = 0, max = limit; i < max; i++) {
+                                            retVal.push(messages[i]);
+                                        }
+                                    } else {
+                                        retVal = messages;
+                                    }
+
+                                    response.status(200).send(messages);
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                })
+                        } else {
+                            response.status(400).send('UserID needs to be sent to get messages.');
+                        }
+                    }
+                } else if (path === '/messages/byWaitRequest') {
+                    // gets all latest messages grouped by waitRequestID
+                    if (method === 'GET') {
+                        const messagesRef = admin.firestore().collection('messages');
+
+                        messagesRef.orderBy('sentDate').get()
+                            .then(async snapshot => {
+                                const waitRequestIDs: string[] = [];
+                                let messages: any[] = [];
+
+                                if (snapshot.size > 0) {
+                                    for (const messageDoc of snapshot.docs) {
+                                        const message = messageDoc.data();
+                                        message.messageID = messageDoc.id;
+
+                                        if (waitRequestIDs.indexOf(message.waitRequestID) === -1) {
+                                            try {
+                                                const userSnapshot = await admin.firestore().collection('buyers').doc(message.senderID).get();
+                                                message.sender = userSnapshot.data();
+                                            } catch (err) {
+                                                console.log(err);
+                                            }
+
+                                            messages.push(message);
+                                            waitRequestIDs.push(message.waitRequestID);                                        
+                                        }                                        
+                                    }
+                                }
+
+                                messages = messages.sort((a, b) => {
+                                    const dateA = new Date(a.sentDate);
+                                    const dateB = new Date(b.sentDate);
+
+                                    return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
+                                });
+
+                                response.status(200).send(messages);
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
                     }
                 }
             }
