@@ -19,6 +19,13 @@ class BreefSignUp extends Component {
         super(props);
     }
 
+    componentDidMount() {
+        this.setState({
+            email: '',
+            password: '' 
+        });
+    }
+
     handleEmailChanged = (e) => {
         this.setState({
             email: e.target.value
@@ -33,10 +40,10 @@ class BreefSignUp extends Component {
 
     handleRegularSignUp = async () => {
         const { email, password } = this.state;
-        let isValidPassowrd = validationService.validPassword(password, 8);
+        let isValidPassword = validationService.validPassword(password, 8);
         let isValidEmail = validationService.validateEmail(email);
 
-        if (email.length > 0 && isValidPassowrd && isValidEmail) {
+        if (email.length > 0 && isValidPassword && isValidEmail) {
             try {
                 const res = await firebase.auth().createUserWithEmailAndPassword(email.trim().toLowerCase(), password);
                 const currentUser = res.user;
@@ -57,7 +64,7 @@ class BreefSignUp extends Component {
                 if (err.message) {
                     toastr.error(err.message);
                 } else {
-                    toastr.error('Theere was an error in creating an account.');
+                    toastr.error('There was an error in creating an account.');
                 }
             }
         }
@@ -100,9 +107,23 @@ class BreefSignUp extends Component {
         if (isDesktop === false) {
             try {
                 const userInfo = await firebase.auth().signInWithPopup(provider);
+                const user = userInfo.user;
                 
                 if (!userInfo.user.emailVerified) {
                     await userInfo.user.sendEmailVerification();
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+                }
+
+                const createUserData = {
+                    userID: userInfo.uid,
+                    email: user.email,
+                    statusID: 1
+                };
+
+                await userService.createUser(createUserData);
+
+                if (userInfo.sendEmailVerification) {
+                    await userInfo.sendEmailVerification();
                     toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
                 }
 

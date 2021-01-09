@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
-import WaitListForm from '../puppyRequest/puppyRequeestForm';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
 import * as api from '../../api.json';
 import $ from 'jquery';

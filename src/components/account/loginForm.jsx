@@ -17,6 +17,7 @@ class LoginForm extends Component {
         super(props);
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
+
               this.props.showLoading({reset: false, count: 1 });
       
               try {
@@ -146,7 +147,22 @@ class LoginForm extends Component {
             }
 
             if (userInfo.additionalUserInfo.isNewUser === true) {
-                // redirect to the user registration page.
+                if (!userInfo.user.emailVerified) {
+                    const { user } = userInfo;
+
+                    await userInfo.user.sendEmailVerification();
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+
+                    const createUserData = {
+                        userID: userInfo.uid,
+                        email: user.email,
+                        statusID: 1
+                    };
+    
+                    await userService.createUser(createUserData);
+
+                    this.props.history.push('/');
+                }
             } else {
                 // get user info from the api, then set the user info to the global state.
                 await this.populateUser(userInfo.user);
@@ -160,6 +176,7 @@ class LoginForm extends Component {
                 }
             }
         } catch (err) {
+            toastr.error(err);
             console.log(err);
         } finally {
             this.props.doneLoading();

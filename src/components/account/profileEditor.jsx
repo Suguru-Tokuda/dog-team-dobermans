@@ -309,7 +309,7 @@ class ProfileEditor extends Component {
                             )}
                         </div>
                     </div>
-                    {currentUser.providerData[0].providerId !== 'facebook.com' && (
+                    {currentUser.providerData && currentUser.providerData[0].providerId !== 'facebook.com' && (
                         <div className="form-group row">
                             <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="email">Email</label>
                             <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">

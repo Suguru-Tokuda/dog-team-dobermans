@@ -29,7 +29,7 @@ export class PuppyRequests extends Component {
             this.props.setRedirectURL(this.props.location.pathname);
             return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
         } else if (authenticated && user && !user.emailVerified) {
-            return <Redirect to="/email-verifiation" />;
+            return <Redirect to="/email-verification" />;
         } else {
             return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
         }

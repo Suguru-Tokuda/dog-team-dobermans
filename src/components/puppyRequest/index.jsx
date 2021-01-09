@@ -1,11 +1,60 @@
 import React, { Component } from 'react';
-import PuppyRequestForm from './puppyRequeestForm';
+import { Redirect } from 'react-router-dom';
+import firebase from '../../services/firebaseService';
+import PuppyRequestForm from './puppyRequestForm';
+import userService from '../../services/userService';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import toastr from 'toastr';
 
 class PuppyRequest extends Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount = async () => {
+        if (this.props.user) {
+            this.props.showLoading({ reset: false, count: 1 });
+            try {
+                const res = await userService.getUser(this.props.user.userID);
+                const { buyerID, firstName, lastName, phone, email, city, state, statusID, emailVerified, registrationCompleted } = res.data;
+                const { user } = this.props;
+
+                if (user.currentUser.reload) {
+                    await user.currentUser.reload();
+                }
+
+                const currentUser = firebase.auth().currentUser;
+            
+                user.userID = buyerID;
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.email = email;
+                user.phone = phone;
+                user.city = city;
+                user.state = state;
+                user.statusID = statusID;
+                user.currentUser = currentUser;
+                user.emailVerified = emailVerified;
+                user.registrationCompleted = registrationCompleted;
+
+                if (emailVerified !== currentUser.emailVerified) {
+                    const userUpdateData = {
+                        userID: user.userID,
+                        emailVerified: currentUser.emailVerified
+                    };
+
+                    await userService.editUser(userUpdateData);
+                }
+
+                this.props.setUser(user);
+            } catch (err) {
+                console.log(err);
+                toastr.error('There was an error in refreshing user data.');
+            } finally {
+                this.props.doneLoading({ resetAll: true });
+            }
+        }
     }
 
     getHeader() {
@@ -59,14 +108,34 @@ class PuppyRequest extends Component {
     }
 
     render() {
+        const { user, authenticated, userChecked } = this.props;
+        let emailVerified, registrationCompleted;
+
+        if (this.props.user) {
+            emailVerified = user.emailVerified;
+            registrationCompleted = user.registrationCompleted;
+    
+            if (!emailVerified) {
+                toastr.error('Please verify your email first.');
+            } else if (!registrationCompleted) {
+                toastr.error('Please complete user registration first.');
+            }
+        }
+
         return (
             <React.Fragment>
                 {this.getHeader()}
-                {(this.props.userChecked === true && this.props.authenticated === true) && (
+                {(userChecked && authenticated  && emailVerified && registrationCompleted) && (
                     <PuppyRequestForm {...this.props} />
                 )} 
-                {(this.props.userChecked === true && this.props.authenticated === false) && (
+                {(userChecked && !authenticated) && (
                     this.getLoginButton()
+                )}
+                {(userChecked && user && !emailVerified) && (
+                    <Redirect to="/email-verification" />
+                )}
+                {(userChecked && user && emailVerified && !registrationCompleted) && (
+                    <Redirect to="/user-registration" />
                 )}
             </React.Fragment>
         );
@@ -79,4 +148,13 @@ const mapStateToProps = state => ({
     userChecked: state.userChecked
 });
 
-export default connect(mapStateToProps)(PuppyRequest);
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PuppyRequest);

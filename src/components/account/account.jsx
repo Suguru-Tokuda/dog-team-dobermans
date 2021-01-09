@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import userService from '../../services/userService';
 import firebase from '../../services/firebaseService';
 import BasicInformation from './basicInformation';
 import ProfileEditor from './profileEditor';
 import PasswordUpdate from './passwordUpdate';
+import toastr from 'toastr';
 
 class Account extends Component {
 
@@ -12,7 +14,50 @@ class Account extends Component {
         selectedProfileMenu: ''
     };
 
-    componentDidMount() {
+    componentDidMount = async () => {
+        if (this.props.user) {
+            this.props.showLoading({ reset: false, count: 1 });
+            try {
+                const res = await userService.getUser(this.props.user.userID);
+                const { buyerID, firstName, lastName, phone, email, city, state, statusID, emailVerified, registrationCompleted } = res.data;
+                const { user } = this.props;
+
+                if (user.currentUser.reload) {
+                    await user.currentUser.reload();
+                }
+
+                const currentUser = firebase.auth().currentUser;
+            
+                user.userID = buyerID;
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.email = email;
+                user.phone = phone;
+                user.city = city;
+                user.state = state;
+                user.statusID = statusID;
+                user.currentUser = currentUser;
+                user.emailVerified = emailVerified;
+                user.registrationCompleted = registrationCompleted;
+
+                if (emailVerified !== currentUser.emailVerified) {
+                    const userUpdateData = {
+                        userID: user.userID,
+                        emailVerified: currentUser.emailVerified
+                    };
+
+                    await userService.editUser(userUpdateData);
+                }
+
+                this.props.setUser(user);
+            } catch (err) {
+                console.log(err);
+                toastr.error('There was an error in refreshing user data.');
+            } finally {
+                this.props.doneLoading({ resetAll: true });
+            }
+        }
+
         if (this.props.match && this.props.match.accountMenu) {
             this.setState({ selectedProfileMenu: this.props.match.accountMenu });
         }
@@ -113,7 +158,11 @@ class Account extends Component {
         } else if (!authenticated) {
             this.props.resetRedirectURL();
             return <Redirect to={{ pathname: '/login' }} />;
-        } else if (authenticated && user && !user.registrationCompleted) {
+        } else if (authenticated && user && !user.emailVerified && !user.registrationCompleted) {
+            toastr.error('Please verify email first.');
+            return <Redirect to={{ pathname: '/email-verification' }} />;
+        } else if (authenticated && user && user.emailVerified && !user.registrationCompleted) {
+            toastr.error('Please complete user registration.');
             return <Redirect to={{ pathname: '/user-registration' }} />;
         }
     }

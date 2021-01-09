@@ -16,7 +16,7 @@ import Contact from './components/contact/contact';
 import Login from './components/account/login';
 import SignUp from './components/account/signUp';
 import Account from './components/account/account';
-import EmailVerifixation from './components/account/emailVerification';
+import EmailVerification from './components/account/emailVerification';
 import PasswordReset from './components/account/passwordReset';
 import PuppyRequests from './components/puppyRequests';
 import PuppyRequest from './components/puppyRequest';
@@ -108,7 +108,7 @@ class App extends Component {
             <Route path="/puppy-request" render={(props) => <PuppyRequest {...props} />} />
             <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/sign-up" render={(props) => <SignUp {...props} />} />
-            <Route path="/email-verifiation" render={(props) => <EmailVerifixation {...props} />} />
+            <Route path="/email-verification" render={(props) => <EmailVerification {...props} />} />
             <Route path="/user-registration"render={(props) => <UserRegistration {...props} />} />
             <Route path="/password-reset" render={(props) => <PasswordReset {...props} />} />
             <Route component={PageNotFound} />

@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
+import firebase from '../../services/firebaseService';
 import { connect } from 'react-redux';
+import userService from '../../services/userService';
+import toastr from 'toastr';
 
 class EmailVerification extends Component {
     
@@ -8,8 +11,52 @@ class EmailVerification extends Component {
         emailVerificationConfirmationMsg: ''
     }
 
-    handleResendVerificationEmailBtnClicked = () => {
+    handleResendVerificationEmailBtnClicked = async () => {
         const { currentUser } = this.props.user;
+
+        if (this.props.user) {
+            this.props.showLoading({ reset: false, count: 1 });
+
+            try {
+                const res = await userService.getUser(this.props.user.userID);
+                const { buyerID, firstName, lastName, phone, email, city, state, statusID, emailVerified, registrationCompleted } = res.data;
+                const { user } = this.props;
+
+                if (user.currentUser.reload) {
+                    await user.currentUser.reload();
+                }
+
+                const currentUser = firebase.auth().currentUser;
+            
+                user.userID = buyerID;
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.email = email;
+                user.phone = phone;
+                user.city = city;
+                user.state = state;
+                user.statusID = statusID;
+                user.currentUser = currentUser;
+                user.emailVerified = emailVerified;
+                user.registrationCompleted = registrationCompleted;
+
+                if (emailVerified !== currentUser.emailVerified) {
+                    const userUpdateData = {
+                        userID: user.userID,
+                        emailVerified: currentUser.emailVerified
+                    };
+
+                    await userService.editUser(userUpdateData);
+                }
+
+                this.props.setUser(user);
+            } catch (err) {
+                console.log(err);
+                toastr.error('There was an error in refreshing user data.');
+            } finally {
+                this.props.doneLoading({ resetAll: true });
+            }
+        }
 
         if (currentUser && currentUser.sendEmailVerification) {
             this.props.showLoading({ reset: true, count: 1 });
