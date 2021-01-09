@@ -67,13 +67,36 @@ class Topnavbar extends Component {
                                         <NavLink className="nav-link" activeClassName="active" to="/puppy-request">Request a Puppy</NavLink>
                                     </li>
                                 )}
+                                <li className="nav-item visible-xs">
+                                    <NavLink className="nav-link" activeClassName="active" to="/puppy-requests">
+                                        Puppy Requests
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item visible-xs">
+                                    <NavLink className="nav-link" activeClassName="active" to="/sign-up">
+                                        Sign Up
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item visible-xs">
+                                    {(!this.props.authenticated) && (
+                                        <NavLink className="nav-link" activeClassName="active" to="/login">
+                                            Login
+                                        </NavLink>
+                                    )}
+                                    {(this.props.authenticated) && (
+                                        <a onClick={this.handleLogoutClicked} style={{ color: 'white', cursor: 'pointer' }}>
+                                            LOG OUT
+                                        </a>
+                                    )}
+                                    <NavLink className="nav-link" activeClassName="active" to="/puppy-request"></NavLink>
+                                </li>
                             </ul>
                         </div>
-                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row">
+                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs">
                             {(this.props.authenticated === true) && (
                                 <div className="user">
                                     <Link id="account" to="/puppy-requests">
-                                        <i className="fab fa-facebook-messenger" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
+                                        <i className="far fa-list-alt" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
                                         <ReactTooltip />
                                     </Link>
                                 </div>

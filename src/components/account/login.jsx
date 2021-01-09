@@ -23,6 +23,7 @@ class Login extends Component {
                         <div className="row">
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                                 <img src={siteLogo} style={{ width: '100%' }} alt={siteLogo}></img>
+                                <p style={{ marginTop: '5px' }}>Homeland Security Family Friend</p>
                             </div>
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6 mt-xs-2">
                                 <LoginForm {...this.props} urlToRedirect={this.state.previousUrl} />

@@ -40,7 +40,6 @@ class PuppyRequestForm extends Component {
         return formSubmitted === true && typeof validations[key] !== 'undefined' && validations[key].length > 0 ? 'is-invalid' : '';
     }
 
-
     handleSetColor = (event) => {
         const color = event.target.value;
         const { selections, validations } = this.state;
@@ -53,19 +52,19 @@ class PuppyRequestForm extends Component {
         this.setState({ selections, validations });
     }
 
-    handleSelectExpectedPurchaseDate = (expectedPurchaseDate) => {
-        const { selections, validations } = this.state;
+    // handleSelectExpectedPurchaseDate = (expectedPurchaseDate) => {
+    //     const { selections, validations } = this.state;
 
-        selections.expectedPurchaseDate = expectedPurchaseDate;
+    //     selections.expectedPurchaseDate = expectedPurchaseDate;
 
-        if (expectedPurchaseDate !== null) {
-            validations.expectedPurchaseDate = '';
-        } else {
-            validations.expectedPurchaseDate = 'Enter expected purchase date';
-        }
+    //     if (expectedPurchaseDate !== null) {
+    //         validations.expectedPurchaseDate = '';
+    //     } else {
+    //         validations.expectedPurchaseDate = 'Enter expected purchase date';
+    //     }
 
-        this.setState({ selections, validations });
-    }
+    //     this.setState({ selections, validations });
+    // }
 
     handleSetMessage = (event) => {
         const message = event.target.value;
@@ -114,7 +113,7 @@ class PuppyRequestForm extends Component {
 
         if (isValid === true) {
             const { userID } = this.props.user;
-            const { phone, message, color, expectedPurchaseDate } = selections;
+            const { phone, message, color } = selections;
 
             this.setState({ loading: true });
 
@@ -123,7 +122,6 @@ class PuppyRequestForm extends Component {
                 phone: phone,
                 message: message,
                 color: color,
-                expectedPurchaseDate: expectedPurchaseDate,
                 created: new Date(),
                 lastModified: new Date(),
                 notified: null
@@ -153,7 +151,7 @@ class PuppyRequestForm extends Component {
 
     render() {
         const { selections, validations, loading, formSubmitted } = this.state;
-        const { message, color, expectedPurchaseDate } = selections;
+        const { message, color } = selections;
 
         return (
             <section id="waitListForm">
@@ -173,11 +171,11 @@ class PuppyRequestForm extends Component {
                                                 {this.getColorOptions()}
                                             </select>
                                         </div>
-                                        <div className="col-sm-6">
+                                        {/* <div className="col-sm-6">
                                             <label className="form-label">Expected Purchase Date *</label><br/>
                                             <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} style={{ height: '50px'}} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} minDate={new Date()} />
                                             <br />{formSubmitted === true && validations.expectedPurchaseDate && (<small className="text-danger">{validations.expectedPurchaseDate}</small>)}
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className="form-group mt-5">
                                         <label htmlFor="message" className={`form-label`}>Message for us *</label>

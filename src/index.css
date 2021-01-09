@@ -180,3 +180,19 @@ nav.navbar a.nav-link.active {
   pointer-events: none;
   opacity: 0.4;
 }
+
+@media screen and (max-width: 767px) {
+  .hidden-xs {
+    display: none !important;
+  }
+
+  .visible-xs {
+      display: block !important;
+    }
+}
+
+@media screen and (min-width: 768px) {
+  .visible-xs {
+    display: none !important;
+  }
+}

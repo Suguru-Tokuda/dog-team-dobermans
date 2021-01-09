@@ -115,6 +115,13 @@ class LoginForm extends Component {
                 .then(async res => {
                     await this.populateUser(res.user);
                     this.props.login();
+
+                    if (this.props.urlToRedirect) {
+                        this.props.history.push(this.props.urlToRedirect);
+                    } else {
+                        // redirect to the main page
+                        this.props.history.push('/');
+                    }
                 })
                 .catch(err => {
                     if (err.message) {
@@ -125,12 +132,6 @@ class LoginForm extends Component {
                 })
                 .finally(() => {
                     this.props.doneLoading();
-                    if (this.props.urlToRedirect) {
-                        this.props.history.push(this.props.urlToRedirect);
-                    } else {
-                        // redirect to the main page
-                        this.props.history.push('/');
-                    }
                 });
         }
     }
@@ -162,6 +163,12 @@ class LoginForm extends Component {
 
                     await userInfo.user.sendEmailVerification();
                     toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+
+                    const userData = createUserData;
+                    userData.currentUser = user;
+        
+                    this.props.setUser(userData);
+                    this.props.login();      
 
                     this.props.history.push('/');
                 }

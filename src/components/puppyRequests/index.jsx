@@ -3,6 +3,7 @@ import { Redirect, Route } from 'react-router-dom';
 import PuppyRequestList from './puppyRequestList';
 import PuppyRequestDetail from './puppyRequestDetail';
 import { connect } from 'react-redux';
+import toastr from 'toastr';
 
 export class PuppyRequests extends Component {
     constructor(props) { 
@@ -29,8 +30,10 @@ export class PuppyRequests extends Component {
             this.props.setRedirectURL(this.props.location.pathname);
             return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
         } else if (authenticated && user && !user.emailVerified) {
+            toastr.error('Please verify your email first.');
             return <Redirect to="/email-verification" />;
         } else {
+            toastr.error('You need to login to continue.');
             return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
         }
     }

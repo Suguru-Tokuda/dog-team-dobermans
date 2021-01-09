@@ -11,8 +11,7 @@ class PuppyRequestModal extends Component {
     state = {
         puppyData: {},
         selections: {
-            message: '',
-            expectedPurchaseDate: null
+            message: ''
         },
         validations: {},
         formSubmitted: false,
@@ -138,7 +137,7 @@ class PuppyRequestModal extends Component {
                             <h5 className="modal-title">Puppy Request Form</h5>
                         </div>
                         <div className="modal-body">
-                            <div className="custo-form form">
+                            <div className="custom-form form">
                                 <div className="row">
                                     <div className="col-12">
                                         <div className="table-responsive">
@@ -165,13 +164,13 @@ class PuppyRequestModal extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="row">
+                                {/* <div className="row">
                                     <div className="col-sm-6">
                                         <label className="form-label">Expected Purchase Date *</label><br/>
                                         <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} minDate={new Date()} />
                                         <br />{formSubmitted === true && validations.expectedPurchaseDate && (<small className="text-danger">{validations.expectedPurchaseDate}</small>)}
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className="form-group">
                                     <label htmlFor="message" className={`form-label`}>Your message for us *</label>
                                     <textarea row="4" className={`form-control ${this.getFormClass('message')}`} placehodler="Enter your message" value={message} onChange={this.handleSetMessage}></textarea>

@@ -23,6 +23,7 @@ class SignUp extends Component {
                         <div className="row">
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                                 <img src={siteLogo} style={{ width: '100%' }} alt={siteLogo}></img>
+                                <p style={{ marginTop: '5px' }}>With a Dog Team Dobermans account, you are able to create puppy requests and communicate with the Doberman breeder smoothly.</p>
                             </div>
                             <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                                 <SignUpForm {...this.props} urlToRedirect={this.state.previousUrl} />

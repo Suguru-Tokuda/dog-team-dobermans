@@ -245,7 +245,8 @@ class UserRegistration extends Component {
                 lastName: lastName.trim(),
                 phone: phone.trim(),
                 state: state.trim(),
-                city: city.trim()
+                city: city.trim(),
+                registrationCompleted: true
             };
 
             if (user.currentUser.providerData[0].providerId === 'password') {
@@ -255,17 +256,23 @@ class UserRegistration extends Component {
             this.props.showLoading({ reset: true, count: 1 });
             
             try {
-                await userService.editUser(data);
                 
                 if (user.currentUser.providerData[0].providerId === 'password') {
                     if (user.email.toLowerCase() !== email.trim().toLowerCase()) {
                         await user.currentUser.updateEmail(email.trim().toLowerCase());
                         await user.currentUser.sendEmailVerification();
-
+                        
                         toastr.success('Verification email has been sent. Please check your email to continue.');
                         user.email = email.trim().toLowerCase();
+                        user.emailVerified = false;
                     }
+                } else {
+                    user.emailVerified = true;
                 }
+                
+                await userService.editUser(data);
+
+                const { firstName, lastName, phone, city, state } = data;
 
                 user.firstName = firstName;
                 user.lastName = lastName;

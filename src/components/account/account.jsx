@@ -143,7 +143,7 @@ class Account extends Component {
                                         {currentUser.providerData && currentUser.providerData[0].providerId !== 'facebook.com' && (
                                             <a href="#" onClick={() => this.setState({ selectedProfileMenu: 'update-password'})} className={`list-group-item d-flex justify-content-between align-items-center ${selectedProfileMenu === 'update-password' ? 'active' : '' }`}><i className="fa fa-key"></i> Update Passowrd</a>
                                         )}
-                                        <a href="#" onClick={this.handleSignOut} className={`list-group-item d-flex justify-content-between align-items-center`}><i className="fas fa-sign-out-alt"></i> Sign out</a>
+                                        <a href="#" onClick={this.handleSignOut} className={`list-group-item d-flex justify-content-between align-items-center`}><i className="fas fa-sign-out-alt"></i> Log out</a>
                                         {/* <a href="#" onClick={() => this.setState({ selectedProfileMenu: 'delete'})} className={`list-group-item d-flex justify-content-between align-items-center ${selectedProfileMenu === 'delete' ? 'active' : '' }`}><i className="fa fa-remove"></i> Delete Account</a> */}
                                     </nav>
                                 </div>
@@ -157,9 +157,10 @@ class Account extends Component {
             );
         } else if (!authenticated) {
             this.props.resetRedirectURL();
+            this.props.setRedirectURL('/account');
             return <Redirect to={{ pathname: '/login' }} />;
         } else if (authenticated && user && !user.emailVerified && !user.registrationCompleted) {
-            toastr.error('Please verify email first.');
+            toastr.error('Please verify your email first..');
             return <Redirect to={{ pathname: '/email-verification' }} />;
         } else if (authenticated && user && user.emailVerified && !user.registrationCompleted) {
             toastr.error('Please complete user registration.');
@@ -186,6 +187,7 @@ const mapStateToProps = state => ({
       getUser: () => dispatch({ type: 'GET_USER' }),
       showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
       doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      setRedirectURL: (url) => dispatch({ type: 'SET_REDIRECT_URL', url: url }),
       resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
     };
   }

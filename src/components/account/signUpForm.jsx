@@ -194,8 +194,6 @@ class SignUpForm extends Component {
 
             const { user, additionalUserInfo } = userInfo;
 
-            this.props.login();
-
             const createUserData = {
                 userID: user.uid,
                 firstName: additionalUserInfo.profile.first_name,
@@ -210,6 +208,12 @@ class SignUpForm extends Component {
                 await userInfo.user.sendEmailVerification();
                 toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
             }
+
+            const userData = createUserData;
+            userData.currentUser = user;
+
+            this.props.setUser(userData);
+            this.props.login();
 
             // check if there was a previousURL from props.
             if (this.props.urlToRedirect) {

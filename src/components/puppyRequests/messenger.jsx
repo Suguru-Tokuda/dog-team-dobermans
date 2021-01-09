@@ -51,6 +51,10 @@ class Messenger extends Component {
 
                     this.props.updateMessages(messages);
 
+                    this.setState({
+                        messageBody: ''
+                    });
+
                     toastr.success('A message was successfully sent.');
                 })
                 .catch(err => {
