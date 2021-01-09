@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
@@ -26,6 +27,8 @@ class ContactuUs extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+
+
         ContactService.getContact()
             .then(res => {
                 const contactInfo = res.data;
@@ -150,4 +153,22 @@ class ContactuUs extends Component {
 
 }
 
-export default ContactuUs;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactuUs);
