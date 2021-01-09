@@ -120,7 +120,7 @@ class LoginForm extends Component {
                     if (err.message) {
                         toastr.error(err.message);
                     } else {
-                        toastr.error('There was an error in loggin in.');
+                        toastr.error('There was an error in login in.');
                     }
                 })
                 .finally(() => {
