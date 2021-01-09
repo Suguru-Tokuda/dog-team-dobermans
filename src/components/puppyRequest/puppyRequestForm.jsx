@@ -124,7 +124,8 @@ class PuppyRequestForm extends Component {
                 color: color,
                 created: new Date(),
                 lastModified: new Date(),
-                notified: null
+                notified: null,
+                statusID: 1
             };
 
             this.props.showLoading({ reset: true, count: 1 });

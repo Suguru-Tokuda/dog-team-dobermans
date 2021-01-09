@@ -3,7 +3,6 @@ import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import { connect } from 'react-redux';
 import WaitListService from '../../services/waitListService';
 import ConstantsService from '../../services/contactService';
-import DatePicker from 'react-datepicker';
 import toastr from 'toastr';
 import $ from 'jquery';
 
@@ -94,12 +93,12 @@ class PuppyRequestModal extends Component {
                 created: new Date().toISOString(),
                 color: puppyData.color,
                 notified: null,
-                expectedPurchaseDate: expectedPurchaseDate
+                statusID: 1
             };
 
             WaitListService.createWaitRequest(waitRequest)
                 .then(() => {
-                    toastr.success('The inquiry was successfuly sent. We will get back to you within a couple business days.');
+                    toastr.success('The inquiry was successfully sent. We will get back to you within a couple business days.');
                     this.setState({
                         selections: {
                             firstName: '',

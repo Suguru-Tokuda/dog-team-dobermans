@@ -26,3 +26,4 @@ functions/src/*.json
 src/api.json
 
 /.firebase
+firebase-debug.log

@@ -1268,6 +1268,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
+                    data.statusID = 1;
 
                     admin.firestore().collection('waitList').add(data)
                         .then(async () => {
@@ -1292,6 +1293,10 @@ export const waitList = functions.https.onRequest((request, response) => {
                         const data = request.body;
                         if (data.waitRequestID)
                             delete data.waitRequestID;
+
+                        if (data.statusID === undefined)
+                            data.statusID = 1;
+
                         const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
                         waitRequestRef.set(data, { merge: true })
                             .then(() => {
