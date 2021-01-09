@@ -148,18 +148,20 @@ class LoginForm extends Component {
 
             if (userInfo.additionalUserInfo.isNewUser === true) {
                 if (!userInfo.user.emailVerified) {
-                    const { user } = userInfo;
-
-                    await userInfo.user.sendEmailVerification();
-                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
-
+                    const { user, additionalUserInfo } = userInfo;
+                    
                     const createUserData = {
-                        userID: userInfo.uid,
+                        userID: user.uid,
+                        firstName: additionalUserInfo.profile.first_name,
+                        lastName: additionalUserInfo.profile.last_name,
                         email: user.email,
                         statusID: 1
                     };
     
                     await userService.createUser(createUserData);
+
+                    await userInfo.user.sendEmailVerification();
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
 
                     this.props.history.push('/');
                 }

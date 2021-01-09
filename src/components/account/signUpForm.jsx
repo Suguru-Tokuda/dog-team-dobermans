@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import firebase from '../../services/firebaseService';
 import { provider } from '../../services/firebaseService';
@@ -8,7 +9,7 @@ import utilService from '../../services/utilService';
 import validationService from '../../services/validationService';
 import toastr from 'toastr';
 
-class BreefSignUp extends Component {
+class SignUpForm extends Component {
 
     state = {
         email: '',
@@ -183,38 +184,45 @@ class BreefSignUp extends Component {
     handleFaceBookSignIn = async () => {
         const isDesktop = utilService.isMobile();
 
-        if (isDesktop === false) {
-            try {
-                const userInfo = await firebase.auth().signInWithPopup(provider);
-                const user = userInfo.user;
-                
-                if (!userInfo.user.emailVerified) {
-                    await userInfo.user.sendEmailVerification();
-                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
-                }
+        try {
+            let userInfo;
+            if (isDesktop === false) {
+                userInfo = await firebase.auth().signInWithPopup(provider);
+            } else {
+                userInfo = await firebase.auth().signInWithRedirect(provider);
+            }
 
-                const createUserData = {
-                    userID: userInfo.uid,
-                    email: user.email,
-                    statusID: 1
-                };
+            const { user, additionalUserInfo } = userInfo;
 
-                await userService.createUser(createUserData);
+            this.props.login();
 
-                if (userInfo.sendEmailVerification) {
-                    await userInfo.sendEmailVerification();
-                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
-                }
+            const createUserData = {
+                userID: user.uid,
+                firstName: additionalUserInfo.profile.first_name,
+                lastName: additionalUserInfo.profile.last_name,
+                email: user.email,
+                statusID: 1
+            };
 
-                // check if there was a previousURL from props.
-                if (this.props.urlToRedirect) {
-                    return <Redirect to={this.props.urlToRedirect} />;
-                } else {
-                    // redirect to the main page
-                    return <Redirect to="/" />;
-                }
-            } catch (err) {
-                console.log(err);
+            await userService.createUser(createUserData);
+
+            if (!userInfo.user.emailVerified) {
+                await userInfo.user.sendEmailVerification();
+                toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+            }
+
+            // check if there was a previousURL from props.
+            if (this.props.urlToRedirect) {
+                this.props.history.push(this.props.urlToRedirect);
+            } else {
+                // redirect to the main page
+                this.props.history.push('/');
+            }
+        } catch (err) {
+            if (err.message) {
+                toastr.error(err.message);
+            } else {
+                toastr.error('There was an error with Facebook sign up. Please try again.');
             }
         }
     }
@@ -283,4 +291,22 @@ class BreefSignUp extends Component {
     }
 }
 
-export default BreefSignUp;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUpForm);
