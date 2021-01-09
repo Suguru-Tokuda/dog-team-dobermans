@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import firebase from 'firebase/app';
+import firebase from '../../services/firebaseService';
 import { provider } from '../../services/firebaseService';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
