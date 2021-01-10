@@ -6,7 +6,7 @@ import * as api from '../src/api.json';
 import * as config from '../src/config.json';
 import * as moment from 'moment';
 
-admin.initializeApp(functions.config().firease);
+admin.initializeApp(functions.config().firebase);
 
 const corsHeader = cors({ origin: true });
 
@@ -17,7 +17,7 @@ function getAPIKEY() {
 
 function getConfig() {
     const parsedJSON = JSON.parse(JSON.stringify(config));
-    return parsedJSON.office;
+    return parsedJSON;
 }
 
 function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string) {
@@ -126,7 +126,7 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
             </html>
         `;
 
-        sendEmail('suguru.tokuda@gmail.com', `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
+        sendEmail(getConfig().breederEmail, `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
         .then(() => {
             resolve(1);
         })
@@ -136,19 +136,21 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
     });
 }
 
-function sendNotificationForWiatListMessage(email: string, senderName: string, waitRequestID: string, toBreeder: boolean) {
+function sendNotificationForWaitListMessage(email: string, senderName: string, waitRequestID: string, toBreeder: boolean) {
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
+            const publicBaseURL = getConfig().baseURL.dev.public;
+            const adminBaseURL = getConfig().baseURL.dev.admin;
 
             if (toBreeder === false) {
                 htmlBody = `
                     <!DOCTYPE html>
                         <body>
                             <p>Hello ${senderName},<p>
-                            <p>You recieved a new message from the breeder.</p>
+                            <p>You received a new message from the breeder.</p>
                             <p>Please click the following link to read the message.</p>
-                            <p><a href="https://dogteamdobermans.com/puppy-requests/${waitRequestID}">https://dogteamdobermans.com/puppy-requests/${waitRequestID}</a></p>
+                            <p><a href="${publicBaseURL}/puppy-requests/${waitRequestID}">${publicBaseURL}/puppy-requests/${waitRequestID}</a></p>
                             <br /><br />
                             Dog Team Dobermans
                         </body>
@@ -158,9 +160,9 @@ function sendNotificationForWiatListMessage(email: string, senderName: string, w
                 htmlBody = `
                     <!DOCTYPE html>
                         <body>
-                            <p>You recieved a new message from ${senderName}.</p>
+                            <p>You received a new message from ${senderName}.</p>
                             <p>Please click the following link to read the message.</p>
-                            <p><a href="https://dogteamdobermans-admin.web.app/wait-list/${waitRequestID}">https://dogteamdobermans-admin.web.app/wait-list/${waitRequestID}</a></p>
+                            <p><a href="${adminBaseURL}/wait-list/${waitRequestID}">${adminBaseURL}/wait-list/${waitRequestID}</a></p>
                             <br /><br />
                             Dog Team Dobermans
                         </body>
@@ -187,14 +189,14 @@ function sendEmail(email: string, subject: string, htmlBody: string) {
         port: 587,
         secure: false,
         auth: {
-            user: getConfig().user,
-            pass: getConfig().pass
+            user: getConfig().office.user,
+            pass: getConfig().office.pass
         }
     });
 
     const options = {
-        sender: getConfig().user,
-        from: getConfig().user,
+        sender: getConfig().office.user,
+        from: getConfig().office.user,
         to: email,
         subject: subject,
         html: htmlBody
@@ -1502,9 +1504,9 @@ export const waitList = functions.https.onRequest((request, response) => {
                             // TODO: send a notification meail to the recipient.
                             // if the recipientID is Bob's, call 
                             if (isBreeder === true) {
-                                await sendNotificationForWiatListMessage(recipient.email, `${recipient.firstName} ${recipient.lastName}`, waitRequestID, false);
+                                await sendNotificationForWaitListMessage(recipient.email, `${recipient.firstName} ${recipient.lastName}`, waitRequestID, false);
                             } else if (isBreeder === false) {
-                                await sendNotificationForWiatListMessage('suguru.tokuda@gmail.com', `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
+                                await sendNotificationForWaitListMessage('suguru.tokuda@gmail.com', `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
                             }
 
                             response.status(201).send(messageData);
