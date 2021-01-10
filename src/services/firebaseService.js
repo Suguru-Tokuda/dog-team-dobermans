@@ -3,7 +3,7 @@ import 'firebase/storage';
 import 'firebase/auth';
 import * as api from '../api.json';
 
-const isProd = window.location.toString().indexOf('localhost') === -1;;
+const isProd = window.location.toString().indexOf('https://dogteamdobermans.com/') === -1;;
 let apiParams;
 
 if (isProd === true) {
