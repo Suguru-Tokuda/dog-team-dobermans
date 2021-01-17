@@ -271,18 +271,31 @@ class SignUpForm extends Component {
                                 </ul>
                             </div>
                             <div className="from-group text-center">
-                                <button type="button" className="btn btn-primary" onClick={this.handleRegularSignUp}>
-                                    <i className="fas fa-user-alt"></i>
-                                    Sign Up
-                                    </button>
-                                <span className="ml-2 mr-2">or</span>
-                                <button 
-                                    type="button" 
-                                    className="btn btn-facebook"
-                                    onClick={this.handleFaceBookSignIn}
-                                >
-                                    <i className="fab fa-facebook-f"></i>
-                                    Sign up with Facebook</button>
+                                <div className="row">
+                                    <div className="col-12">
+                                        <button type="button" 
+                                                className="btn btn-primary" 
+                                                onClick={this.handleRegularSignUp}
+                                                style={{ width: '100%' }}
+                                        >
+                                            <i className="fas fa-user-alt"></i>
+                                            Sign Up
+                                        </button>                                        
+                                    </div>
+                                    <div className="col-12">
+                                        OR
+                                    </div>
+                                    <div className="col-12">
+                                        <button type="button" 
+                                                className="btn btn-facebook"
+                                                onClick={this.handleFaceBookSignIn}
+                                                style={{ width: '100%' }}
+                                        >
+                                            <i className="fab fa-facebook-f"></i>
+                                            Sign up with Facebook
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div className="form-group mt-3">
                                 <p>Already a member? Click <Link to="/login">here</Link> to log in.</p>

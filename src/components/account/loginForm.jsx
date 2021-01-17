@@ -250,25 +250,34 @@ class LoginForm extends Component {
                             />
                         </div>
                         <div className="form-group text-center">
-                            <button type="button" 
-                                    className="btn btn-primary"
-                                    onClick={this.handleLoginBtnClicked}
-                            >
-                                <i className="fas fa-sign-in-alt"></i> 
-                                Log in</button>
-                            <span className="ml-2 mr-2">or</span>
-                            <button type="button" 
-                                    className="btn btn-facebook"
-                                    onClick={this.handleFacebookSignIn}
-                            >
-                                <i className="fab fa-facebook-f"></i> 
-                                Continue with Facebook
-                            </button>
+                            <div className="row">
+                                <div className="col-12">
+                                    <button type="button" 
+                                            className="btn btn-primary"
+                                            onClick={this.handleLoginBtnClicked}
+                                            style={{ width: '100%' }}
+                                    >
+                                        <i className="fas fa-sign-in-alt"></i> 
+                                        Log in
+                                    </button>
+                                </div>
+                                <div className="col-12">
+                                    OR
+                                </div>
+                                <div className="col-12">
+                                    <button type="button" 
+                                            className="btn btn-facebook"
+                                            onClick={this.handleFacebookSignIn}
+                                            style={{ width: '100%' }}
+                                    >
+                                        <i className="fab fa-facebook-f"></i> 
+                                        Continue with Facebook
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div className="form-group">
-                            <div className="text-center">
-                                <p>Forgot password? Click <Link to="/password-reset">here</Link>.</p>
-                            </div>
+                            <p>Forgot password? Click <Link to="/password-reset">here</Link>.</p>
                         </div>
                     </form>
                 </div>
