@@ -10,11 +10,12 @@ import toastr from 'toastr';
 class LoginForm extends Component {
     state = {
         email: '',
-        password: ''
+        password: '',
     };
 
     constructor(props) {
         super(props);
+
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
 
