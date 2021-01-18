@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import PuppiesTable from './puppiesTable';
 import PuppyService from '../../services/puppyService';
 import HomepageContentsService from '../../services/homepageContentsService';
@@ -14,6 +15,8 @@ class PuppyList extends Component {
     componentDidMount() {
         const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyMessage()];
         window.scrollTo(0, 0);
+
+        this.props.showLoading({ reset: true, count: 1 });
         Promise.all(promises)
             .then(res => {
                 this.setState({ 
@@ -26,6 +29,7 @@ class PuppyList extends Component {
             })
             .finally(() => {
                 this.setState({ loaded: true });
+                this.props.doneLoading();
             });
     }
 
@@ -78,4 +82,18 @@ class PuppyList extends Component {
     }
 }
 
-export default PuppyList;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PuppyList);

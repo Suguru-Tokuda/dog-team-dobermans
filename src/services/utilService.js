@@ -29,4 +29,14 @@ export default class UtilService {
             return '';
         }
     }
+
+    static isMobile() {
+        const userAgent = navigator.userAgent;
+
+        if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(userAgent) || /Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(userAgent)) {
+            return true;
+        }
+
+        return false;
+    }
 }

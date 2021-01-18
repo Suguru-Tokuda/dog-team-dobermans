@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ParentsTable from './parentsTable';
 import ParentService from '../../services/parentService';
+import { connect } from 'react-redux';
 
 class ParentList extends Component {
     state = {
@@ -11,6 +12,8 @@ class ParentList extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+
+        this.props.showLoading({ reset: false, count: 1 });
         ParentService.getAllParents()
             .then(res => {
                 this.setState({ parents: res.data });
@@ -20,6 +23,8 @@ class ParentList extends Component {
             })
             .finally(() => {
                 this.setState({ loaded: true });
+
+                this.props.doneLoading();
             });
     }
 
@@ -72,4 +77,18 @@ class ParentList extends Component {
     }
 }
 
-export default ParentList;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' })
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ParentList);

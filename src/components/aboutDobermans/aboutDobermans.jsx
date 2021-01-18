@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import AboutDobermanService from '../../services/aboutDobermansService'
 
 class AboutDobermans extends Component {
@@ -9,6 +10,7 @@ class AboutDobermans extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+        this.props.showLoading({ reset: true, count: 1 });
         AboutDobermanService.getAboutDobermans()
             .then(res => {
                 this.setState({
@@ -17,6 +19,9 @@ class AboutDobermans extends Component {
             })
             .catch(err => {
                 console.log(err);
+            })
+            .finally(() => {
+                this.props.doneLoading({ reset: true });
             });
     }
 
@@ -72,4 +77,25 @@ class AboutDobermans extends Component {
 
 }
 
-export default AboutDobermans;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    loadCount: state.loadCount,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+  });
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+      login: () => dispatch({ type: 'SIGN_IN' }),
+      logout: () => dispatch({ type: 'SIGN_OUT' }),
+      checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+      setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+      getUser: () => dispatch({ type: 'GET_USER' }),
+      showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+      doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(AboutDobermans);

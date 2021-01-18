@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
-import WaitListForm from './waitListForm';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
 import * as api from '../../api.json';
-import $ from 'jquery';
 
 function Map() {
     return <GoogleMap defaultZoom={12} defaultCenter={{ lat: 39.891180, lng: -89.854590 }} ><Marker position={{ lat: 39.891180, lng: -89.854590 }} /></GoogleMap>;
@@ -27,6 +26,8 @@ class ContactuUs extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+
+        this.props.showLoading({ reset: true, count: 1 });
         ContactService.getContact()
             .then(res => {
                 const contactInfo = res.data;
@@ -43,6 +44,9 @@ class ContactuUs extends Component {
             })
             .catch(err => {
                 console.log(err);
+            })
+            .finally(() => {
+                this.props.doneLoading({ reset: true });
             });
     }
 
@@ -52,7 +56,7 @@ class ContactuUs extends Component {
                 <div className="container">
                     <div className="row d-flex">
                         <div className="col-lg-9 order-2 order-lg-1">
-                            <h1>Contact / Request a Puppy</h1>
+                            <h1>Contact</h1>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">
@@ -72,6 +76,8 @@ class ContactuUs extends Component {
 
     getMain() {
         const { city, email, phone, state, street, zip } = this.state;
+        const { authenticated } = this.props;
+
         if (city !== '' && email !== '' && phone !== '' && state !== '' && street !== '' && zip !== '') {
             return (
                 <section className="contact">
@@ -107,7 +113,12 @@ class ContactuUs extends Component {
                                     <i className="fas fa-dog"></i>
                                 </div>
                                 <h3>Request</h3>
-                                <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to jump to the Doberman Puppy Wait List Form.</p>
+                                <p>Please 
+                                    <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleRequestPuppyLinkClicked}>&nbsp;click here</a> to go to the Doberman Puppy Wait List Form.
+                                    {!authenticated && (
+                                        <span>(Account login is required.)</span>
+                                    )}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -131,12 +142,18 @@ class ContactuUs extends Component {
         );
     }
 
-    handleToNavigateToTheForm = () => {
-        $(document).ready(() => {
-            $('html, body').animate({
-                scrollTop: $('#waitListForm').offset().top
-            }, 1000)
-        });
+    handleRequestPuppyLinkClicked = () => {
+        const { authenticated } = this.props;
+
+        if (authenticated) {
+            this.props.history.push('/puppy-request');
+        } else {
+            this.props.setRedirectURL({ url: '/puppy-request'})
+            this.props.history.push({ 
+                pathname: '/login',
+                state: { message: 'Please login to create a Doberman puppy request.' }
+            });
+        }
     }
 
     render() {
@@ -145,11 +162,29 @@ class ContactuUs extends Component {
                 {this.getHeader()}
                 {this.getMain()}
                 {this.getMap()}
-                <WaitListForm />
             </React.Fragment>
         )
     }
 
 }
 
-export default ContactuUs;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+});
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch({ type: 'SIGN_IN' }),
+        setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+        checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+        showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+        doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+        setRedirectURL: (url) => dispatch({ type: 'SET_REDIRECT_URL', url: url }),
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' }),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactuUs);
