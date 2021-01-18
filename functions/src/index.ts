@@ -140,8 +140,8 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
-            const publicBaseURL = getConfig().baseURL.dev.public;
-            const adminBaseURL = getConfig().baseURL.dev.admin;
+            const publicBaseURL = getConfig().baseURL.prod.public;
+            const adminBaseURL = getConfig().baseURL.prod.admin;
 
             if (toBreeder === false) {
                 htmlBody = `
