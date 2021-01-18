@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import allReducer from './reducers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -29,6 +32,17 @@ import 'masonry-layout/dist/masonry.pkgd.min.js';
 import 'imagesloaded/imagesloaded.pkgd.min.js';
 import 'ladda/dist/ladda-themeless.min.css';
 import 'react-image-crop/dist/ReactCrop.css';
+import './services/facebookSetup';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const store = createStore(
+    allReducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>
+, document.getElementById('root')
+);
 serviceWorker.unregister();

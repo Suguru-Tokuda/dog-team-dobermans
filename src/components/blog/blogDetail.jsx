@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import PageNotFound from '../common/pageNotFound';
 import BlogService from '../../services/blogService';
@@ -42,6 +43,7 @@ class BlogDetail extends Component {
 
     getBlogData() {
         const { blogID } = this.state;
+        this.props.showLoading({ reset: true, count: 1 });
         BlogService.getBlog(blogID)
             .then(res => {
                 if (Object.keys(res.data).length === 0) {
@@ -63,6 +65,7 @@ class BlogDetail extends Component {
                 toastr.error('There was an error in loading blog data');
             })
             .finally(() => {
+                this.props.doneLoading({ reset: true });
                 this.setState({ pageLoaded: true });
             });
     }
@@ -163,4 +166,25 @@ class BlogDetail extends Component {
 
 }
 
-export default BlogDetail;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    loadCount: state.loadCount,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+  });
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+      login: () => dispatch({ type: 'SIGN_IN' }),
+      logout: () => dispatch({ type: 'SIGN_OUT' }),
+      checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+      setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+      getUser: () => dispatch({ type: 'GET_USER' }),
+      showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+      doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(BlogDetail);

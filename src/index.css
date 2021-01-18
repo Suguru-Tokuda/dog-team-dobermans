@@ -7,6 +7,10 @@ code {
     monospace;
 }
 
+select {
+  height: 42px !important;
+}
+
 .owl-carousel .item img{
   display: block;
   width: 100%;
@@ -35,6 +39,10 @@ input[type="file"] {
   section.divider {
     height: 800px;
   }
+}
+
+.error {
+  border: 1px solid #d9534f;
 }
 
 .pointer {
@@ -121,4 +129,70 @@ nav.navbar a.nav-link.active {
   right: 100%;
   width: 100%;
   height: 2px;
+}
+
+/* facebook buttons */
+.btn-facebook, .btn-template {
+  color: white;
+  background-color: #1777F2;
+  border-color: #1777F2;
+}
+
+.btn-facebook:hover, .btn-template:hover {
+  color: white;
+  background-color: #1461C5;
+  border-color: #1461C5;
+}
+
+.btn-facebook:focus, .btn-template:focus, .btn-facebook.focus, .focus.btn-template {
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
+}
+
+.btn-facebook.disabled, .disabled.btn-template, .btn-facebook:disabled, .btn-template:disabled {
+  background-color: #1777F2;
+  border-color: #1777F2;
+}
+
+.btn-facebook:not([disabled]):not(.disabled):active, .btn-template:not([disabled]):not(.disabled):active, .btn-facebook:not([disabled]):not(.disabled).active, .btn-template:not([disabled]):not(.disabled).active,
+.show > .btn-facebook.dropdown-toggle,
+.show > .dropdown-toggle.btn-template {
+  color: color-yiq(#1777F2);
+  background-color: #1777F2;
+  border-color: #1777F2;
+  -webkit-box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(144, 85, 162, 0.5);
+}
+
+.centered-spinner {
+  position: absolute;
+  height: 200px;
+  width: 200px;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+  background-size: 200%;
+  z-index: 1;
+}
+
+.block-screen {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+@media screen and (max-width: 767px) {
+  .hidden-xs {
+    display: none !important;
+  }
+
+  .visible-xs {
+      display: block !important;
+    }
+}
+
+@media screen and (min-width: 768px) {
+  .visible-xs {
+    display: none !important;
+  }
 }

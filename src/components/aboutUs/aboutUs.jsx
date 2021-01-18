@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import MissionStatements from './missionStatements';
 import OurTeam from './ourTeam';
 import AboutUsService from '../../services/aboutUsService';
+import toastr from 'toastr';
 
 class AboutUs extends Component {
     state = {
@@ -12,6 +14,7 @@ class AboutUs extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+        this.props.showLoading({ reset: true, count: 1 });
         AboutUsService.getAboutUs()
             .then(res => {
                 this.setState({
@@ -21,6 +24,10 @@ class AboutUs extends Component {
             })
             .catch(err => {
                 console.log(err);
+                toastr.error('There was an error in loading about us data');
+            })
+            .finally(() => {
+                this.props.doneLoading({ reset: true });
             });
     }
 
@@ -75,4 +82,25 @@ class AboutUs extends Component {
     }
 }
 
-export default AboutUs;
+const mapStateToProps = state => ({
+    user: state.user,
+    authenticated: state.authenticated,
+    loadCount: state.loadCount,
+    userChecked: state.userChecked,
+    redirectURL: state.redirectURL
+  });
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+      login: () => dispatch({ type: 'SIGN_IN' }),
+      logout: () => dispatch({ type: 'SIGN_OUT' }),
+      checkUser: () => dispatch({ type: 'USER_CHECKED' }),
+      setUser: (user) => dispatch({ type: 'SET_USER', user: user }),
+      getUser: () => dispatch({ type: 'GET_USER' }),
+      showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
+      doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
+      resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+    };
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(AboutUs);
