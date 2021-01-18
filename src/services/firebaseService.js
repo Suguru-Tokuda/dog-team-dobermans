@@ -4,9 +4,6 @@ import 'firebase/auth';
 import * as api from '../api.json';
 
 const isProd = window.location.toString().indexOf('https://dogteamdobermans.com/') !== -1;
-
-console.log('production', isProd);
-
 let apiParams;
 
 if (isProd === true) {
