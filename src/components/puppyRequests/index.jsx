@@ -28,13 +28,13 @@ export class PuppyRequests extends Component {
             );
         } else if (!authenticated) {
             this.props.setRedirectURL(this.props.location.pathname);
-            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
+            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
         } else if (authenticated && user && !user.emailVerified) {
             toastr.error('Please verify your email first.');
             return <Redirect to="/email-verification" />;
         } else {
             toastr.error('You need to login to continue.');
-            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname } }}/>;
+            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
         }
     }
 }

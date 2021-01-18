@@ -17,8 +17,7 @@ class LoginForm extends Component {
         super(props);
 
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-
+            if (user) {                
               this.props.showLoading({reset: false, count: 1 });
       
               try {
@@ -157,6 +156,7 @@ class LoginForm extends Component {
                         firstName: additionalUserInfo.profile.first_name,
                         lastName: additionalUserInfo.profile.last_name,
                         email: user.email,
+                        userType: user.providerData[0].providerId,
                         statusID: 1
                     };
     

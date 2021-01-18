@@ -129,6 +129,7 @@ class SignUpForm extends Component {
                 const createUserData = {
                     userID: currentUser.uid,
                     email: email.trim().toLowerCase(),
+                    userType: res.user.providerData[0].providerId,
                     statusID: 1
                 };
 
@@ -199,6 +200,7 @@ class SignUpForm extends Component {
                 firstName: additionalUserInfo.profile.first_name,
                 lastName: additionalUserInfo.profile.last_name,
                 email: user.email,
+                userType: user.providerData[0].providerId,
                 statusID: 1
             };
 
