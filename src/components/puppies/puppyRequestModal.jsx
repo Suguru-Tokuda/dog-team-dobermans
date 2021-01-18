@@ -81,8 +81,8 @@ class PuppyRequestModal extends Component {
 
         if (isValid === true) {
             const { user } = this.props;
-            const {  expectedPurchaseDate } = selections;
             const { puppyID } = puppyData;
+            const { selections } = this.state;
 
             this.setState({ loading: true });
             this.props.showLoading({ reset: true, count: 1 });
@@ -93,7 +93,8 @@ class PuppyRequestModal extends Component {
                 created: new Date().toISOString(),
                 color: puppyData.color,
                 notified: null,
-                statusID: 1
+                statusID: 1,
+                message: selections.message
             };
 
             WaitListService.createWaitRequest(waitRequest)
@@ -101,14 +102,7 @@ class PuppyRequestModal extends Component {
                     toastr.success('The inquiry was successfully sent. We will get back to you within a couple business days.');
                     this.setState({
                         selections: {
-                            firstName: '',
-                            lastName: '',
-                            email: '',
-                            phone: '',
-                            city: '',
-                            state: '',
                             message: '',
-                            expectedPurchaseDate: null
                         },
                         validations: {},
                         formSubmitted: false,

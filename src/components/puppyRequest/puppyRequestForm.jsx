@@ -12,8 +12,7 @@ class PuppyRequestForm extends Component {
     state = {
         selections: {
             message: '',
-            color: '',
-            expectedPurchaseDate: null
+            color: ''
         },
         validations: {},
         formSubmitted: false,
