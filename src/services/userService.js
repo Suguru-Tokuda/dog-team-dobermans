@@ -8,7 +8,6 @@ export default class UserService {
     }
 
     static getUser(userID) {
-        console.log(`${this.getServiceBase()}?key=${api.API_KEY}&buyerID=${userID}`);
         return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&buyerID=${userID}`);
     }
 
