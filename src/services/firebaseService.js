@@ -5,6 +5,7 @@ import * as api from '../api.json';
 
 // const isProd = window.location.toString().indexOf('https://dogteamdobermans.com/') !== -1;
 const isProd = true;
+
 let apiParams;
 
 if (isProd === true) {
@@ -12,6 +13,8 @@ if (isProd === true) {
 } else {
   apiParams = api.dev;
 }
+
+console.log(apiParams);
 
 const firebaseConfig = {
   apiKey: apiParams.firebaseConfigParams.apiKey,

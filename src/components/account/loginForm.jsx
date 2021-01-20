@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
 import utilService from '../../services/utilService';
 import toastr from 'toastr';
+import moment from 'moment';
 
 class LoginForm extends Component {
     state = {
@@ -157,6 +158,7 @@ class LoginForm extends Component {
                         lastName: additionalUserInfo.profile.last_name,
                         email: user.email,
                         userType: user.providerData[0].providerId,
+                        createDate: new Date().toISOString(),
                         statusID: 1
                     };
     

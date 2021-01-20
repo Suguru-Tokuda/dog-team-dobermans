@@ -49,7 +49,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                     </html>
         `;
 
-        sendEmail('suguru.tokuda@gmail.com', 'New Testimonial Submitted', htmlBody)
+        sendEmail('dogteam@dogteamdobermans.com', 'New Testimonial Submitted', htmlBody)
             .then(() => {
                 resolve(1);
             })
@@ -1092,7 +1092,7 @@ export const contact = functions.https.onRequest((request, response) => {
                             contactRef.set(data, { merge: true })
                                 .then(() => {
                                     const retVal = data;
-                                    retVal.contacdtUsID = contactID;
+                                    retVal.contactUsID = contactID;
                                     response.status(201).send(retVal);
                                 })
                                 .catch(err => {
@@ -1259,6 +1259,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                     retVal.sort((a: any, b: any) => { 
                                         return a.created > b.created ? -1 : (a.created < b.created ? 1 : 0);
                                     });
+
                                     response.status(200).send(retVal);
                                 } else {
                                     response.status(200).send([]);
