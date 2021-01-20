@@ -130,7 +130,8 @@ class SignUpForm extends Component {
                     userID: currentUser.uid,
                     email: email.trim().toLowerCase(),
                     userType: res.user.providerData[0].providerId,
-                    statusID: 1
+                    statusID: 1,
+                    createDate: new Date().toISOString(),
                 };
 
                 await userService.createUser(createUserData);
@@ -201,6 +202,7 @@ class SignUpForm extends Component {
                 lastName: additionalUserInfo.profile.last_name,
                 email: user.email,
                 userType: user.providerData[0].providerId,
+                createDate: new Date().toISOString(),
                 statusID: 1
             };
 
