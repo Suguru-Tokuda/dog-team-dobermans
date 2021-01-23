@@ -3,8 +3,7 @@ import 'firebase/storage';
 import 'firebase/auth';
 import * as api from '../api.json';
 
-// const isProd = window.location.toString().indexOf('https://dogteamdobermans.com/') !== -1;
-const isProd = true;
+const isProd = window.location.toString().indexOf('https://dogteamdobermans.com/') !== -1;
 
 let apiParams;
 
@@ -13,8 +12,6 @@ if (isProd === true) {
 } else {
   apiParams = api.dev;
 }
-
-console.log(apiParams);
 
 const firebaseConfig = {
   apiKey: apiParams.firebaseConfigParams.apiKey,

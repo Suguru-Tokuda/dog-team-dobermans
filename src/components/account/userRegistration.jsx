@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import contactService from '../../services/contactService';
 import validationService from '../../services/validationService';
 import userService from '../../services/userService';
@@ -17,12 +17,15 @@ class UserRegistration extends Component {
             city: ''
         },
         validation: {},
+        redirectURL: '/',
         formSubmitted: false,
         dataLoaded: false
     };
 
     constructor(props) {
         super(props);
+        if (this.props.history && this.props.history.location.state && this.props.history.location.state.redirectURL)
+            this.state.redirectURL = this.props.history.location.state.redirectURL;
     }
 
     componentDidUpdate() {
@@ -279,6 +282,7 @@ class UserRegistration extends Component {
                 user.phone = phone;
                 user.city = city;
                 user.state = state;
+                user.emailVerified = user.currentUser.emailVerified;
                 user.registrationCompleted = true;
 
                 this.props.setUser(user);
@@ -291,7 +295,7 @@ class UserRegistration extends Component {
 
             toastr.success('User Registration Completed.');
 
-            this.props.history.push('/');
+            this.props.history.push(this.state.redirectURL);
         }
     }
 
@@ -304,120 +308,124 @@ class UserRegistration extends Component {
         const { firstName, lastName, email, phone, city, state } = this.state.selection;
         const { validation, formSubmitted } = this.state;
 
-        return (
-            <React.Fragment>
-                {this.getHeader()}
-                <div className="container">
-                    <div className="content-block" style={{ margin: '20px', color: 'gray' }}>
-                        <div className="form-group row">
-                            <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3" htmlFor="firstName">First Name</label>
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                                <input 
-                                    id="firstName" 
-                                    type="text" 
-                                    className={`form-control ${formSubmitted && validation.firstName ? 'error': ''}`} 
-                                    value={firstName}
-                                    onChange={this.handleFirstNameChanged}
-                                />
-                                {(validation.firstName) && (
-                                    <small className="text-danger">{formSubmitted && validation.firstName}</small>
-                                )}
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="lastName">Last Name</label>
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                                <input 
-                                    id="lastName" 
-                                    type="text" 
-                                    className={`form-control ${formSubmitted && validation.lastName ? 'error': ''}`} 
-                                    value={lastName}
-                                    onChange={this.handleLastNameChanged}
-                                />
-                                {(validation.lastName) && (
-                                    <small className="text-danger">{formSubmitted && validation.lastName}</small>
-                                )}
-                            </div>
-                        </div>
-                        {currentUser && currentUser.providerData && currentUser.providerData[0].providerId !== 'facebook.com' && (
+        if (user) {
+            return (
+                <React.Fragment>
+                    {this.getHeader()}
+                    <div className="container">
+                        <div className="content-block" style={{ margin: '20px', color: 'gray' }}>
                             <div className="form-group row">
-                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="email">Email</label>
+                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3" htmlFor="firstName">First Name</label>
                                 <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
                                     <input 
-                                        id="email" 
-                                        type="email" 
-                                        className={`form-control ${formSubmitted && validation.email ? 'error': ''}`} 
-                                        value={email}
-                                        readOnly
-                                        onChange={this.handleEmailChanged}
+                                        id="firstName" 
+                                        type="text" 
+                                        className={`form-control ${formSubmitted && validation.firstName ? 'error': ''}`} 
+                                        value={firstName}
+                                        onChange={this.handleFirstNameChanged}
                                     />
-                                    {(validation.email) && (
-                                        <small className="text-danger">{formSubmitted && validation.email}</small>
+                                    {(validation.firstName) && (
+                                        <small className="text-danger">{formSubmitted && validation.firstName}</small>
                                     )}
                                 </div>
                             </div>
-                        )}
-                        <div className="form-group row">
-                            <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="firstName">Phone</label>
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                                <input 
-                                    id="phone" 
-                                    type="text" 
-                                    className={`form-control ${formSubmitted && validation.phone ? 'error': ''}`} 
-                                    value={phone}
-                                    onChange={this.handlePhoneChanged}
-                                />
-                                {(validation.phone) && (
-                                    <small className="text-danger">{formSubmitted && validation.phone}</small>
-                                )}
+                            <div className="form-group row">
+                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="lastName">Last Name</label>
+                                <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                                    <input 
+                                        id="lastName" 
+                                        type="text" 
+                                        className={`form-control ${formSubmitted && validation.lastName ? 'error': ''}`} 
+                                        value={lastName}
+                                        onChange={this.handleLastNameChanged}
+                                    />
+                                    {(validation.lastName) && (
+                                        <small className="text-danger">{formSubmitted && validation.lastName}</small>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-group row">
-                            <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3" htmlFor="city">City</label>
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                                <input 
-                                    id="city" 
-                                    type="text" 
-                                    className={`form-control ${formSubmitted && validation.city ? 'error': ''}`} 
-                                    value={city}
-                                    onChange={this.handleCityChanged}
-                                />
-                                {(validation.phone) && (
-                                    <small className="text-danger">{formSubmitted && validation.city}</small>
-                                )}
+                            {currentUser && currentUser.providerData && currentUser.providerData[0].providerId !== 'facebook.com' && (
+                                <div className="form-group row">
+                                    <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="email">Email</label>
+                                    <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                                        <input 
+                                            id="email" 
+                                            type="email" 
+                                            className={`form-control ${formSubmitted && validation.email ? 'error': ''}`} 
+                                            value={email}
+                                            readOnly
+                                            onChange={this.handleEmailChanged}
+                                        />
+                                        {(validation.email) && (
+                                            <small className="text-danger">{formSubmitted && validation.email}</small>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            <div className="form-group row">
+                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="firstName">Phone</label>
+                                <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                                    <input 
+                                        id="phone" 
+                                        type="text" 
+                                        className={`form-control ${formSubmitted && validation.phone ? 'error': ''}`} 
+                                        value={phone}
+                                        onChange={this.handlePhoneChanged}
+                                    />
+                                    {(validation.phone) && (
+                                        <small className="text-danger">{formSubmitted && validation.phone}</small>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-group row">
-                            <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="state">State</label>
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                                <select 
-                                    id="state" 
-                                    className={`form-control ${formSubmitted && validation.state ? 'error': ''}`} 
-                                    value={state}
-                                    onChange={this.handleStateChanged}
-                                >
-                                    <option value="">--Select State--</option>
-                                    {this.renderStateOptions()}
-                                </select>
-                                {(validation.phone) && (
-                                    <small className="text-danger">{formSubmitted && validation.state}</small>
-                                )}
+                            <div className="form-group row">
+                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3" htmlFor="city">City</label>
+                                <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                                    <input 
+                                        id="city" 
+                                        type="text" 
+                                        className={`form-control ${formSubmitted && validation.city ? 'error': ''}`} 
+                                        value={city}
+                                        onChange={this.handleCityChanged}
+                                    />
+                                    {(validation.phone) && (
+                                        <small className="text-danger">{formSubmitted && validation.city}</small>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-group row">
-                            <div className="col-xs-12">
-                                <button type="button"
-                                        className="btn btn-primary ml-1"
-                                        onClick={this.handleSubmitBtnClicked}
-                                >
-                                    Submit
-                                </button>
+                            <div className="form-group row">
+                                <label className="form-label col-xs-12 col-sm-12 col-md-3 col-lg-3"  htmlFor="state">State</label>
+                                <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                                    <select 
+                                        id="state" 
+                                        className={`form-control ${formSubmitted && validation.state ? 'error': ''}`} 
+                                        value={state}
+                                        onChange={this.handleStateChanged}
+                                    >
+                                        <option value="">--Select State--</option>
+                                        {this.renderStateOptions()}
+                                    </select>
+                                    {(validation.phone) && (
+                                        <small className="text-danger">{formSubmitted && validation.state}</small>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <div className="col-xs-12">
+                                    <button type="button"
+                                            className="btn btn-primary ml-1"
+                                            onClick={this.handleSubmitBtnClicked}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </React.Fragment>
-        );
+                </React.Fragment>
+            );
+        } else {
+            return <Redirect to="/" />;
+        }
     }
 }
 

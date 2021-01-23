@@ -19,9 +19,6 @@ class Topnavbar extends Component {
                 this.props.resetUser();
                 this.props.resetRedirectURL();
             })
-            .catch(() => {
-                
-            })
             .finally(() => {
                 this.props.doneLoading({ reset: true });
             });
@@ -67,17 +64,12 @@ class Topnavbar extends Component {
                                         <NavLink className="nav-link" activeClassName="active" to="/puppy-request">Request a Puppy</NavLink>
                                     </li>
                                 )}
-                                <li className="nav-item visible-xs">
+                                <li className="nav-item visible-xs hidden-md hidden-lg">
                                     <NavLink className="nav-link" activeClassName="active" to="/puppy-requests">
                                         Puppy Requests
                                     </NavLink>
                                 </li>
-                                <li className="nav-item visible-xs">
-                                    <NavLink className="nav-link" activeClassName="active" to="/sign-up">
-                                        Sign Up
-                                    </NavLink>
-                                </li>
-                                <li className="nav-item visible-xs">
+                                <li className="nav-item visible-xs visible-sm hidden-md hidden-lg">
                                     {(!this.props.authenticated) && (
                                         <NavLink className="nav-link" activeClassName="active" to="/login">
                                             Login
@@ -92,7 +84,7 @@ class Topnavbar extends Component {
                                 </li>
                             </ul>
                         </div>
-                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs">
+                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs hidden-sm">
                             {(this.props.authenticated === true) && (
                                 <div className="user">
                                     <Link id="account" to="/puppy-requests">
@@ -106,13 +98,6 @@ class Topnavbar extends Component {
                                     <Link id="account" to="/account" style={{ color: 'white' }}>
                                         <i className="fa fa-user" style={{ fontSize: '25px', color: 'white'}} data-tip="Account"></i>
                                         <ReactTooltip />
-                                    </Link>
-                                </div>
-                            )}
-                            {(!this.props.authenticated) && (
-                                <div className="user ml-3">
-                                    <Link id="sign-up" to="/sign-up" style={{ color: 'white' }}>
-                                        Sign Up
                                     </Link>
                                 </div>
                             )}

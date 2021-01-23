@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SignUpModal from './signUpModal';
 import firebase from '../../services/firebaseService';
 import { provider } from '../../services/firebaseService';
 import { connect } from 'react-redux';
@@ -6,12 +7,13 @@ import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
 import utilService from '../../services/utilService';
 import toastr from 'toastr';
-import moment from 'moment';
+import $ from 'jquery';
 
 class LoginForm extends Component {
     state = {
         email: '',
         password: '',
+        showForm: false
     };
 
     constructor(props) {
@@ -94,6 +96,28 @@ class LoginForm extends Component {
           });
     }
 
+    componentDidMount() {
+        const { authenticated } = this.props;
+
+        if (authenticated) {
+            if (this.props.urlToRedirect || this.props.redirectURL) {
+                if (this.props.urlToRedirect) {
+                    this.props.history.push(this.props.urlToRedirect);
+                    this.props.resetRedirectURL();
+                    return;
+                }
+
+                if (this.props.resetRedirectURL) {
+                    this.props.history.push(this.props.resetRedirectURL);
+                    this.props.resetRedirectURL();
+                    return;
+                }
+            }
+        }
+
+        this.setState({ showForm: true });
+    }
+
     handleEmailChanged = (e) => {
         this.setState({
             email: e.target.value
@@ -142,50 +166,73 @@ class LoginForm extends Component {
 
         try {
             let userInfo;
+            let userData;
+
             if (isDesktop === false) {
                 userInfo = await firebase.auth().signInWithPopup(provider);
             } else {
                 userInfo = await firebase.auth().signInWithRedirect(provider);
             }
 
-            if (userInfo.additionalUserInfo.isNewUser === true) {
-                if (!userInfo.user.emailVerified) {
-                    const { user, additionalUserInfo } = userInfo;
-                    
-                    const createUserData = {
-                        userID: user.uid,
-                        firstName: additionalUserInfo.profile.first_name,
-                        lastName: additionalUserInfo.profile.last_name,
-                        email: user.email,
-                        userType: user.providerData[0].providerId,
-                        createDate: new Date().toISOString(),
-                        statusID: 1
-                    };
-    
-                    await userService.createUser(createUserData);
+            try {
+                const userRes = await userService.getUser(userInfo.user.uid);
+                userData = userRes.data;
+            } catch {
 
-                    await userInfo.user.sendEmailVerification();
-                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+            }
 
-                    const userData = createUserData;
-                    userData.currentUser = user;
-        
-                    this.props.setUser(userData);
-                    this.props.login();      
+            // check if user exists
+            if (userData) {
+                const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
 
-                    this.props.history.push('/');
-                }
-            } else {
-                // get user info from the api, then set the user info to the global state.
-                await this.populateUser(userInfo.user);
+                this.props.setUser({
+                    userID: buyerID,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    city: city,
+                    state: state,
+                    statusID: statusID,
+                    currentUser: userInfo,
+                    emailVerified: userInfo.emailVerified,
+                    registrationCompleted: registrationCompleted,
+                    recentAuthenticationRequired: false
+                });
 
                 this.props.login();
+
                 if (this.props.urlToRedirect) {
                     this.props.history.push(this.props.urlToRedirect);
                 } else {
                     // redirect to the main page
                     this.props.history.push('/');
                 }
+            } else {
+                const { user, additionalUserInfo } = userInfo;
+                    
+                const createUserData = {
+                    userID: user.uid,
+                    firstName: additionalUserInfo.profile.first_name,
+                    lastName: additionalUserInfo.profile.last_name,
+                    email: user.email,
+                    userType: user.providerData[0].providerId,
+                    createDate: new Date().toISOString(),
+                    statusID: 1
+                };
+
+                await userService.createUser(createUserData);
+
+                await userInfo.user.sendEmailVerification();
+                toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+
+                const userData = createUserData;
+                userData.currentUser = user;
+    
+                this.props.setUser(userData);
+                this.props.login();      
+
+                this.props.history.push('/');
             }
         } catch (err) {
             toastr.error(err);
@@ -228,64 +275,94 @@ class LoginForm extends Component {
         });
     }
 
+    handleSignUpBtnClicked = () => {
+        $('#signUpModal').modal('show');
+    }
+
+    handleRegistrationCompleted = (redirectURL) => {
+        $('#signUpModal').modal('hide');
+        this.props.history.push(redirectURL);
+    }
+
     render() {
-        return (
-            <div className="block">
-                <div className="block-header">
-                    <h5>Login</h5>
-                </div>
-                <div className="block-body">
-                    <form noValidate>
-                        <div className="form-group">
-                            <label htmlFor="email" className="form-label">Email</label>
-                            <input id="email" 
-                                type="text" 
-                                className="form-control"
-                                onChange={this.handleEmailChanged}
-                            />
+        const { showForm } = this.state;
+
+        if (showForm) {
+            return (
+                <React.Fragment>
+                    <div className="block">
+                        <div className="block-header">
+                            <h5>Login</h5>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="password" className="form-label">Password</label>
-                            <input id="password" 
-                                type="password" 
-                                className="form-control" 
-                                onChange={this.handlePasswordChanged}
-                            />
-                        </div>
-                        <div className="form-group text-center">
-                            <div className="row">
-                                <div className="col-12">
-                                    <button type="button" 
-                                            className="btn btn-primary"
-                                            onClick={this.handleLoginBtnClicked}
-                                            style={{ width: '100%' }}
-                                    >
-                                        <i className="fas fa-sign-in-alt"></i> 
-                                        Log in
-                                    </button>
+                        <div className="block-body">
+                            <form noValidate>
+                                <div className="form-group">
+                                    <label htmlFor="email" className="form-label">Email</label>
+                                    <input id="email" 
+                                        type="text" 
+                                        className="form-control"
+                                        onChange={this.handleEmailChanged}
+                                    />
                                 </div>
-                                <div className="col-12">
-                                    OR
+                                <div className="form-group">
+                                    <label htmlFor="password" className="form-label">Password</label>
+                                    <input id="password" 
+                                        type="password" 
+                                        className="form-control" 
+                                        onChange={this.handlePasswordChanged}
+                                    />
                                 </div>
-                                <div className="col-12">
-                                    <button type="button" 
-                                            className="btn btn-facebook"
-                                            onClick={this.handleFacebookSignIn}
-                                            style={{ width: '100%' }}
-                                    >
-                                        <i className="fab fa-facebook-f"></i> 
-                                        Continue with Facebook
-                                    </button>
+                                <div className="form-group text-center">
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <button type="button" 
+                                                    className="btn btn-primary"
+                                                    onClick={this.handleLoginBtnClicked}
+                                                    style={{ width: '100%' }}
+                                            >
+                                                <i className="fas fa-sign-in-alt"></i> 
+                                                Log in
+                                            </button>
+                                        </div>
+                                        <div className="col-12">
+                                            OR
+                                        </div>
+                                        <div className="col-12">
+                                            <button type="button" 
+                                                    className="btn btn-facebook"
+                                                    onClick={this.handleFacebookSignIn}
+                                                    style={{ width: '100%' }}
+                                            >
+                                                <i className="fab fa-facebook-f"></i> 
+                                                Continue with Facebook
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <div className="form-group">
+                                    <p>Forgot password? Click <Link to="/password-reset">here</Link>.</p>
+                                </div>
+                                <div className="hr-line-dashed"></div>
+                                <div className="row form-group">
+                                    <div className="col-12">
+                                        <button type="button"
+                                                className="btn btn-success"
+                                                onClick={this.handleSignUpBtnClicked}
+                                                style={{ width: '100%' }}
+                                        >
+                                            Register
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <div className="form-group">
-                            <p>Forgot password? Click <Link to="/password-reset">here</Link>.</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        )
+                    </div>
+                    <SignUpModal onRegistrationCompleted={this.handleRegistrationCompleted} />
+                </React.Fragment>
+            );
+        } else {
+            return <div style={{ height: '300px' }}></div>
+        }
     }
 }
 

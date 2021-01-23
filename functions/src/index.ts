@@ -1132,7 +1132,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     const waitRequestID = query.waitRequestID;
                     const recipientID = query.recipientID;
 
-                    if (typeof waitRequestID !== 'undefined' && waitRequestID.length > 0) {
+                    if (waitRequestID && waitRequestID.length > 0) {
                         admin.firestore().collection('waitList').doc(waitRequestID).get()
                             .then(async doc => {
                                 let retVal: any = {};
@@ -1199,61 +1199,60 @@ export const waitList = functions.https.onRequest((request, response) => {
                             .then(async querySnapshot => {
                                 if (querySnapshot.size > 0) {
                                     const retVal = [] as any;
+
                                     for (const waitRequestDoc of querySnapshot.docs) {
                                         const waitRequest = waitRequestDoc.data();
                                         waitRequest.waitRequestID = waitRequestDoc.id;
 
-                                        if (!waitRequest.statusID || waitRequestID.statusID === 1) {
-                                            if (waitRequest.puppyID) {
-                                                try {
-                                                    const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
-                                                    const puppyData: any = puppyDoc.data();
-                                                    waitRequest.puppyName = puppyData.name;
-                                                } catch (err) {
-                                                    console.log(err);
-                                                }
+                                        if (waitRequest.puppyID) {
+                                            try {
+                                                const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
+                                                const puppyData: any = puppyDoc.data();
+                                                waitRequest.puppyName = puppyData.name;
+                                            } catch (err) {
+                                                console.log(err);
                                             }
-    
-                                            if (waitRequest.userID) {
-                                                try {
-                                                    const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
-                                                    const userData: any = userDoc.data();
-                
-                                                    const { firstName, lastName, email, phone, city, state, registrationCompleted } = userData;
-                
-                                                    waitRequest.firstName = firstName;
-                                                    waitRequest.lastName = lastName;
-                                                    waitRequest.email = email;
-                                                    waitRequest.phone = phone;
-                                                    waitRequest.city = city;
-                                                    waitRequest.state = state;
-    
-                                                    waitRequest.userRegistrationCompleted = registrationCompleted ? true : false;
-    
-                                                    if (registrationCompleted) {
-                                                        const messagesRef = admin.firestore().collection('messages');
-                                                        const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
+                                        }
+
+                                        if (waitRequest.userID) {
+                                            try {
+                                                const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
+                                                const userData: any = userDoc.data();
             
-                                                        waitRequest.numberOfUnreadMessages = 0;
-    
-                                                        if (snapshot.size > 0) {
-                                                            for (const messageDoc of snapshot.docs) {
-                                                                const message = messageDoc.data();
-                                                                message.messageID = messageDoc.id;
-    
-                                                                if (message.read === false && message.recipientID === recipientID) {
-                                                                    waitRequest.numberOfUnreadMessages++;
-                                                                }
+                                                const { firstName, lastName, email, phone, city, state, registrationCompleted } = userData;
             
+                                                waitRequest.firstName = firstName;
+                                                waitRequest.lastName = lastName;
+                                                waitRequest.email = email;
+                                                waitRequest.phone = phone;
+                                                waitRequest.city = city;
+                                                waitRequest.state = state;
+
+                                                waitRequest.userRegistrationCompleted = registrationCompleted ? true : false;
+
+                                                if (registrationCompleted) {
+                                                    const messagesRef = admin.firestore().collection('messages');
+                                                    const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
+        
+                                                    waitRequest.numberOfUnreadMessages = 0;
+
+                                                    if (snapshot.size > 0) {
+                                                        for (const messageDoc of snapshot.docs) {
+                                                            const message = messageDoc.data();
+                                                            message.messageID = messageDoc.id;
+
+                                                            if (message.read === false && message.recipientID === recipientID) {
+                                                                waitRequest.numberOfUnreadMessages++;
                                                             }
+        
                                                         }
                                                     }
-                                                } catch (err) {
-                                                    console.log(err);
                                                 }
+                                            } catch (err) {
+                                                console.log(err);
                                             }
-                                            retVal.push(waitRequest);
                                         }
+                                            retVal.push(waitRequest);
                                     }
 
                                     retVal.sort((a: any, b: any) => { 

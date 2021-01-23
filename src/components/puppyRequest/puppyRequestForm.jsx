@@ -138,6 +138,8 @@ class PuppyRequestForm extends Component {
                         expectedPurchaseDate: null
                     };
                     this.setState({selections, formSubmitted: false });
+
+                    this.props.history.push('/puppy-requests');
                 })
                 .catch(err => {
                     console.log(err);
@@ -171,11 +173,6 @@ class PuppyRequestForm extends Component {
                                                 {this.getColorOptions()}
                                             </select>
                                         </div>
-                                        {/* <div className="col-sm-6">
-                                            <label className="form-label">Expected Purchase Date *</label><br/>
-                                            <DatePicker className={`form-control ${this.getFormClass('expectedPurchaseDate')}`} style={{ height: '50px'}} selected={expectedPurchaseDate} onChange={this.handleSelectExpectedPurchaseDate} minDate={new Date()} />
-                                            <br />{formSubmitted === true && validations.expectedPurchaseDate && (<small className="text-danger">{validations.expectedPurchaseDate}</small>)}
-                                        </div> */}
                                     </div>
                                     <div className="form-group mt-5">
                                         <label htmlFor="message" className={`form-label`}>Message for us *</label>

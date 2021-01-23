@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import firebase from '../../services/firebaseService';
 import { provider } from '../../services/firebaseService';
-import { Redirect } from 'react-router-dom';
 import userService from '../../services/userService';
 import utilService from '../../services/utilService';
 import validationService from '../../services/validationService';
@@ -81,10 +79,10 @@ class SignUpForm extends Component {
                 this.props.login();
 
                 if (this.props.redirectURL && !currentUser.recentAuthenticationRequired) {
-                  this.props.history.push(this.props.redirectURL);
+                  this.props.onRegistrationCompleted(this.props.redirectURL);
                   this.props.resetRedirectURL();
                 } else if (this.props.urlToRedirect && !currentUser.recentAuthenticationRequired) {
-                    this.props.history.push(this.props.urlToRedirect);
+                    this.props.onRegistrationCompleted(this.props.redirectURL);
                     this.props.resetRedirectURL();  
                 }
       
@@ -135,13 +133,21 @@ class SignUpForm extends Component {
                 };
 
                 await userService.createUser(createUserData);
+                const userRes = await userService.getUser(currentUser.uid);
 
                 if (currentUser.sendEmailVerification) {
                     await currentUser.sendEmailVerification();
-                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+                    toastr.success('Verification email has been sent. Please check your email and click the link to continue.', 'Registration Success', { timeOut: 10000 });
                 }
 
-                this.props.history.push('/');
+                const userData = userRes.data;
+
+                userData.userID = currentUser.uid;
+                userData.currentUser = currentUser;
+
+                this.props.setUser(userData);
+
+                this.props.onRegistrationCompleted('/');
             } catch (err) {
                 if (err.message) {
                     toastr.error(err.message);
@@ -175,7 +181,7 @@ class SignUpForm extends Component {
 
     getSpecialCharacterClass() {
         const { password } = this.state;
-        const specialCharacterRegex = /[!@#?\]\-]/g;
+        const specialCharacterRegex = /[!@#$?\-]/g;
 
         if (specialCharacterRegex.test(password))
             return 'text-success'
@@ -210,7 +216,7 @@ class SignUpForm extends Component {
 
             if (!userInfo.user.emailVerified) {
                 await userInfo.user.sendEmailVerification();
-                toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
+                toastr.success('Verification email has been sent. Please check your email and click the link to continue.', 'Registration Success', { timeOut: 10000 });
             }
 
             const userData = createUserData;
@@ -221,10 +227,10 @@ class SignUpForm extends Component {
 
             // check if there was a previousURL from props.
             if (this.props.urlToRedirect) {
-                this.props.history.push(this.props.urlToRedirect);
+                this.props.onRegistrationCompleted(this.props.urlToRedirect);
             } else {
                 // redirect to the main page
-                this.props.history.push('/');
+                this.props.onRegistrationCompleted('/');
             }
         } catch (err) {
             if (err.message) {
@@ -241,11 +247,11 @@ class SignUpForm extends Component {
         return (
             <React.Fragment>
                 <div className="block">
-                    <div className="block-header">
-                        <h5>Create a New Account</h5>
-                    </div>
                     <div className="block-body">
                         <form>
+                            <div className="form-group">
+                                With a Dog Team Doberman registration, you can directly communicate with the breeder.
+                            </div>
                             <div className="form-group">
                                 <label htmlFor="email" className="form-label">Email</label>
                                 <input 
@@ -270,8 +276,8 @@ class SignUpForm extends Component {
                                 <p>Password rules:</p>
                                 <ul style={{ color: 'gray' }}>
                                     <li className={this.getEightCharacterLongClass()}>At least 8 characters.</li>
-                                    <li className={this.getUpperCaseLowerCaseLettersClass()}>A mixture of both uppercase and lowercase letters.</li>
-                                    <li className={this.getSpecialCharacterClass()}>Inclusion of at least one special character, e.g., ! @ # ? ] -</li>
+                                    <li className={this.getUpperCaseLowerCaseLettersClass()}>Must have at least one uppercase and one lowercase character.</li>
+                                    <li className={this.getSpecialCharacterClass()}>Must have at least one special character: ! @ # $ ? -</li>
                                 </ul>
                             </div>
                             <div className="from-group text-center">
@@ -300,9 +306,6 @@ class SignUpForm extends Component {
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="form-group mt-3">
-                                <p>Already a member? Click <Link to="/login">here</Link> to log in.</p>
                             </div>
                         </form>
                     </div>
