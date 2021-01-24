@@ -114,6 +114,7 @@ class SignUpForm extends Component {
 
     handleFaceBookSignIn = async () => {
         const isDesktop = utilService.isMobile();
+        this.props.turnOnLoginStatusCheck();
 
         try {
             let userInfo;
