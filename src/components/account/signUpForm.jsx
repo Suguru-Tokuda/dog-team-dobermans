@@ -16,83 +16,6 @@ class SignUpForm extends Component {
 
     constructor(props) {
         super(props);
-
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-
-              this.props.showLoading({reset: false, count: 1 });
-      
-              try {
-                const res = await userService.getUser(user.uid);
-                const userData = res.data;
-          
-                const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
-                const { emailVerified } = user;
-
-                if (user.providerData[0].providerId === 'password') {
-                    if (user.email.toLowerCase() !== email.toLowerCase()) {
-                        const userUpdateData = {
-                            userID: user.uid,
-                            email: user.email.toLowerCase()
-                        };
-    
-                        await userService.editUser(userUpdateData);
-                    }
-                }
-
-                let currentUser;
-
-                if (this.props.user) {
-                    const sessionUser = this.props.user;
-
-                    sessionUser.userID = buyerID;
-                    sessionUser.firstName = firstName;
-                    sessionUser.lastName = lastName;
-                    sessionUser.email = user.email;
-                    sessionUser.phone = phone;
-                    sessionUser.city = city;
-                    sessionUser.state = state;
-                    sessionUser.statusID = statusID;
-                    sessionUser.currentUser = user;
-                    sessionUser.emailVerified = emailVerified;
-                    sessionUser.registrationCompleted = registrationCompleted;
-
-                    currentUser = sessionUser;
-                } else {
-                    currentUser = {
-                        userID: buyerID,
-                        firstName: firstName,
-                        lastName: lastName,
-                        email: user.email,
-                        phone: phone,
-                        city: city,
-                        state: state,
-                        statusID: statusID,
-                        currentUser: user,
-                        emailVerified: emailVerified,
-                        registrationCompleted: registrationCompleted
-                    };
-                }
-                
-                this.props.setUser(currentUser);
-                this.props.checkUser();          
-                this.props.login();
-
-                if (this.props.redirectURL && !currentUser.recentAuthenticationRequired) {
-                  this.props.onRegistrationCompleted(this.props.redirectURL);
-                  this.props.resetRedirectURL();
-                } else if (this.props.urlToRedirect && !currentUser.recentAuthenticationRequired) {
-                    this.props.onRegistrationCompleted(this.props.redirectURL);
-                    this.props.resetRedirectURL();  
-                }
-      
-              } catch (err) {
-                console.log(err);
-              } finally {
-                this.props.doneLoading();
-              }
-            }
-          });
     }
 
     componentDidMount() {
@@ -121,6 +44,8 @@ class SignUpForm extends Component {
 
         if (email.length > 0 && isValidPassword && isValidEmail) {
             try {
+                this.props.turnOffLoginStatusCheck();
+
                 const res = await firebase.auth().createUserWithEmailAndPassword(email.trim().toLowerCase(), password);
                 const currentUser = res.user;
 
@@ -133,21 +58,19 @@ class SignUpForm extends Component {
                 };
 
                 await userService.createUser(createUserData);
-                const userRes = await userService.getUser(currentUser.uid);
 
                 if (currentUser.sendEmailVerification) {
                     await currentUser.sendEmailVerification();
                     toastr.success('Verification email has been sent. Please check your email and click the link to continue.', 'Registration Success', { timeOut: 10000 });
                 }
 
-                const userData = userRes.data;
+                this.setState({
+                    email: '',
+                    password: ''
+                });
 
-                userData.userID = currentUser.uid;
-                userData.currentUser = currentUser;
-
-                this.props.setUser(userData);
-
-                this.props.onRegistrationCompleted('/');
+                await firebase.auth().signOut()
+                this.props.onRegistrationCompleted();
             } catch (err) {
                 if (err.message) {
                     toastr.error(err.message);
@@ -238,6 +161,8 @@ class SignUpForm extends Component {
             } else {
                 toastr.error('There was an error with Facebook sign up. Please try again.');
             }
+            
+            this.props.turnOnLoginStatusCheck();
         }
     }
 
@@ -319,7 +244,8 @@ const mapStateToProps = state => ({
     user: state.user,
     authenticated: state.authenticated,
     userChecked: state.userChecked,
-    redirectURL: state.redirectURL
+    redirectURL: state.redirectURL,
+    loginStatusCheck: state.loginStatusCheck
 });
 
 const mapDispatchToProps = dispatch => {
@@ -329,7 +255,9 @@ const mapDispatchToProps = dispatch => {
         checkUser: () => dispatch({ type: 'USER_CHECKED' }),
         showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
         doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
-        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' }),
+        turnOnLoginStatusCheck: () => dispatch({ type: 'TURN_ON_LOGIN_CHECK' }),
+        turnOffLoginStatusCheck: () => dispatch({ type: 'TURN_OFF_LOGIN_CHECK' })
     };
 }
 

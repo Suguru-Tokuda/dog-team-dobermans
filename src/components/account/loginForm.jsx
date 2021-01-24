@@ -20,7 +20,7 @@ class LoginForm extends Component {
         super(props);
 
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {                
+            if (user && this.props.loginStatusCheck) {                
               this.props.showLoading({reset: false, count: 1 });
       
               try {
@@ -134,6 +134,7 @@ class LoginForm extends Component {
         const { email, password } = this.state;
 
         if (email && password) {
+            this.props.turnOnLoginStatusCheck();
             this.props.showLoading({ reset: false, count: 1});
 
             firebase.auth().signInWithEmailAndPassword(email, password)
@@ -163,7 +164,7 @@ class LoginForm extends Component {
 
     handleFacebookSignIn = async () => {
         const isDesktop = utilService.isMobile();
-
+        this.props.turnOnLoginStatusCheck();
         try {
             let userInfo;
             let userData;
@@ -281,7 +282,9 @@ class LoginForm extends Component {
 
     handleRegistrationCompleted = (redirectURL) => {
         $('#signUpModal').modal('hide');
-        this.props.history.push(redirectURL);
+        
+        if (redirectURL)
+            this.props.history.push(redirectURL);
     }
 
     render() {
@@ -370,7 +373,8 @@ const mapStateToProps = state => ({
     user: state.user,
     authenticated: state.authenticated,
     userChecked: state.userChecked,
-    redirectURL: state.redirectURL
+    redirectURL: state.redirectURL,
+    loginStatusCheck: state.loginStatusCheck
 });
 
 const mapDispatchToProps = dispatch => {
@@ -380,7 +384,9 @@ const mapDispatchToProps = dispatch => {
         checkUser: () => dispatch({ type: 'USER_CHECKED' }),
         showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
         doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
-        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' }),
+        turnOnLoginStatusCheck: () => dispatch({ type: 'TURN_ON_LOGIN_CHECK' }),
+        turnOffLoginStatusCheck: () => dispatch({ type: 'TURN_OFF_LOGIN_CHECK' })
     };
 }
 

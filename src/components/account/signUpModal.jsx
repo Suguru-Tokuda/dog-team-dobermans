@@ -13,7 +13,7 @@ class SignUpModal extends Component {
                                 Register
                             </h5>
                             <button type="button"
-                                    class="close"
+                                    className="close"
                                     data-dismiss="modal"
                                     aria-label="Close"
                             >

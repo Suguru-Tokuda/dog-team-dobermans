@@ -54,11 +54,23 @@ export const setRedirectURL = (url) => {
     return {
         type: 'SET_REDIRECT_URL',
         url: url
-    }
+    };
 }
 
 export const resetRedirectURL = () => {
     return {
         type: 'RESET_REDIRECT_URL'
-    }
+    };
+}
+
+export const turnOffLoginStatusCheck = () => {
+    return {
+        type: 'TURN_OFF_LOGIN_CHECK'
+    };
+}
+
+export const turnOnLoginStatusCheck = () => {
+    return {
+        type: 'TURN_ON_LOGIN_CHECK'
+    };
 }

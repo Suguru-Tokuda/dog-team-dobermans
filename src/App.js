@@ -28,7 +28,7 @@ class App extends Component {
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(async (user) => {
-      if (user) {
+      if (user && this.props.loginStatusCheck) {
         this.props.checkUser();          
         this.props.login();
 
@@ -124,7 +124,8 @@ const mapStateToProps = state => ({
   authenticated: state.authenticated,
   loadCount: state.loadCount,
   userChecked: state.userChecked,
-  redirectURL: state.redirectURL
+  redirectURL: state.redirectURL,
+  loginStatusCheck: state.loginStatusCheck
 });
 
 const mapDispatchToProps = dispatch => {
