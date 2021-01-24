@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SignUpModal from './signUpModal';
 import firebase from '../../services/firebaseService';
+import firebaseCustomActions from'../../services/firebaseCustomActions';
 import { provider } from '../../services/firebaseService';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -224,7 +225,9 @@ class LoginForm extends Component {
 
                 await userService.createUser(createUserData);
 
-                await userInfo.user.sendEmailVerification();
+                const options = firebaseCustomActions.getCustomActionParameters();
+
+                await userInfo.user.sendEmailVerification(options);
                 toastr.success('Verification email has been sent. Please check your email and click the link to continue.');
 
                 const userData = createUserData;

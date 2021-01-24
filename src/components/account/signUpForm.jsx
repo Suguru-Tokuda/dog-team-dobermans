@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import firebase from '../../services/firebaseService';
+import firebaseCustomActions from '../../services/firebaseCustomActions';
 import { provider } from '../../services/firebaseService';
 import userService from '../../services/userService';
 import utilService from '../../services/utilService';
@@ -44,8 +45,6 @@ class SignUpForm extends Component {
 
         if (email.length > 0 && isValidPassword && isValidEmail) {
             try {
-                this.props.turnOffLoginStatusCheck();
-
                 const res = await firebase.auth().createUserWithEmailAndPassword(email.trim().toLowerCase(), password);
                 const currentUser = res.user;
 
@@ -60,7 +59,9 @@ class SignUpForm extends Component {
                 await userService.createUser(createUserData);
 
                 if (currentUser.sendEmailVerification) {
-                    await currentUser.sendEmailVerification();
+                    const options = firebaseCustomActions.getCustomActionParameters();
+
+                    await currentUser.sendEmailVerification(options);
                     toastr.success('Verification email has been sent. Please check your email and click the link to continue.', 'Registration Success', { timeOut: 10000 });
                 }
 
@@ -70,7 +71,7 @@ class SignUpForm extends Component {
                 });
 
                 await firebase.auth().signOut()
-                this.props.onRegistrationCompleted();
+                this.props.onRegistrationCompleted('/');
             } catch (err) {
                 if (err.message) {
                     toastr.error(err.message);
@@ -139,7 +140,9 @@ class SignUpForm extends Component {
             await userService.createUser(createUserData);
 
             if (!userInfo.user.emailVerified) {
-                await userInfo.user.sendEmailVerification();
+                const options = firebaseCustomActions.getCustomActionParameters();
+
+                await userInfo.user.sendEmailVerification(options);
                 toastr.success('Verification email has been sent. Please check your email and click the link to continue.', 'Registration Success', { timeOut: 10000 });
             }
 

@@ -103,7 +103,7 @@ class PuppyDetail extends Component {
         if (currentUser && currentUser.sendEmailVerification) {
             this.props.showLoading({ reset: true, count: 1 });
 
-            currentUser.sendEmailVerification()
+            currentUser.sendEmailVerification({ url: window.location.href })
                 .then(res => {
                     this.setState({ emailVerificationConfirmationMsg: 'Verification Email has been sent. Please check your email and click the link to continue using the site.' });
                 })

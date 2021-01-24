@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import firebase from '../../services/firebaseService';
+import firebaseCustomActions from '../../services/firebaseService';
 import { connect } from 'react-redux';
 import userService from '../../services/userService';
 import toastr from 'toastr';
@@ -60,8 +61,9 @@ class EmailVerification extends Component {
 
         if (currentUser && currentUser.sendEmailVerification) {
             this.props.showLoading({ reset: true, count: 1 });
+            const options = firebaseCustomActions.getCustomActionParameters();
 
-            currentUser.sendEmailVerification()
+            currentUser.sendEmailVerification(options)
                 .then(res => {
                     this.setState({ emailVerificationConfirmationMsg: 'Verification Email has been sent. Please check your email and click the link to continue using the site.' });
                 })

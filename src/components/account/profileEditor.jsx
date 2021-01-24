@@ -228,7 +228,7 @@ class ProfileEditor extends Component {
                 if (user.currentUser.providerData[0].providerId === 'password') {
                     if (user.email.toLowerCase() !== email.trim().toLowerCase()) {
                         await user.currentUser.updateEmail(email.trim().toLowerCase());
-                        await user.currentUser.sendEmailVerification();
+                        await user.currentUser.sendEmailVerification({ url: window.location.origin.toString() });
 
                         toastr.success('Verification email has been sent. Please check your email to continue.');
                         user.email = email.trim().toLowerCase();
