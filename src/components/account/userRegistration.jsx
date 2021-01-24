@@ -67,6 +67,12 @@ class UserRegistration extends Component {
             this.setState({
                 dataLoaded: true
             });
+        } else {
+            if (this.props.userChecked && !this.state.dataLoaded) {
+                this.setState({
+                    dataLoaded: true
+                });
+            }
         }
     }
 
@@ -425,7 +431,8 @@ class UserRegistration extends Component {
                     </React.Fragment>
                 );
             } else {
-                return <Redirect to="/" />;
+                toastr.error('Please login to continue.');
+                return <Redirect to="/login" />;
             }
         } else {
             return <div style={{ height: '300px' }}></div>

@@ -28,8 +28,7 @@ class App extends Component {
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(async (user) => {
-      if (user && this.props.loginStatusCheck) {
-        this.props.checkUser();          
+      if (user && this.props.loginStatusCheck) {                
         this.props.login();
 
         this.props.showLoading({reset: false, count: 1 });
@@ -54,11 +53,16 @@ class App extends Component {
               emailVerified: emailVerified,
               registrationCompleted: registrationCompleted
           });
+
+          this.props.checkUser();
         } catch (err) {
           console.log(err);
         } finally {
           this.props.doneLoading();
+          this.props.checkUser();
         }
+      } else {
+        this.props.checkUser();
       }
     });
 
