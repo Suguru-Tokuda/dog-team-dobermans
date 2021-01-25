@@ -70,8 +70,13 @@ class SignUpForm extends Component {
                     password: ''
                 });
 
-                await firebase.auth().signOut()
-                this.props.onRegistrationCompleted('/');
+                const userData = createUserData;
+                userData.currentUser = currentUser;
+    
+                this.props.setUser(userData);
+                this.props.login();
+
+                this.props.onRegistrationCompleted('/email-verification');
             } catch (err) {
                 if (err.message) {
                     toastr.error(err.message);
@@ -153,11 +158,11 @@ class SignUpForm extends Component {
             this.props.login();
 
             // check if there was a previousURL from props.
-            if (this.props.urlToRedirect) {
+            if (this.props.urlToRedirect && userInfo.emailVerified) {
                 this.props.onRegistrationCompleted(this.props.urlToRedirect);
             } else {
                 // redirect to the main page
-                this.props.onRegistrationCompleted('/');
+                this.props.onRegistrationCompleted('/email-verification');
             }
         } catch (err) {
             if (err.message) {

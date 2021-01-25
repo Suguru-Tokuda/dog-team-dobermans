@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import LoginForm from './loginForm';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
 

@@ -315,7 +315,7 @@ class UserRegistration extends Component {
         const { validation, formSubmitted, dataLoaded } = this.state;
 
         if (dataLoaded) {
-            if (user) {
+            if (user && user.emailVerified) {
                 return (
                     <React.Fragment>
                         {this.getHeader()}
@@ -430,9 +430,22 @@ class UserRegistration extends Component {
                         </div>
                     </React.Fragment>
                 );
-            } else {
+            } else if (user && !user.emailVerified) {
+                toastr.error('Please verify your email first.');
+                return <Redirect to={{
+                    pathname: '/email-verification',
+                    state: {
+                        previousUrl: '/user-registration'
+                    }
+                }} />;
+            } else if (!user) {
                 toastr.error('Please login to continue.');
-                return <Redirect to="/login" />;
+                return <Redirect to={{
+                    pathname: '/login',
+                    state: {
+                        previousUrl: '/user-registration'
+                    }
+                }} />;
             }
         } else {
             return <div style={{ height: '300px' }}></div>

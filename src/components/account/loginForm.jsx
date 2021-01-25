@@ -14,7 +14,8 @@ class LoginForm extends Component {
     state = {
         email: '',
         password: '',
-        showForm: false
+        showForm: false,
+        hasRedirected: false
     };
 
     constructor(props) {
@@ -102,21 +103,28 @@ class LoginForm extends Component {
 
         if (authenticated) {
             if (this.props.urlToRedirect || this.props.redirectURL) {
-                if (this.props.urlToRedirect) {
+                if (this.props.urlToRedirect && !this.state.hasRedirected) {
                     this.props.history.push(this.props.urlToRedirect);
                     this.props.resetRedirectURL();
+
+                    if (!this.state.hasRedirected)
+                        this.setState({ hasRedirected: true });
                     return;
                 }
 
-                if (this.props.resetRedirectURL) {
+                if (this.props.resetRedirectURL && !this.state.hasRedirected) {
                     this.props.history.push(this.props.resetRedirectURL);
                     this.props.resetRedirectURL();
+
+                    if (!this.state.hasRedirected)
+                        this.setState({ hasRedirected: true });
                     return;
                 }
             }
         }
 
-        this.setState({ showForm: true });
+        if (!this.state.showForm)
+            this.setState({ showForm: true });
     }
 
     handleEmailChanged = (e) => {
@@ -142,6 +150,8 @@ class LoginForm extends Component {
                 .then(async res => {
                     await this.populateUser(res.user);
                     this.props.login();
+
+                    console.log(this.props.urlToRedirect);
 
                     if (this.props.urlToRedirect) {
                         this.props.history.push(this.props.urlToRedirect);
@@ -350,6 +360,9 @@ class LoginForm extends Component {
                                 </div>
                                 <div className="hr-line-dashed"></div>
                                 <div className="row form-group">
+                                    <div className="col-12">
+                                        <p>Haven't registered yet?</p>
+                                    </div>
                                     <div className="col-12">
                                         <button type="button"
                                                 className="btn btn-success"

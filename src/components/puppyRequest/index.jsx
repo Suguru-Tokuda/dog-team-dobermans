@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import firebase from '../../services/firebaseService';
 import PuppyRequestForm from './puppyRequestForm';
 import userService from '../../services/userService';
@@ -17,18 +16,24 @@ class PuppyRequest extends Component {
     }
 
     componentDidMount = async () => {
-        if (this.props.user || firebase.auth().currentUser) {
+        if (this.props.user || firebase.auth().currentUser !== null) {
             const { emailVerified, registrationCompleted } = this.props.user;
+            const currentUser = firebase.auth().currentUser;
 
-            if (!emailVerified || !registrationCompleted) {
+            if (currentUser !== null && !emailVerified || !registrationCompleted) {
                 this.props.showLoading({ reset: false, count: 1 });
                 try {
-                    const res = await userService.getUser(firebase.auth().currentUser.uid);
+                    let userID;
+                    if (this.props.user)
+                        userID = this.props.user.userID;
+                    else
+                        userID = currentUser.uid;
+                    const res = await userService.getUser(userID);
     
                     const { buyerID, firstName, lastName, phone, email, city, state, statusID, emailVerified, registrationCompleted } = res.data;
                     const { user } = this.props;
     
-                    if (user.currentUser.reload)
+                    if (user.currentUser && user.currentUser.reload)
                         await user.currentUser.reload();
     
                     const currentUser = firebase.auth().currentUser;

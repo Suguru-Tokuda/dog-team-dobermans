@@ -18,6 +18,8 @@ class Topnavbar extends Component {
                 this.props.logout();
                 this.props.resetUser();
                 this.props.resetRedirectURL();
+
+                window.location.href = window.location.origin;
             })
             .finally(() => {
                 this.props.doneLoading({ reset: true });
