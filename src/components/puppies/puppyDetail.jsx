@@ -70,7 +70,7 @@ class PuppyDetail extends Component {
                         momID: puppyData.momID,
                         pictures: puppyData.pictures,
                         parents: parents,
-                        // sold: puppyData.sold,
+                        sold: puppyData.sold,
                         sold: false,
                         puppyFound: true
                     });
