@@ -65,6 +65,8 @@ class Pagination extends Component {
                 this.props.onPageChange(clickedPage, paginationInfo.startIndex, paginationInfo.endIndex);
             }
         }
+
+        window.scrollTo(0, 0);
     }
 
     getPageItemClass = (page) => {

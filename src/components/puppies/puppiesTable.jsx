@@ -90,11 +90,11 @@ class PuppiesTable extends Component {
         const { tableData, paginationInfo } = this.state;
         if (tableData.length > 0) {
             return <Pagination
-                    onPageChange={this.updateDisplayedData.bind(this)}
-                    currentPage={paginationInfo.currentPage}
-                    totalItems={paginationInfo.totalItems}
-                    maxPages={paginationInfo.maxPages}
-                    pageSize={paginationInfo.pageSize}
+                        onPageChange={this.updateDisplayedData.bind(this)}
+                        currentPage={paginationInfo.currentPage}
+                        totalItems={paginationInfo.totalItems}
+                        maxPages={paginationInfo.maxPages}
+                        pageSize={paginationInfo.pageSize}
                     />;
         }
     }

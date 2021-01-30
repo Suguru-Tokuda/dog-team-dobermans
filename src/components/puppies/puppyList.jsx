@@ -42,6 +42,7 @@ class PuppyList extends Component {
                         <div className="col-lg-9 order-2 order-lg-1">
                             <h1>Puppies</h1>
                             <p className="lead text-muted" dangerouslySetInnerHTML={{__html: puppyMessage }}></p>
+                            <p className="lead text-muted">Click <Link to="/contact">here</Link> to be added to a puppy waiting list.</p>
                         </div>
                         <div className="col-lg-3 text-right order-1 order-lg-2">
                             <ul className="breadcrumb justify-content-lg-end">

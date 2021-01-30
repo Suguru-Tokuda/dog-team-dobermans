@@ -207,24 +207,9 @@ class PuppyDetail extends Component {
                                 </ul>
                             </div>
                             <p>{description}</p>
-                            {(sold === false && authenticated && user && user.emailVerified && user.registrationCompleted) && (
+                            {(sold === false) && (
                                 <ul>
                                     <button type="button" className="btn btn-primary wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
-                                </ul>
-                            )}
-                            {(sold === false && authenticated && user && user.emailVerified && !user.registrationCompleted) && (
-                                <ul>
-                                    <button type="button" className="btn btn-primary wide" onClick={this.handleInquireBtnClicked}>Inquire</button>
-                                </ul>
-                            )}
-                            {(sold === false && authenticated && user && !user.emailVerified) && (
-                                <ul>
-                                    <button type="button" className="btn btn-primary wide" onClick={this.handleResendVerificationEmailBtnClicked}>Resend Verification Email</button>
-                                </ul>
-                            )}
-                            {(sold === false && !authenticated) && (
-                                <ul>
-                                    <Link type="button" className="btn btn-primary wide" to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname }}}>Login</Link>
                                 </ul>
                             )}
                         </div>

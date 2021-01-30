@@ -123,16 +123,6 @@ class PuppyRequestForm extends Component {
         } else {
             validations.phone = 'Enter phone number';
         }
-        // if (phone.length > 0) {
-        //     phone = phone.replace(/\D/g, '');
-        //     if (phone !== '') {
-        //         delete validations.phone;
-        //     } else {
-        //         validations.phone = 'Enter phone';
-        //     }
-        // } else {
-        //     validations.phone = 'Enter phone number';
-        // }
 
         selections.phone = phone;
         this.setState({ selections, validations });
@@ -324,7 +314,7 @@ class PuppyRequestForm extends Component {
                         <div className="col-md-7">
                             <form noValidate className="custom-form form">
                                 <div className="controls">
-                                <div className="row">
+                                    <div className="row">
                                         <div className="col-sm-6">
                                             <div className="form-group">
                                                 <label htmlFor="firstName" className={`form-label`}>First Name *</label>
