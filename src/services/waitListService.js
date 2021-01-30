@@ -8,7 +8,7 @@ export default class WaitListService {
     }
 
     static createWaitRequest(data) {
-        return axios.post(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
+        return axios.post(`${this.getServiceBase()}/createByEmail?key=${api.API_KEY}`, data);
     }
 
     static sendWaitRequestMessage(senderID, waitRequestID, messageBody) {
@@ -43,8 +43,8 @@ export default class WaitListService {
         return axios.get(`${this.getServiceBase()}/messages/getUnreadMessagesByUserID?key=${api.API_KEY}&userID=${userID}`)
     }
 
-    static getWaitRequestList(userID, waitRequestID) {
-        return axios.get(`${this.getServiceBase()}/getByUserID?key=${api.API_KEY}&userID=${userID}&waitRequestID=${waitRequestID}`);
+    static getWaitRequestList(waitRequestID) {
+        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&waitRequestID=${waitRequestID}`);
     }
 
     static markMessageAsRead(messageIDs) {

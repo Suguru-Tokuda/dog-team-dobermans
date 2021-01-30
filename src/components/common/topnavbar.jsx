@@ -61,17 +61,17 @@ class Topnavbar extends Component {
                                 <li className="nav-item">
                                     <NavLink className="nav-link" activeClassName="active" to="/contact">Contact</NavLink>
                                 </li>
-                                {(this.props.authenticated === true) && (
+                                {/* {(this.props.authenticated === true) && (
                                     <li className="nav-item">
                                         <NavLink className="nav-link" activeClassName="active" to="/puppy-request">Request a Puppy</NavLink>
                                     </li>
-                                )}
-                                <li className="nav-item visible-xs hidden-md hidden-lg">
+                                )} */}
+                                {/* <li className="nav-item visible-xs hidden-md hidden-lg">
                                     <NavLink className="nav-link" activeClassName="active" to="/puppy-requests">
                                         Puppy Requests
                                     </NavLink>
-                                </li>
-                                <li className="nav-item visible-xs visible-sm hidden-md hidden-lg">
+                                </li> */}
+                                {/* <li className="nav-item visible-xs visible-sm hidden-md hidden-lg">
                                     {(!this.props.authenticated) && (
                                         <NavLink className="nav-link" activeClassName="active" to="/login">
                                             Login
@@ -83,10 +83,10 @@ class Topnavbar extends Component {
                                         </a>
                                     )}
                                     <NavLink className="nav-link" activeClassName="active" to="/puppy-request"></NavLink>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
-                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs hidden-sm">
+                        {/* <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs hidden-sm">
                             {(this.props.authenticated === true) && (
                                 <div className="user">
                                     <Link id="account" to="/puppy-requests">
@@ -111,7 +111,7 @@ class Topnavbar extends Component {
                                     <a onClick={this.handleLogoutClicked} style={{ color: 'white', cursor: 'pointer' }}>Logout</a>
                                 )}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </nav>
             </header>

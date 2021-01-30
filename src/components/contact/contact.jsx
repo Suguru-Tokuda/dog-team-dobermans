@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
 import { GoogleMap, Marker, withGoogleMap, withScriptjs } from 'react-google-maps';
+import PuppyRequestForm from '../puppyRequest/puppyRequestForm';
+import $ from 'jquery';
 import * as api from '../../api.json';
 
 function Map() {
@@ -76,14 +78,13 @@ class ContactuUs extends Component {
 
     getMain() {
         const { city, email, phone, state, street, zip } = this.state;
-        const { authenticated } = this.props;
 
         if (city !== '' && email !== '' && phone !== '' && state !== '' && street !== '' && zip !== '') {
             return (
                 <section className="contact">
                     <div className="container">
                         <div className="row">
-                            <div className="col-md-3">
+                            <div className="col-md-6">
                                 <div className="contact-icon">
                                     <i className="far fa-map"></i>
                                 </div>
@@ -91,36 +92,28 @@ class ContactuUs extends Component {
                                 <p>{street}<br/>{city} {state}<br/>{zip}</p>
                                 <a href="https://goo.gl/maps/ZDt8tCAdYn1tXR1g7" target="_"><strong>Google Maps</strong></a>
                             </div>
-                            <div className="col-md-3">
+                            {/* <div className="col-md-3">
                                 <div className="contact-icon">
                                     <i className="fa fa-phone"></i>
                                 </div>
                                 <h3>Phone</h3>
                                 <p>You may contact us Monday-Saturday from 9am - 6pm</p>
                                 <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
-
                             </div>
                             <div className="col-md-3">
-                            <div className="contact-icon">
-                                <i className="far fa-envelope"></i>
-                            </div>
-                            <h3>Email</h3>
-                            <p>Please feel free to contact us regarding Doberman puppies.</p>
-                            <p><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
-                            </div>
-                            <div className="col-md-3">
+                                <div className="contact-icon">
+                                    <i className="far fa-envelope"></i>
+                                </div>
+                                <h3>Email</h3>
+                                <p>Please feel free to contact us regarding Doberman puppies.</p>
+                                <p><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
+                            </div> */}
+                            <div className="col-md-6">
                                 <div className="contact-icon">
                                     <i className="fas fa-dog"></i>
                                 </div>
                                 <h3>Request</h3>
-                                <p>
-                                    {!authenticated && (
-                                        <span>To be added to our puppy wait list, please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleRequestPuppyLinkClicked}>click here</a> to register or login to the existing registration.</span>
-                                    )}
-                                    {authenticated && (
-                                        <span>To be added to our puppy wait list, please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleRequestPuppyLinkClicked}>click here</a></span>
-                                    )}
-                                </p>
+                                <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to jump to the Doberman Puppy Wait List Form.</p>
                             </div>
                         </div>
                     </div>
@@ -129,6 +122,14 @@ class ContactuUs extends Component {
         } else {
             return null;
         }
+    }
+
+    handleToNavigateToTheForm = () => {
+        $(document).ready(() => {
+            $('html, body').animate({
+                scrollTop: $('#waitListForm').offset().top
+            }, 1000)
+        });
     }
 
     getMap() {
@@ -164,6 +165,7 @@ class ContactuUs extends Component {
                 {this.getHeader()}
                 {this.getMain()}
                 {this.getMap()}
+                <PuppyRequestForm />
             </React.Fragment>
         )
     }

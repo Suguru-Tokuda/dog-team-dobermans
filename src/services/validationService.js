@@ -8,6 +8,16 @@ export default class ValidationService {
         return false;
     }
 
+    static validatePhone(phone) {
+        const testRegex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
+
+        if (testRegex.test(phone)) {
+            return true;
+        }
+
+        return false;
+    }
+
     static validPassword(password, minLength) {
         const upperCaseRegex = /[A-Z]/g;
         const lowerCaseRegex = /[a-z]/g;

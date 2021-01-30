@@ -18,61 +18,61 @@ class PuppyRequestDetail extends Component {
 
     constructor(props) {
         super(props);
-        const reuqestID = props.match.params.puppyRequestID;
+        const requestID = props.match.params.puppyRequestID;
         
-        if (reuqestID.length === 0)
+        if (requestID.length === 0)
             this.state.requestFound = false;
         else
-            this.state.requestID = reuqestID;
+            this.state.requestID = requestID;
 
-        if (this.props.user) {
-            this.state.userID = this.props.user.userID;
-        }
+        // if (this.props.user) {
+        //     this.state.userID = this.props.user.userID;
+        // }
     }
 
     componentDidMount = async () => {
         const { requestID } = this.state;
-        const { userID } = this.props.user;
 
         window.scrollTo(0, 0);
 
         this.props.showLoading({ reset: false, count: 1 });
+            try {
+                const waitRequestRes = await waitListService.getWaitRequestList(requestID);
+                const waitRequest = waitRequestRes.data;
+                
+                const messagesRes = await waitListService.getWaitRequestMessages(requestID);
 
-            Promise.all([
-                waitListService.getWaitRequestMessages(requestID),
-                waitListService.getWaitRequestList(userID, requestID)
-                ])
-                .then(async res => {
-                    const messages = res[0].data;
+                const messages = messagesRes.data;
 
-                    const waitRequest = res[1].data[0];
+                if (messages.length > 0) {
+                    const messageIDsMarkAsRead = [];
 
-                    if (messages.length > 0) {
-                        const messageIDsMarkAsRead = [];
-
-                        messages.forEach(message => {
-                            if (message.recipientID === this.props.user.userID && !message.read)
-                                messageIDsMarkAsRead.push(message.messageID);
-                        });
-        
-                        if (messageIDsMarkAsRead.length > 0) {
-                            try {
-                                await waitListService.markMessageAsRead(messageIDsMarkAsRead);
-                            } catch (err) {
-                                console.log(err);
-                            }
+                    messages.forEach(message => {
+                        if (message.recipientID === waitRequest.userID && !message.read)
+                            messageIDsMarkAsRead.push(message.messageID);
+                    });
+    
+                    if (messageIDsMarkAsRead.length > 0) {
+                        try {
+                            await waitListService.markMessageAsRead(messageIDsMarkAsRead);
+                        } catch (err) {
+                            console.log(err);
                         }
                     }
+                }
 
-                    this.setState({ request: waitRequest, messages: messages });        
-                })
-                .catch(err => {
-                    toastr.error('There was an error in loading request data.');
-                })
-                .finally(() => {
-                    this.props.doneLoading({ reset: true });
-                    this.setState({ dataLoaded: true });
-                })
+                this.setState({
+                    messages: messages,
+                    userID: waitRequest.userID,
+                    request: waitRequest
+                });
+            } catch (err) {
+                console.log(err);
+                toastr.error('There was an error in loading request data.');
+            } finally {
+                this.props.doneLoading({ reset: true });
+                this.setState({ dataLoaded: true });
+            }
     }
 
     getHeader() {
@@ -118,15 +118,15 @@ class PuppyRequestDetail extends Component {
                                 </div>
                             </div>
                             <div className="form-group row">
-                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Request Sent</label>
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Name</label>
                                 <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
-                                    { request.created }
+                                    { request.firstName } { request.lastName }
                                 </div>
                             </div>
                             <div className="form-group row">
-                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Expected Purchase Date</label>
+                                <label className="col-xs-12 col-sm-4 col-md-2 col-lg-2">Request Sent</label>
                                 <div className="col-xs-12 col-sm-8 col-md-10 col-lg-10">
-                                    { moment(request.expectedPurchaseDate).format('MM/DD/YYYY') }
+                                    { moment(request.created).format('MMMM DD, YYYY') }
                                 </div>
                             </div>
                             <div className="form-group row">
@@ -159,16 +159,30 @@ class PuppyRequestDetail extends Component {
                 {this.getHeader()}
                 {this.renderRequestDetail()}
                 <div className="mb-3">
-                    <Messenger {...this.props}
-                               messages={this.state.messages}
-                               requestID={this.state.requestID}
-                               updateMessages={this.handleUpdateMessages.bind(this)}
-                    />
+                    {this.state.userID && (
+                        <Messenger {...this.props}
+                                   messages={this.state.messages}
+                                   userID={this.state.userID}
+                                   requestID={this.state.requestID}
+                                   updateMessages={this.handleUpdateMessages.bind(this)}
+                        />
+                    )}
                 </div>
-                <Messages {...this.props} 
-                          messages={this.state.messages} 
-                          dataLoaded={this.state.dataLoaded}
-                />
+                {this.state.userID && (
+                    <Messages {...this.props}
+                              userID={this.state.userID}
+                              messages={this.state.messages} 
+                              request={this.state.request}
+                              dataLoaded={this.state.dataLoaded}
+                    />
+                )}
+                {(this.state.dataLoaded && !this.state.userID) && (
+                    <div className="container">
+                        <div style={{ height: '300px'}}>
+                            <h3>No puppy request found.</h3>
+                        </div>
+                    </div>
+                )}
             </React.Fragment>
         );
     }

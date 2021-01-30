@@ -27,44 +27,44 @@ import UserRegistration from './components/account/userRegistration';
 class App extends Component {
 
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(async (user) => {
-      if (user && this.props.loginStatusCheck) {                
-        this.props.login();
+    // firebase.auth().onAuthStateChanged(async (user) => {
+    //   if (user && this.props.loginStatusCheck) {                
+    //     this.props.login();
 
-        this.props.showLoading({reset: false, count: 1 });
+    //     this.props.showLoading({reset: false, count: 1 });
 
-        try {
-          const res = await userService.getUser(user.uid);
-          const userData = res.data;
+    //     try {
+    //       const res = await userService.getUser(user.uid);
+    //       const userData = res.data;
     
-          const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
-          const { emailVerified } = user;
+    //       const { buyerID, firstName, lastName, phone, email, city, state, statusID, registrationCompleted } = userData;
+    //       const { emailVerified } = user;
 
-          this.props.setUser({
-              userID: buyerID,
-              firstName: firstName,
-              lastName: lastName,
-              email: email,
-              phone: phone,
-              city: city,
-              state: state,
-              statusID: statusID,
-              currentUser: user,
-              emailVerified: emailVerified,
-              registrationCompleted: registrationCompleted
-          });
+    //       this.props.setUser({
+    //           userID: buyerID,
+    //           firstName: firstName,
+    //           lastName: lastName,
+    //           email: email,
+    //           phone: phone,
+    //           city: city,
+    //           state: state,
+    //           statusID: statusID,
+    //           currentUser: user,
+    //           emailVerified: emailVerified,
+    //           registrationCompleted: registrationCompleted
+    //       });
 
-          this.props.checkUser();
-        } catch (err) {
-          console.log(err);
-        } finally {
-          this.props.doneLoading();
-          this.props.checkUser();
-        }
-      } else {
-        this.props.checkUser();
-      }
-    });
+    //       this.props.checkUser();
+    //     } catch (err) {
+    //       console.log(err);
+    //     } finally {
+    //       this.props.doneLoading();
+    //       this.props.checkUser();
+    //     }
+    //   } else {
+    //     this.props.checkUser();
+    //   }
+    // });
 
     $(document).ready(() => {
       const navMain = $('#navbarCollapse');
@@ -107,12 +107,12 @@ class App extends Component {
             <Route path="/about-us" render={(props) => <AboutUs {...props} />} />
             <Route path="/contact" render={(props) => <Contact {...props} />} />
             <Route path="/account" render={(props) => <Account {...props} />} />
-            <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
-            <Route path="/puppy-request" render={(props) => <PuppyRequest {...props} />} />
-            <Route path="/login" render={(props) => <Login {...props} />} />
+            {/* <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} /> */}
+            <Route path="/puppy-request" render={(props) => <PuppyRequests {...props} />} />
+            {/* <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/email-verification" render={(props) => <EmailVerification {...props} />} />
             <Route path="/user-registration"render={(props) => <UserRegistration {...props} />} />
-            <Route path="/password-reset" render={(props) => <PasswordReset {...props} />} />
+            <Route path="/password-reset" render={(props) => <PasswordReset {...props} />} /> */}
             <Route component={PageNotFound} />
           </Switch>
         <Footer />

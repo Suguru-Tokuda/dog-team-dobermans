@@ -14,8 +14,8 @@ class Messenger extends Component {
     constructor(props) {
         super(props);
         
-        if (this.props.user) {
-            this.state.userID = this.props.user.userID;
+        if (this.props.userID) {
+            this.state.userID = this.props.userID;
         }
         
         if (this.props.requestID) {

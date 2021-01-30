@@ -24,7 +24,14 @@ export default class UtilService {
             const firstPart = phone.substring(0, 3);
             const secondPart = phone.substring(3, 6);
             const thirdPart = phone.substring(6, 10);
-            return `${firstPart}-${secondPart}-${thirdPart}`;
+
+            if (firstPart && !secondPart && !thirdPart) {
+                return firstPart;
+            } else if (firstPart && secondPart && !thirdPart) {
+                return `${firstPart}-${secondPart}`;    
+            } else if (firstPart && secondPart && thirdPart) {
+                return `${firstPart}-${secondPart}-${thirdPart}`;
+            }
         } else {
             return '';
         }

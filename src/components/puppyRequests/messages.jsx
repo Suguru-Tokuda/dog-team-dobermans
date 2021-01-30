@@ -6,13 +6,15 @@ class Messages extends Component {
     state = {
         messages: [],
         userID: '',
+        request: {},
         dataLoaded: false
     };
 
     constructor(props) {
         super(props);
 
-        this.state.userID = this.props.user.userID;
+        this.state.userID = this.props.userID;
+        this.state.request = this.props.request;
     }
 
     componentDidMount() {
@@ -45,7 +47,7 @@ class Messages extends Component {
                                     <span>Bob Johnson</span>
                                 )}
                                 {(message.senderID === userID) && (
-                                    <span>{this.props.user.firstName} {this.props.user.lastName}</span>
+                                    <span>{this.state.request.firstName} {this.state.request.lastName}</span>
                                 )}
                             </div>
                             <div className="col-6">
@@ -67,7 +69,7 @@ class Messages extends Component {
                 );
             });
         } else if (messages.length === 0 && dataLoaded) {
-            retVal = <div className="text-center"><h3>You have no messages.</h3></div>;
+            retVal = <div className="text-center" style={{ marginBottom: '50px' }}><h3>You have no messages.</h3></div>;
         }
 
         return (

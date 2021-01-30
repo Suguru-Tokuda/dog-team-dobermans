@@ -10,32 +10,38 @@ export class PuppyRequests extends Component {
         super(props);
     }
 
-    componentDidMount() {
-        if (this.props.authenticated === false) {
-            this.props.setRedirectURL(this.props.location.pathname);
-        }
-    }
+    // componentDidMount() {
+    //     if (this.props.authenticated === false) {
+    //         this.props.setRedirectURL(this.props.location.pathname);
+    //     }
+    // }
 
     render() {
-        const { authenticated, user } = this.props;
+        return (
+            <React.Fragment>
+                {/* <Route path="/puppy-requests" exact render={(props) => <PuppyRequestList {...props} />} /> */}
+                <Route path="/puppy-request/:puppyRequestID" exact render={(props) => <PuppyRequestDetail {...props} />} />
+            </React.Fragment>
+        );
+        // const { authenticated, user } = this.props;
 
-        if (authenticated === true && user && user.emailVerified) {
-            return (
-                <React.Fragment>
-                    <Route path="/puppy-requests" exact render={(props) => <PuppyRequestList {...props} />} />
-                    <Route path="/puppy-requests/:puppyRequestID" exact render={(props) => <PuppyRequestDetail {...props} />} />
-                </React.Fragment>
-            );
-        } else if (!authenticated) {
-            this.props.setRedirectURL(this.props.location.pathname);
-            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
-        } else if (authenticated && user && !user.emailVerified) {
-            toastr.error('Please verify your email first.');
-            return <Redirect to="/email-verification" />;
-        } else {
-            toastr.error('You need to login to continue.');
-            return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
-        }
+        // if (authenticated === true && user && user.emailVerified) {
+        //     return (
+        //         <React.Fragment>
+        //             {/* <Route path="/puppy-requests" exact render={(props) => <PuppyRequestList {...props} />} /> */}
+        //             <Route path="/puppy-request/:puppyRequestID" exact render={(props) => <PuppyRequestDetail {...props} />} />
+        //         </React.Fragment>
+        //     );
+        // } else if (!authenticated) {
+        //     this.props.setRedirectURL(this.props.location.pathname);
+        //     return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
+        // } else if (authenticated && user && !user.emailVerified) {
+        //     toastr.error('Please verify your email first.');
+        //     return <Redirect to="/email-verification" />;
+        // } else {
+        //     toastr.error('You need to login to continue.');
+        //     return <Redirect to={{ pathname: "/login", state: { previousUrl: this.props.location.pathname, message: 'Please login to see the puppy request messages.' } }}/>;
+        // }
     }
 }
 
