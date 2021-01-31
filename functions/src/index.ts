@@ -8,6 +8,7 @@ import * as config from '../src/config.json';
 admin.initializeApp(functions.config().firebase);
 
 const corsHeader = cors({ origin: true });
+const isProd = true;
 
 function getAPIKEY() {
     const parsedJSON = JSON.parse(JSON.stringify(api));
@@ -17,6 +18,36 @@ function getAPIKEY() {
 function getConfig() {
     const parsedJSON = JSON.parse(JSON.stringify(config));
     return parsedJSON;
+}
+
+function getPublicBaseURL() {
+    const configJson = getConfig();
+
+    if (isProd) {
+        return configJson.baseURL.prod.public;
+    } else {
+        return configJson.baseURL.dev.public;
+    }
+}
+
+function getAdminBaseURL() {
+    const configJson = getConfig();
+
+    if (isProd) {
+        return configJson.baseURL.prod.admin;
+    } else {
+        return configJson.baseURL.dev.admin;
+    }
+}
+
+function getBreederEmail() {
+    const configJSON = getConfig();
+
+    if (isProd) {
+        return configJSON.breederEmail.prod;
+    } else {
+        return configJSON.breederEmail.dev;
+    }
 }
 
 function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string) {
@@ -48,7 +79,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                     </html>
         `;
 
-        sendEmail(getConfig().breederEmail, 'New Testimonial Submitted', htmlBody)
+        sendEmail(getBreederEmail(), 'New Testimonial Submitted', htmlBody)
             .then(() => {
                 resolve(1);
             })
@@ -58,7 +89,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
     });
 }
 
-async function sendNotificationForWaitList(firstName: string, lastName: string, email: string, phone: string, message: string, puppyID: string, color: string) {
+async function sendNotificationForWaitList(firstName: string, lastName: string, email: string, phone: string, message: string, puppyID: string, color: string, waitRequestID: string) {
     let puppyData: any;
     let puppyColor = color;
     let puppyRows: string = '';
@@ -84,6 +115,7 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
     }
 
     const colorPref = (puppyColor === undefined || puppyColor === null || puppyColor === '') ? 'No Preference' : puppyColor;
+    const adminBaseURL = getAdminBaseURL();
 
     return new Promise((resolve, reject) => {
         const htmlBody = `
@@ -116,11 +148,14 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
                             <td>${colorPref}</td>
                         </tr>
                     </table>
+                    <br />
+                    <p>See details and send messages from this link:</p>
+                    <p><a>${adminBaseURL}wait-list/${waitRequestID}</a></p>
                 </body>
             </html>
         `;
 
-        sendEmail(getConfig().breederEmail, `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
+        sendEmail(getBreederEmail(), `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
         .then(() => {
             resolve(1);
         })
@@ -134,7 +169,7 @@ function sendWaitRequestConfirmationEmail(email: string, senderName: string, wai
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
-            const publicBaseURL = getConfig().baseURL.prod.public;
+            const publicBaseURL = getPublicBaseURL();
 
             htmlBody = `
                 <!DOCTYPE html>
@@ -167,8 +202,8 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
-            const publicBaseURL = getConfig().baseURL.prod.public;
-            const adminBaseURL = getConfig().baseURL.prod.admin;
+            const publicBaseURL = getPublicBaseURL();
+            const adminBaseURL = getAdminBaseURL();
 
             if (toBreeder === false) {
                 htmlBody = `
@@ -1300,14 +1335,15 @@ export const waitList = functions.https.onRequest((request, response) => {
                     data.statusID = 1;
 
                     admin.firestore().collection('waitList').add(data)
-                        .then(async () => {
+                        .then(async (snapshot) => {
                             try {
+                                const waitRequestID = snapshot.id;
                                 const { userID, color, puppyID, message } = data;
                                 const buyerDoc = await admin.firestore().collection('buyers').doc(userID).get();
                                 const buyerData:any = buyerDoc.data();
                                 const { firstName, lastName, email, phone } = buyerData;
 
-                                await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color);
+                                await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color, waitRequestID);
                             } catch (err) {
                                 console.log(err);
                             }
@@ -1533,7 +1569,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                             if (isBreeder === true) {
                                 await sendNotificationForWaitListMessage(recipient.email, `${recipient.firstName} ${recipient.lastName}`, waitRequestID, false);
                             } else if (isBreeder === false) {
-                                await sendNotificationForWaitListMessage(getConfig().breederEmail, `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
+                                await sendNotificationForWaitListMessage(getBreederEmail(), `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
                             }
 
                             response.status(201).send(messageData);
@@ -1819,7 +1855,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     const { firstName, lastName, email, phone, } = user;
                     const { color, message, puppyID } = puppyRequestData;
 
-                    await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color);
+                    await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color, puppyRequestData.waitRequestID);
                     await sendWaitRequestConfirmationEmail(email, firstName, puppyRequestData.waitRequestID);
 
                     response.status(200).send(puppyRequestData);
