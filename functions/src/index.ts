@@ -1789,7 +1789,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                             phone: data.phone,
                             city: data.city,
                             state: data.state,
-                            created: currentDate,
+                            createDate: currentDate,
                             lastModified: currentDate,
                             statusID: 1
                         };
