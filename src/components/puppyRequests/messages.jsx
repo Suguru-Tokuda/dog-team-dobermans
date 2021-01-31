@@ -68,9 +68,10 @@ class Messages extends Component {
                     </div>
                 );
             });
-        } else if (messages.length === 0 && dataLoaded) {
-            retVal = <div className="text-center" style={{ marginBottom: '50px' }}><h3>You have no messages.</h3></div>;
         }
+        //  else if (messages.length === 0 && dataLoaded) {
+        //     retVal = <div className="text-center" style={{ marginBottom: '50px' }}><h3>You have no messages.</h3></div>;
+        // }
 
         return (
             <React.Fragment>

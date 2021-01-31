@@ -48,7 +48,7 @@ function notifyNewTestimonial(firstName: string, lastName: string, dogName: stri
                     </html>
         `;
 
-        sendEmail('suguru.tokuda@gmail.com', 'New Testimonial Submitted', htmlBody)
+        sendEmail(getConfig().breederEmail, 'New Testimonial Submitted', htmlBody)
             .then(() => {
                 resolve(1);
             })
@@ -120,7 +120,7 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
             </html>
         `;
 
-        sendEmail('suguru.tokuda@gmail.com', `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
+        sendEmail(getConfig().breederEmail, `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
         .then(() => {
             resolve(1);
         })
@@ -134,7 +134,7 @@ function sendWaitRequestConfirmationEmail(email: string, senderName: string, wai
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
-            const publicBaseURL = getConfig().baseURL.dev.public;
+            const publicBaseURL = getConfig().baseURL.prod.public;
 
             htmlBody = `
                 <!DOCTYPE html>
@@ -167,8 +167,8 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
     return new Promise((res, rej) => {
         if (email && senderName && waitRequestID) {
             let htmlBody: string = '';
-            const publicBaseURL = getConfig().baseURL.dev.public;
-            const adminBaseURL = getConfig().baseURL.dev.admin;
+            const publicBaseURL = getConfig().baseURL.prod.public;
+            const adminBaseURL = getConfig().baseURL.prod.admin;
 
             if (toBreeder === false) {
                 htmlBody = `
@@ -177,7 +177,7 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
                             <p>Hello ${senderName},</p>
                             <p>You received a new message from the breeder.</p>
                             <p>Please click the following link to read the message.</p>
-                            <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}/puppy-requests/${waitRequestID}</a></p>
+                            <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}puppy-requests/${waitRequestID}</a></p>
                             <br /><br />
                             Dog Team Dobermans
                         </body>
@@ -1533,7 +1533,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                             if (isBreeder === true) {
                                 await sendNotificationForWaitListMessage(recipient.email, `${recipient.firstName} ${recipient.lastName}`, waitRequestID, false);
                             } else if (isBreeder === false) {
-                                await sendNotificationForWaitListMessage('suguru.tokuda@gmail.com', `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
+                                await sendNotificationForWaitListMessage(getConfig().breederEmail, `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
                             }
 
                             response.status(201).send(messageData);
