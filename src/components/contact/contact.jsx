@@ -83,37 +83,74 @@ class ContactuUs extends Component {
             return (
                 <section className="contact">
                     <div className="container">
+                        <div className="d-block d-sm-none">
                         <div className="row">
-                            <div className="col-md-6">
-                                <div className="contact-icon">
-                                    <i className="far fa-map"></i>
+                                <div className="col-sm-12 text-center">
+                                    <div className="contact-icon">
+                                        <i className="far fa-map"></i>
+                                    </div>
+                                    <h3>Address</h3>
+                                    <p>{street}<br/>{city} {state}<br/>{zip}</p>
+                                    <a href="https://goo.gl/maps/ZDt8tCAdYn1tXR1g7" target="_"><strong>Google Maps</strong></a>
                                 </div>
-                                <h3>Address</h3>
-                                <p>{street}<br/>{city} {state}<br/>{zip}</p>
-                                <a href="https://goo.gl/maps/ZDt8tCAdYn1tXR1g7" target="_"><strong>Google Maps</strong></a>
+                                <div className="col-sm-12 text-center">
+                                    <div className="contact-icon">
+                                        <i className="fa fa-phone"></i>
+                                    </div>
+                                    <h3>Phone</h3>
+                                    <p>You may contact us Monday-Saturday from<br /> 9am - 6pm</p>
+                                    <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
+                                </div>
+                                <div className="col-sm-12 text-center">
+                                    <div className="contact-icon">
+                                        <i className="far fa-envelope"></i>
+                                    </div>
+                                    <h3>Email</h3>
+                                    <p>Please feel free to contact us regarding Doberman puppies.</p>
+                                    <p style={{ fontSize: 'small' }}><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
+                                </div>
+                                <div className="col-sm-12 text-center">
+                                    <div className="contact-icon">
+                                        <i className="fas fa-dog"></i>
+                                    </div>
+                                    <h3>Request</h3>
+                                    <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to jump to the Doberman Puppy Wait List Form.</p>
+                                </div>
                             </div>
-                            {/* <div className="col-md-3">
-                                <div className="contact-icon">
-                                    <i className="fa fa-phone"></i>
+                        </div>
+                        <div className="d-none d-sm-block">
+                            <div className="row">
+                                <div className="col-sm-12 col-sm-6 col-md-6 col-lg-3">
+                                    <div className="contact-icon">
+                                        <i className="far fa-map"></i>
+                                    </div>
+                                    <h3>Address</h3>
+                                    <p>{street}<br/>{city} {state}<br/>{zip}</p>
+                                    <a href="https://goo.gl/maps/ZDt8tCAdYn1tXR1g7" target="_"><strong>Google Maps</strong></a>
                                 </div>
-                                <h3>Phone</h3>
-                                <p>You may contact us Monday-Saturday from 9am - 6pm</p>
-                                <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
-                            </div>
-                            <div className="col-md-3">
-                                <div className="contact-icon">
-                                    <i className="far fa-envelope"></i>
+                                <div className="col-sm-12 col-sm-6 col-md-6 col-lg-3">
+                                    <div className="contact-icon">
+                                        <i className="fa fa-phone"></i>
+                                    </div>
+                                    <h3>Phone</h3>
+                                    <p>You may contact us Monday-Saturday from 9am - 6pm</p>
+                                    <p><strong><a href={`tel:${phone}`}>{UtilService.formatPhoneNumber(phone)}</a></strong></p>
                                 </div>
-                                <h3>Email</h3>
-                                <p>Please feel free to contact us regarding Doberman puppies.</p>
-                                <p><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
-                            </div> */}
-                            <div className="col-md-6">
-                                <div className="contact-icon">
-                                    <i className="fas fa-dog"></i>
+                                <div className="col-sm-12 col-sm-6 col-md-6 col-lg-3">
+                                    <div className="contact-icon">
+                                        <i className="far fa-envelope"></i>
+                                    </div>
+                                    <h3>Email</h3>
+                                    <p>Please feel free to contact us regarding Doberman puppies.</p>
+                                    <p style={{ fontSize: 'small' }}><strong><a href={`mailto:${email}`}>{email}</a></strong></p>
                                 </div>
-                                <h3>Request</h3>
-                                <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to jump to the Doberman Puppy Wait List Form.</p>
+                                <div className="col-sm-12 col-sm-6 col-md-6 col-lg-3">
+                                    <div className="contact-icon">
+                                        <i className="fas fa-dog"></i>
+                                    </div>
+                                    <h3>Request</h3>
+                                    <p>Please <a style={{color: 'purple', cursor: 'pointer'}} onClick={this.handleToNavigateToTheForm}>click here</a> to jump to the Doberman Puppy Wait List Form.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
