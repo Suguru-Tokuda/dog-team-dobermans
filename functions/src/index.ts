@@ -156,25 +156,26 @@ async function sendNotificationForWaitList(firstName: string, lastName: string, 
         `;
 
         sendEmail(getBreederEmail(), `New Puppy Request Created from ${firstName} ${lastName}`, htmlBody)
-        .then(() => {
-            resolve(1);
-        })
-        .catch(() => {
-            reject();
-        });
+            .then(() => {
+                resolve(1);
+            })
+            .catch(() => {
+                reject();
+            });
     });
 }
 
-function sendWaitRequestConfirmationEmail(email: string, senderName: string, waitRequestID: string) {
+function sendWaitRequestConfirmationEmail(email: string, firstName: string, lastName: string, waitRequestID: string) {
     return new Promise((res, rej) => {
-        if (email && senderName && waitRequestID) {
+
+        if (email && firstName && lastName && waitRequestID) {
             let htmlBody: string = '';
             const publicBaseURL = getPublicBaseURL();
 
             htmlBody = `
                 <!DOCTYPE html>
                     <body>
-                        <p>Hello ${senderName},</p>
+                        <p>Hello ${firstName},</p>
                         <p>Thank you for submitting a Doberman puppy request. The breeder will be in touch with you when new puppies will be available for you. If you have any questions about your request, you can send messages to the breeder from the link below.</p>
                         <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}puppy-request/${waitRequestID}</a></p>
                         <br/></br/>
@@ -198,9 +199,9 @@ function sendWaitRequestConfirmationEmail(email: string, senderName: string, wai
     });
 }
 
-function sendNotificationForWaitListMessage(email: string, senderName: string, waitRequestID: string, toBreeder: boolean) {
+function sendNotificationForWaitListMessage(email: string, sender: any, recipient: any, waitRequestID: string, toBreeder: boolean) {
     return new Promise((res, rej) => {
-        if (email && senderName && waitRequestID) {
+        if (email && sender && waitRequestID) {
             let htmlBody: string = '';
             const publicBaseURL = getPublicBaseURL();
             const adminBaseURL = getAdminBaseURL();
@@ -209,7 +210,7 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
                 htmlBody = `
                     <!DOCTYPE html>
                         <body>
-                            <p>Hello ${senderName},</p>
+                            <p>Hello ${recipient.firstName},</p>
                             <p>You received a new message from the breeder.</p>
                             <p>Please click the following link to read the message.</p>
                             <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}puppy-requests/${waitRequestID}</a></p>
@@ -222,7 +223,7 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
                 htmlBody = `
                     <!DOCTYPE html>
                         <body>
-                            <p>You received a new message from ${senderName}.</p>
+                            <p>You received a new message from ${recipient.firstName} ${recipient.lastName}.</p>
                             <p>Please click the following link to read the message.</p>
                             <p><a href="${adminBaseURL}wait-list/${waitRequestID}">${adminBaseURL}/wait-list/${waitRequestID}</a></p>
                             <br /><br />
@@ -231,15 +232,15 @@ function sendNotificationForWaitListMessage(email: string, senderName: string, w
                     </html>
                 `;
             }
-            
-            const subject = `New Message from ${senderName}`;
+
+            const subject = `New Message from ${sender.firstName} ${sender.lastName}`;
 
             sendEmail(email, subject, htmlBody)
                 .then(() => {
                     res(1);
                 })
-                .catch(() => {
-                    rej();
+                .catch((err) => {
+                    rej(err);
                 })
         }
     });
@@ -300,7 +301,7 @@ export const homepageContents = functions.https.onRequest((request, response) =>
                                     const homepageContentRef = admin.firestore().collection('homepageContents').doc(homepageContentID);
                                     homepageContentRef.set(homepageContentData, { merge: true })
                                         .then(() => {
-                                            response.sendStatus(200);        
+                                            response.sendStatus(200);
                                         })
                                         .catch(err => {
                                             response.status(500).send(err);
@@ -356,44 +357,44 @@ export const puppies = functions.https.onRequest((request, response) => {
             } else if (query.key === getAPIKEY()) {
                 if (path === '/') {
                     admin.firestore().collection('puppies').get()
-                    .then(async querySnapshot => {
-                        let limit: any = undefined;
-                        if (query.limit !== undefined)
-                            limit = parseInt(query.limit);
-                        const puppyArr: any = [];
-                        if (querySnapshot.size > 0) {
-                            for (const doc of querySnapshot.docs) {
-                                const retVal = doc.data();
-                                retVal.puppyID = doc.id;
-                                if (query.includeBuyer === "true" && retVal.buyerID !== null) {
-                                    try {
-                                        const buyerDoc = await admin.firestore().collection('buyers').doc(retVal.buyerID).get();
-                                        retVal.buyer = buyerDoc.data();
-                                        retVal.buyer.buyerID = buyerDoc.id;
-                                    } catch (err) {
-                                        console.log(err);
+                        .then(async querySnapshot => {
+                            let limit: any = undefined;
+                            if (query.limit !== undefined)
+                                limit = parseInt(query.limit);
+                            const puppyArr: any = [];
+                            if (querySnapshot.size > 0) {
+                                for (const doc of querySnapshot.docs) {
+                                    const retVal = doc.data();
+                                    retVal.puppyID = doc.id;
+                                    if (query.includeBuyer === "true" && retVal.buyerID !== null) {
+                                        try {
+                                            const buyerDoc = await admin.firestore().collection('buyers').doc(retVal.buyerID).get();
+                                            retVal.buyer = buyerDoc.data();
+                                            retVal.buyer.buyerID = buyerDoc.id;
+                                        } catch (err) {
+                                            console.log(err);
+                                        }
+                                    }
+                                    if (query.live === "true" && retVal.live === true) {
+                                        if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                            puppyArr.push(retVal);
+                                    } else if (query.live === "false" && retVal.live === false) {
+                                        if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                            puppyArr.push(retVal);
+                                    } else if (typeof query.live === 'undefined') {
+                                        if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
+                                            puppyArr.push(retVal);
                                     }
                                 }
-                                if (query.live === "true" && retVal.live === true) {
-                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                        puppyArr.push(retVal);
-                                } else if (query.live === "false" && retVal.live === false) {
-                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                        puppyArr.push(retVal);
-                                } else if (typeof query.live === 'undefined') {
-                                    if ((typeof limit !== 'undefined' && puppyArr.length < limit) || typeof limit === 'undefined')
-                                        puppyArr.push(retVal);
-                                }
                             }
-                        }
-                        puppyArr.sort((a: any, b: any) => {
-                            return a.dateOfBirth < b.dateOfBirth ? 1 : a.dateOfBirth > b.dateOfBirth ? -1 : 0;
+                            puppyArr.sort((a: any, b: any) => {
+                                return a.dateOfBirth < b.dateOfBirth ? 1 : a.dateOfBirth > b.dateOfBirth ? -1 : 0;
+                            });
+                            response.status(200).send(puppyArr);
+                        })
+                        .catch(err => {
+                            response.status(500).send(err);
                         });
-                        response.status(200).send(puppyArr);
-                    })
-                    .catch(err => {
-                        response.status(500).send(err);
-                    });
                 } else if (path === '/getByBuyerID') {
                     const buyerID = query.buyerID;
                     if (typeof buyerID !== 'undefined' && buyerID.length > 0) {
@@ -438,7 +439,7 @@ export const puppies = functions.https.onRequest((request, response) => {
                             if (typeof buyerData !== 'undefined') {
                                 if (buyerData.puppyIDs.indexOf(transactionData.puppyID) === -1) {
                                     buyerData.puppyIDs.push(transactionData.puppyID);
-                                    await buyerRef.set(buyerData, {merge: true });
+                                    await buyerRef.set(buyerData, { merge: true });
                                 }
                             }
                         })
@@ -529,9 +530,9 @@ export const puppy = functions.https.onRequest((request, response) => {
                             }
                             response.status(200).send(retVal);
                         })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
                     } else {
                         response.status(204);
                     }
@@ -550,29 +551,29 @@ export const puppy = functions.https.onRequest((request, response) => {
                     }
                 } else if (request.method === 'PUT') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
-                            const data = request.body;
-                            const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
-                            puppyRef.set(data, { merge: true })
-                                .then(() => {
-                                    const retVal = data;
-                                    retVal.puppyID = puppyID;
-                                    response.status(200).send(retVal);
-                                })
-                                .catch(err => {
-                                    response.sendStatus(500).send(err);
-                                });
-                        }
+                        const data = request.body;
+                        const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
+                        puppyRef.set(data, { merge: true })
+                            .then(() => {
+                                const retVal = data;
+                                retVal.puppyID = puppyID;
+                                response.status(200).send(retVal);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    }
                 } else if (request.method === 'DELETE') {
                     if (typeof puppyID !== 'undefined' && puppyID.length > 0) {
-                            const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
-                            puppyRef.delete()
-                                .then(() => {
-                                    response.sendStatus(200);
-                                })
-                                .catch(err => {
-                                    response.sendStatus(500).send(err);
-                                });
-                        } else {
+                        const puppyRef = admin.firestore().collection('puppies').doc(puppyID);
+                        puppyRef.delete()
+                            .then(() => {
+                                response.sendStatus(200);
+                            })
+                            .catch(err => {
+                                response.sendStatus(500).send(err);
+                            });
+                    } else {
                         response.status(400).send('Invalid ID');
                     }
                 }
@@ -592,32 +593,32 @@ export const parents = functions.https.onRequest((request, response) => {
                 response.status(400).send("Incorrect API key");
             } else if (query.key === getAPIKEY()) {
                 admin.firestore().collection('parents').get()
-                .then(querySnapshot => {
-                    let limit: any = undefined;
-                    if (query.limit !== undefined)
-                        limit = parseInt(query.limit);
-                    const parentsArr: any = [];
-                    if (querySnapshot.size > 0) {
-                        querySnapshot.forEach((doc) => {
-                            const retVal = doc.data();
-                            retVal.parentID = doc.id;
-                            if (query.live === "true" && retVal.live === true) {
-                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
-                                    parentsArr.push(retVal);
-                            } else if (query.live === "false" && retVal.live === false) {
-                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
-                                    parentsArr.push(retVal);
-                            } else if (typeof query.live === 'undefined') {
-                                if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
-                                    parentsArr.push(retVal);
-                            }
-                        });
-                    }
-                    response.status(200).send(parentsArr);
-                })
-                .catch(err => {
-                    response.status(500).send(err);
-                });
+                    .then(querySnapshot => {
+                        let limit: any = undefined;
+                        if (query.limit !== undefined)
+                            limit = parseInt(query.limit);
+                        const parentsArr: any = [];
+                        if (querySnapshot.size > 0) {
+                            querySnapshot.forEach((doc) => {
+                                const retVal = doc.data();
+                                retVal.parentID = doc.id;
+                                if (query.live === "true" && retVal.live === true) {
+                                    if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                        parentsArr.push(retVal);
+                                } else if (query.live === "false" && retVal.live === false) {
+                                    if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                        parentsArr.push(retVal);
+                                } else if (typeof query.live === 'undefined') {
+                                    if ((typeof limit !== 'undefined' && parentsArr.length < limit) || typeof limit === 'undefined')
+                                        parentsArr.push(retVal);
+                                }
+                            });
+                        }
+                        response.status(200).send(parentsArr);
+                    })
+                    .catch(err => {
+                        response.status(500).send(err);
+                    });
             }
         }
     });
@@ -804,15 +805,15 @@ export const buyer = functions.https.onRequest((request, response) => {
                                 let foundCount = 0;
                                 searchKeywords.forEach((searchKeyword: string) => {
                                     if (typeof retVal.firstName !== 'undefined' && retVal.firstName.toLowerCase().indexOf(searchKeyword) !== -1)
-                                            foundCount++;
+                                        foundCount++;
                                     if (typeof retVal.lastName !== 'undefined' && retVal.lastName.toLowerCase().indexOf(searchKeyword) !== -1)
-                                            foundCount++;
+                                        foundCount++;
                                     if (typeof retVal.email !== 'undefined' && retVal.email.toLowerCase().indexOf(searchKeyword) !== -1)
-                                            foundCount++;
+                                        foundCount++;
                                     if (typeof retVal.state !== 'undefined' && retVal.state.toLowerCase().indexOf(searchKeyword) !== -1)
-                                            foundCount++;
+                                        foundCount++;
                                     if (typeof retVal.city !== 'undefined' && retVal.city.toLowerCase().indexOf(searchKeyword) !== -1)
-                                            foundCount++;
+                                        foundCount++;
                                 });
                                 if (foundCount > 0)
                                     buyersArr.push(retVal)
@@ -893,7 +894,7 @@ export const buyers = functions.https.onRequest((request, response) => {
                             buyersArray.push(buyerToPush);
                         }
                         buyersArray.sort((a: any, b: any) => {
-                            return a.firstName > b.firstName ? 1 : a.firstName < b.firstName ? -1 :0;
+                            return a.firstName > b.firstName ? 1 : a.firstName < b.firstName ? -1 : 0;
                         });
                         response.status(200).send(buyersArray);
                     }
@@ -1028,14 +1029,14 @@ export const testimonials = functions.https.onRequest((request, response) => {
                     if (query.testimonialID) {
                         const testimonialID = query.testimonialID;
                         if (typeof testimonialID !== 'undefined') {
-                                admin.firestore().collection('testimonials').doc(testimonialID).get()
-                                    .then(doc => {
-                                        const retVal = doc.data();
-                                        response.status(200).send(retVal);
-                                    })
-                                    .catch(err => {
-                                        response.status(500).send(err);
-                                    });
+                            admin.firestore().collection('testimonials').doc(testimonialID).get()
+                                .then(doc => {
+                                    const retVal = doc.data();
+                                    response.status(200).send(retVal);
+                                })
+                                .catch(err => {
+                                    response.status(500).send(err);
+                                });
                         } else {
                             response.status(500).send('Missing testimonialID');
                         }
@@ -1175,7 +1176,7 @@ export const contact = functions.https.onRequest((request, response) => {
                     .catch(err => {
                         response.status(500).send(err);
                     });
-            } 
+            }
         }
     });
 });
@@ -1217,9 +1218,9 @@ export const waitList = functions.https.onRequest((request, response) => {
                                     try {
                                         const userDoc = await admin.firestore().collection('buyers').doc(retVal.userID).get();
                                         const userData: any = userDoc.data();
-    
+
                                         const { firstName, lastName, email, phone, state, city, registrationCompleted } = userData;
-    
+
                                         retVal.firstName = firstName;
                                         retVal.lastName = lastName;
                                         retVal.email = email;
@@ -1280,9 +1281,9 @@ export const waitList = functions.https.onRequest((request, response) => {
                                             try {
                                                 const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
                                                 const userData: any = userDoc.data();
-            
+
                                                 const { firstName, lastName, email, phone, city, state, registrationCompleted } = userData;
-            
+
                                                 waitRequest.firstName = firstName;
                                                 waitRequest.lastName = lastName;
                                                 waitRequest.email = email;
@@ -1295,7 +1296,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                 if (registrationCompleted) {
                                                     const messagesRef = admin.firestore().collection('messages');
                                                     const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
-        
+
                                                     waitRequest.numberOfUnreadMessages = 0;
 
                                                     if (snapshot.size > 0) {
@@ -1306,7 +1307,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                             if (message.read === false && message.recipientID === recipientID) {
                                                                 waitRequest.numberOfUnreadMessages++;
                                                             }
-        
+
                                                         }
                                                     }
                                                 }
@@ -1314,10 +1315,10 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                 console.log(err);
                                             }
                                         }
-                                            retVal.push(waitRequest);
+                                        retVal.push(waitRequest);
                                     }
 
-                                    retVal.sort((a: any, b: any) => { 
+                                    retVal.sort((a: any, b: any) => {
                                         return a.created > b.created ? -1 : (a.created < b.created ? 1 : 0);
                                     });
 
@@ -1325,10 +1326,10 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 } else {
                                     response.status(200).send([]);
                                 }
-                        })
-                        .catch(err => {
-                            response.status(500).send(err);
-                        });
+                            })
+                            .catch(err => {
+                                response.status(500).send(err);
+                            });
                     }
                 } else if (method === 'POST') {
                     const data = request.body;
@@ -1340,7 +1341,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 const waitRequestID = snapshot.id;
                                 const { userID, color, puppyID, message } = data;
                                 const buyerDoc = await admin.firestore().collection('buyers').doc(userID).get();
-                                const buyerData:any = buyerDoc.data();
+                                const buyerData: any = buyerDoc.data();
                                 const { firstName, lastName, email, phone } = buyerData;
 
                                 await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color, waitRequestID);
@@ -1371,7 +1372,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                             })
                             .catch(err => {
                                 response.sendStatus(500).send(err);
-                            }); 
+                            });
                     } else {
                         response.status(400).send('Missing waitRequestID');
                     }
@@ -1535,12 +1536,12 @@ export const waitList = functions.https.onRequest((request, response) => {
                     } else if (method === 'POST') {
                         const { senderID, recipientID, waitRequestID, messageBody, isBreeder } = request.body;
 
-                       try {
+                        try {
                             // let sender: any, recipient: any, recipientData: any;
                             // sender = await admin.firestore().collection('buyers').doc(senderID).get();
                             // const senderData: any = sender.data();
                             let recipient: any, sender: any;
-                            
+
                             if (isBreeder === true) {
                                 const recipientRef = await admin.firestore().collection('buyers').doc(recipientID).get();
                                 recipient = recipientRef.data();
@@ -1548,7 +1549,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 const senderRef = await admin.firestore().collection('buyers').doc(senderID).get();
                                 sender = senderRef.data();
                             }
-        
+
                             const messageData: any = {
                                 senderID: senderID,
                                 recipientID: recipientID,
@@ -1564,18 +1565,28 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                             messageData.messageID = snapshot.id;
 
-                            // TODO: send a notification meail to the recipient.
+                            // TODO: send a notification email to the recipient.
                             // if the recipientID is Bob's, call 
                             if (isBreeder === true) {
-                                await sendNotificationForWaitListMessage(recipient.email, `${recipient.firstName} ${recipient.lastName}`, waitRequestID, false);
+                                const senderObj = {
+                                    firstName: 'Robert Johnson (The Doberman Breeder)',
+                                    lastName: ''
+                                };
+
+                                await sendNotificationForWaitListMessage(recipient.email, senderObj, recipient, waitRequestID, false);
                             } else if (isBreeder === false) {
-                                await sendNotificationForWaitListMessage(getBreederEmail(), `${sender.firstName} ${sender.lastName}`, waitRequestID, true);
+                                const recipientObj = {
+                                    firstName: 'Bob',
+                                    lastName: 'Johnson'
+                                };
+
+                                await sendNotificationForWaitListMessage(getBreederEmail(), sender, recipientObj, waitRequestID, true);
                             }
 
                             response.status(201).send(messageData);
-                       } catch (err) {
+                        } catch (err) {
                             response.status(500).send(err);
-                       }
+                        }
                     } else if (method === 'PUT') {
                         const messageID = query.messageID;
                         const messageBody = query.messageBody;
@@ -1598,7 +1609,7 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                     try {
                         const message = await messagesRef.get();
-                        const messageData : any = {
+                        const messageData: any = {
                             senderID: query.messageID,
                             recipientID: query.recipientID,
                             waitRequestID: query.waitRequestID,
@@ -1625,17 +1636,17 @@ export const waitList = functions.https.onRequest((request, response) => {
                     if (method === 'POST') {
                         const data = request.body;
                         const { messageIDs } = data;
-    
+
                         for (let i = 0, max = messageIDs.length; i < max; i++) {
                             const messageRef = admin.firestore().collection('messages').doc(messageIDs[i]);
-    
+
                             try {
                                 await messageRef.set({ read: true }, { merge: true });
                             } catch (err) {
                                 response.status(500).send(err);
                             }
                         }
-    
+
                         response.sendStatus(204);
                     }
                 } else if (path === '/messages/getUnreadMessagesByUserID') {
@@ -1662,7 +1673,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                 } catch (err) {
                                                     console.log(err);
                                                 }
-                                                
+
                                                 messages.push(message);
                                             }
                                         }
@@ -1717,7 +1728,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                             } catch (err) {
                                                 console.log(err);
                                             }
-                                            
+
                                             messages.push(message);
                                         }
                                     }
@@ -1772,8 +1783,8 @@ export const waitList = functions.https.onRequest((request, response) => {
                                             }
 
                                             messages.push(message);
-                                            waitRequestIDs.push(message.waitRequestID);                                        
-                                        }                                        
+                                            waitRequestIDs.push(message.waitRequestID);
+                                        }
                                     }
                                 }
 
@@ -1805,15 +1816,15 @@ export const waitList = functions.https.onRequest((request, response) => {
                     if (querySnapshot.size > 0) {
                         user = querySnapshot.docs[0].data();
                         const userID = querySnapshot.docs[0].id;
-                        
+
                         user.firstName = data.firstName;
                         user.lastName = data.lastName;
                         user.phone = data.phone;
                         user.city = data.city;
                         user.state = data.state;
                         user.lastModified = currentDate;
-                        
-                        await admin.firestore().collection('buyers').doc(userID).set(user, {merge: true});
+
+                        await admin.firestore().collection('buyers').doc(userID).set(user, { merge: true });
 
                         user.userID = userID;
                     } else {
@@ -1830,13 +1841,13 @@ export const waitList = functions.https.onRequest((request, response) => {
                             statusID: 1
                         };
                         const userInsertRes = await admin.firestore().collection('buyers').add(userInsertData);
-    
+
                         user = userInsertData;
                         user.userID = userInsertRes.id;
                     }
-                    
+
                     // create a puppy request
-    
+
                     const puppyRequestData: any = {
                         color: data.color,
                         message: data.message,
@@ -1847,7 +1858,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                         lastModified: currentDate,
                         notified: null
                     };
-    
+
                     const requestInsertRes = await admin.firestore().collection('waitList').add(puppyRequestData);
 
                     puppyRequestData.waitRequestID = requestInsertRes.id;
@@ -1856,7 +1867,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                     const { color, message, puppyID } = puppyRequestData;
 
                     await sendNotificationForWaitList(firstName, lastName, email, phone, message, puppyID, color, puppyRequestData.waitRequestID);
-                    await sendWaitRequestConfirmationEmail(email, firstName, puppyRequestData.waitRequestID);
+                    await sendWaitRequestConfirmationEmail(email, firstName, lastName, puppyRequestData.waitRequestID);
 
                     response.status(200).send(puppyRequestData);
                 } catch (err) {
@@ -1931,7 +1942,7 @@ export const blogs = functions.https.onRequest((request, response) => {
                 const data = request.body;
                 if (typeof blogRef !== 'undefined') {
                     blogRef.set(data, { merge: true })
-                        .then(() => {   
+                        .then(() => {
                             const retVal = data;
                             retVal.blogID = blogID;
                             response.status(200).send(retVal);
@@ -2004,7 +2015,7 @@ export const aboutDobermans = functions.https.onRequest((request, response) => {
                                         response.status(500).send(err);
                                     });
                             } else {
-                                admin.firestore().collection('aboutDobermans').add(aboutDobermansData) 
+                                admin.firestore().collection('aboutDobermans').add(aboutDobermansData)
                                     .then(() => {
                                         response.sendStatus(200);
                                     })
