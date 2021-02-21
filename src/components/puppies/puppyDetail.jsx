@@ -71,7 +71,6 @@ class PuppyDetail extends Component {
                         pictures: puppyData.pictures,
                         parents: parents,
                         sold: puppyData.sold,
-                        sold: false,
                         puppyFound: true
                     });
                 }
@@ -185,6 +184,8 @@ class PuppyDetail extends Component {
     getDetailsSection() {
         const { name, description, price, paidAmount, sold } = this.state;
         const { authenticated, user } = this.props;
+
+        console.log(sold);
 
         return (
             <section className="product-details">
