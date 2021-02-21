@@ -132,6 +132,7 @@ class PuppiesTable extends Component {
                             <div className="title">
                                 <Link to={`/puppies/${puppy.puppyID}`}>
                                     <h3 className="h6 text-uppercase no-margin-bottom">{puppy.name}</h3>
+                                    <span className="badge badge-primary">View</span>
                                 </Link>
                             </div>
                         </div>
