@@ -134,8 +134,8 @@ class ParentsTable extends Component {
                                       className="btn btn-sm btn-primary"
                                       style={{ color: 'white' }}
                                 >
-                                        View
-                                    </Link>
+                                    View
+                                </Link>
                             </div>
                         </div>
                     </div>
