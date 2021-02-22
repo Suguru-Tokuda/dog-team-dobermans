@@ -126,11 +126,16 @@ class ParentsTable extends Component {
                             </div>
                             <div className="title">
                                 <Link to={`/our-dogs/${parent.parentID}`}>
-                                    <h3 className="h6 text-uppercase no-margin-bottom">
+                                    <h3 className="h6 text-uppercase no-margin-bottom text-center">
                                         {parent.name}
                                     </h3>
-                                    <span className="badge badge-primary">View</span>
                                 </Link>
+                                <Link to={`/our-dogs/${parent.parentID}`}
+                                      className="btn btn-sm btn-primary"
+                                      style={{ color: 'white' }}
+                                >
+                                        View
+                                    </Link>
                             </div>
                         </div>
                     </div>

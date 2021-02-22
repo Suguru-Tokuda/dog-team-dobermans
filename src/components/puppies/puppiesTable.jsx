@@ -131,8 +131,15 @@ class PuppiesTable extends Component {
                             </div>
                             <div className="title">
                                 <Link to={`/puppies/${puppy.puppyID}`}>
-                                    <h3 className="h6 text-uppercase no-margin-bottom">{puppy.name}</h3>
-                                    <span className="badge badge-primary">View</span>
+                                    <h3 className="h6 text-uppercase no-margin-bottom text-center">
+                                        {puppy.name}
+                                    </h3>
+                                </Link>
+                                <Link to={`/puppies/${puppy.puppyID}`}
+                                      className="btn btn-sm btn-primary"
+                                      style={{ color: 'white' }}
+                                >
+                                        View
                                 </Link>
                             </div>
                         </div>
