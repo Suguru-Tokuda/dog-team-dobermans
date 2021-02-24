@@ -50,6 +50,20 @@ function getBreederEmail() {
     }
 }
 
+function getBreederID() {
+    const configJSON = getConfig();
+
+    return configJSON.breederID;
+}
+
+function stripHTML(str: string) {
+    if (str) {
+        return str.replace(/(<([^>]+)>)/gi, '');
+    } else {
+        return '';
+    }
+}
+
 function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string) {
     return new Promise((resolve, reject) => {
         const htmlBody = `
@@ -1192,10 +1206,10 @@ export const waitList = functions.https.onRequest((request, response) => {
         } else if (query.key === getAPIKEY()) {
             if (path === '/') {
                 if (method === 'GET') {
-                    const waitRequestID = query.waitRequestID;
                     const recipientID = query.recipientID;
-
-                    if (waitRequestID && waitRequestID.length > 0) {
+                    
+                    if (query.waitRequestID && query.waitRequestID.length > 0) {
+                        const waitRequestID = query.waitRequestID;
                         admin.firestore().collection('waitList').doc(waitRequestID).get()
                             .then(async doc => {
                                 let retVal: any = {};
@@ -1213,13 +1227,15 @@ export const waitList = functions.https.onRequest((request, response) => {
                                     }
                                 }
 
+                                retVal.numberOfUnreadMessages = 0;
+
                                 // load buyer information
                                 if (retVal.userID !== undefined) {
                                     try {
                                         const userDoc = await admin.firestore().collection('buyers').doc(retVal.userID).get();
                                         const userData: any = userDoc.data();
 
-                                        const { firstName, lastName, email, phone, state, city, registrationCompleted } = userData;
+                                        const { firstName, lastName, email, phone, state, city } = userData;
 
                                         retVal.firstName = firstName;
                                         retVal.lastName = lastName;
@@ -1227,25 +1243,33 @@ export const waitList = functions.https.onRequest((request, response) => {
                                         retVal.phone = phone;
                                         retVal.state = state;
                                         retVal.city = city;
-                                        retVal.userRegistrationCompleted = registrationCompleted ? true : false;
 
-                                        if (registrationCompleted) {
-                                            const messagesRef = admin.firestore().collection('messages');
-                                            const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
+                                        const messagesRef = admin.firestore().collection('messages');
+                                        const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
 
-                                            retVal.numberOfUnreadMessages = 0;
+                                        const messages = [];
 
-                                            if (snapshot.size > 0) {
-                                                for (const messageDoc of snapshot.docs) {
-                                                    const message = messageDoc.data();
-                                                    message.messageID = messageDoc.id;
+                                        if (snapshot.size > 0  && recipientID) {
+                                            for (const messageDoc of snapshot.docs) {
+                                                const message = messageDoc.data();
+                                                message.messageID = messageDoc.id;
 
-                                                    if (message.read === false && message.recipientID === recipientID) {
-                                                        retVal.numberOfUnreadMessages++;
-                                                    }
+                                                if (message.read === false && message.recipientID === recipientID) {
+                                                    retVal.numberOfUnreadMessages++;
                                                 }
+
+                                                messages.push(message);
                                             }
                                         }
+
+                                        messages.sort((a: any, b: any) => {
+                                            const sentDateA = new Date(a.sentDate);
+                                            const sentDateB = new Date(b.sentDate);
+
+                                            return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                        });
+
+                                        retVal.messages = messages;
                                     } catch (err) {
                                         console.log(err);
                                     }
@@ -1277,12 +1301,14 @@ export const waitList = functions.https.onRequest((request, response) => {
                                             }
                                         }
 
+                                        waitRequest.numberOfUnreadMessages = 0;
+
                                         if (waitRequest.userID) {
                                             try {
                                                 const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
                                                 const userData: any = userDoc.data();
 
-                                                const { firstName, lastName, email, phone, city, state, registrationCompleted } = userData;
+                                                const { firstName, lastName, email, phone, city, state } = userData;
 
                                                 waitRequest.firstName = firstName;
                                                 waitRequest.lastName = lastName;
@@ -1290,31 +1316,41 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                 waitRequest.phone = phone;
                                                 waitRequest.city = city;
                                                 waitRequest.state = state;
+                                                
+                                                const messagesRef = admin.firestore().collection('messages');
+                                                const snapshot = await messagesRef.where('waitRequestID', '==', waitRequest.waitRequestID).get();
 
-                                                waitRequest.userRegistrationCompleted = registrationCompleted ? true : false;
+                                                if (snapshot.size > 0 && recipientID) {
+                                                    const messages = [];
 
-                                                if (registrationCompleted) {
-                                                    const messagesRef = admin.firestore().collection('messages');
-                                                    const snapshot = await messagesRef.where('waitRequestID', '==', waitRequestID).get();
+                                                    for (const messageDoc of snapshot.docs) {
+                                                        const message = messageDoc.data();
+                                                        message.messageID = messageDoc.id;
 
-                                                    waitRequest.numberOfUnreadMessages = 0;
-
-                                                    if (snapshot.size > 0) {
-                                                        for (const messageDoc of snapshot.docs) {
-                                                            const message = messageDoc.data();
-                                                            message.messageID = messageDoc.id;
-
-                                                            if (message.read === false && message.recipientID === recipientID) {
-                                                                waitRequest.numberOfUnreadMessages++;
-                                                            }
-
+                                                        if (message.read === false && message.recipientID === recipientID) {
+                                                            waitRequest.numberOfUnreadMessages++;
                                                         }
+
+                                                        if (message.recipientID === recipientID)
+                                                            messages.push(message);
+                                                    }
+
+                                                    messages.sort((a: any, b: any) => {
+                                                        const sentDateA = new Date(a.sentDate);
+                                                        const sentDateB = new Date(b.sentDate);
+
+                                                        return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                                    });
+
+                                                    if (messages.length > 0) {
+                                                        waitRequest.lastMessageFromUser = messages[0];
                                                     }
                                                 }
                                             } catch (err) {
                                                 console.log(err);
                                             }
                                         }
+
                                         retVal.push(waitRequest);
                                     }
 
@@ -1469,18 +1505,58 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 let waitRequest: any = {};
                                 waitRequest = doc.data();
                                 waitRequest.notified = new Date().toISOString();
+
                                 let body = data.body;
+
                                 await waitRequestRef.set(waitRequest, { merge: true });
-                                if (body.indexOf('[FIRST_NAME]') !== -1) {
-                                    body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
+
+                                // Check if the waitRequest has userID
+                                if (waitRequest.userID) {
+                                    const messageBody = stripHTML(body);
+                                    const recipientRef = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
+                                    const recipient: any = recipientRef.data();
+
+                                    if (body.indexOf('[FIRST_NAME]') !== -1) {
+                                        body = body.replace(/\[FIRST_NAME\]/gm, recipient.firstName);
+                                    }
+    
+                                    if (body.indexOf('[LAST_NAME]') !== -1) {
+                                        body = body.replace(/\[LAST_NAME\]/gm, recipient.lastName);
+                                    }
+
+                                    const messageData: any = {
+                                        senderID: getBreederID(),
+                                        recipientID: waitRequest.userID,
+                                        waitRequestID: waitRequestID,
+                                        messageBody: messageBody,
+                                        sentDate: new Date().toISOString(),
+                                        lastModified: new Date().toISOString(),
+                                        statusID: 1
+                                    };
+
+                                    const messagesRef = admin.firestore().collection('messages');
+                                    await messagesRef.add(messageData);
+
+                                    const senderObj = {
+                                        firstName: 'Robert Johnson (The Doberman Breeder)',
+                                        lastName: ''
+                                    };
+
+                                    await sendNotificationForWaitListMessage(recipient.email, senderObj, recipient, waitRequestID, false);
+                                } else {
+                                    if (body.indexOf('[FIRST_NAME]') !== -1) {
+                                        body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
+                                    }
+    
+                                    if (body.indexOf('[LAST_NAME]') !== -1) {
+                                        body = body.replace(/\[LAST_NAME\]/gm, waitRequest.lastName);
+                                    }
+
+                                    await sendEmail(waitRequest.email, data.subject, body)
+                                        .catch(err => {
+                                            console.log(err);
+                                        });
                                 }
-                                if (body.indexOf('[LAST_NAME]') !== -1) {
-                                    body = body.replace(/\[LAST_NAME\]/gm, waitRequest.lastName);
-                                }
-                                await sendEmail(waitRequest.email, data.subject, body)
-                                    .catch(err => {
-                                        console.log(err);
-                                    });
                             })
                             .catch(err => {
                                 response.status(500).send(err);
@@ -1557,6 +1633,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 messageBody: messageBody,
                                 sentDate: new Date().toISOString(),
                                 lastModified: new Date().toISOString(),
+                                read: false,
                                 statusID: 1
                             };
 
