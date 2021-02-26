@@ -1512,18 +1512,19 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                                 // Check if the waitRequest has userID
                                 if (waitRequest.userID) {
-                                    const messageBody = stripHTML(body);
                                     const recipientRef = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
                                     const recipient: any = recipientRef.data();
 
                                     if (body.indexOf('[FIRST_NAME]') !== -1) {
                                         body = body.replace(/\[FIRST_NAME\]/gm, recipient.firstName);
                                     }
-    
+                                    
                                     if (body.indexOf('[LAST_NAME]') !== -1) {
                                         body = body.replace(/\[LAST_NAME\]/gm, recipient.lastName);
                                     }
-
+                                    
+                                    const messageBody = stripHTML(body);
+                                    
                                     const messageData: any = {
                                         senderID: getBreederID(),
                                         recipientID: waitRequest.userID,
