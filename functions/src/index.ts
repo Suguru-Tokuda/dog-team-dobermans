@@ -57,11 +57,14 @@ function getBreederID() {
 }
 
 function stripHTML(str: string) {
-    if (str) {
-        return str.replace(/(<([^>]+)>)/gi, '');
-    } else {
-        return '';
+    let retVal = str;
+
+    if (retVal) {
+        retVal = retVal.replace(/(<([^>]+)>)/gi, '')
+        retVal.replace(/&#?[a-z0-9]+;/g, ' ');
     }
+
+    return retVal;
 }
 
 function notifyNewTestimonial(firstName: string, lastName: string, dogName: string, email: string) {
