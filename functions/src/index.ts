@@ -1228,6 +1228,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                 }
 
                                 retVal.numberOfUnreadMessages = 0;
+                                retVal.hasUnRepliedMessage = false;
 
                                 // load buyer information
                                 if (retVal.userID !== undefined) {
@@ -1260,14 +1261,16 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                                                 messages.push(message);
                                             }
+                                            messages.sort((a: any, b: any) => {
+                                                const sentDateA = new Date(a.sentDate);
+                                                const sentDateB = new Date(b.sentDate);
+    
+                                                return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                            });
+
+                                            if (messages[0].recipientID !== recipientID)
+                                                retVal.hasUnRepliedMessage = true;
                                         }
-
-                                        messages.sort((a: any, b: any) => {
-                                            const sentDateA = new Date(a.sentDate);
-                                            const sentDateB = new Date(b.sentDate);
-
-                                            return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
-                                        });
 
                                         retVal.messages = messages;
                                     } catch (err) {
@@ -1302,6 +1305,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                         }
 
                                         waitRequest.numberOfUnreadMessages = 0;
+                                        waitRequest.hasUnRepliedMessage = false;
 
                                         if (waitRequest.userID) {
                                             try {
@@ -1322,6 +1326,7 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                                                 if (snapshot.size > 0 && recipientID) {
                                                     const messages = [];
+                                                    const allMessages = [];
 
                                                     for (const messageDoc of snapshot.docs) {
                                                         const message = messageDoc.data();
@@ -1333,6 +1338,8 @@ export const waitList = functions.https.onRequest((request, response) => {
 
                                                         if (message.recipientID === recipientID)
                                                             messages.push(message);
+
+                                                        allMessages.push(message);
                                                     }
 
                                                     messages.sort((a: any, b: any) => {
@@ -1342,9 +1349,19 @@ export const waitList = functions.https.onRequest((request, response) => {
                                                         return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
                                                     });
 
+                                                    allMessages.sort((a: any, b: any) => {
+                                                        const sentDateA = new Date(a.sentDate);
+                                                        const sentDateB = new Date(b.sentDate);
+
+                                                        return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                                    });
+
                                                     if (messages.length > 0) {
                                                         waitRequest.lastMessageFromUser = messages[0];
                                                     }
+
+                                                    if (allMessages[0].recipientID === recipientID)
+                                                        waitRequest.hasUnRepliedMessage = true;                                                    
                                                 }
                                             } catch (err) {
                                                 console.log(err);
