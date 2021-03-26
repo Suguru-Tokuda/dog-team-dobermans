@@ -76,7 +76,7 @@ class App extends Component {
   }
 
   showSpinner = () => {
-    if (this.props.loadCount > 0) {
+    if (this.props.loadCount === 0) {
       return (
         <div className="centered-spinner">
           <Spinner name="line-spin-fade-loader" color="purple"/>
