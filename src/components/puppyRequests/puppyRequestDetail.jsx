@@ -6,6 +6,7 @@ import Messenger from './messenger';
 import waitListService from '../../services/waitListService';
 import toastr from 'toastr';
 import moment from 'moment';
+import $ from 'jquery';
 
 class PuppyRequestDetail extends Component {
     state = {
@@ -42,7 +43,9 @@ class PuppyRequestDetail extends Component {
                 
                 const messagesRes = await waitListService.getWaitRequestMessages(requestID);
 
-                const messages = messagesRes.data;
+                const messages = messagesRes.data.map(message => {
+                    message.messageBody = $('<textarea />').html(message.messageBody).text();
+                });
 
                 if (messages.length > 0) {
                     const messageIDsMarkAsRead = [];
