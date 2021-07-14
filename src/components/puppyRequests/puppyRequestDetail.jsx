@@ -25,10 +25,6 @@ class PuppyRequestDetail extends Component {
             this.state.requestFound = false;
         else
             this.state.requestID = requestID;
-
-        // if (this.props.user) {
-        //     this.state.userID = this.props.user.userID;
-        // }
     }
 
     componentDidMount = async () => {
@@ -45,6 +41,7 @@ class PuppyRequestDetail extends Component {
 
                 const messages = messagesRes.data.map(message => {
                     message.messageBody = $('<textarea />').html(message.messageBody).text();
+                    return message;
                 });
 
                 if (messages.length > 0) {
