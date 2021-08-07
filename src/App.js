@@ -109,6 +109,7 @@ class App extends Component {
             <Route path="/account" render={(props) => <Account {...props} />} />
             {/* <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} /> */}
             <Route path="/puppy-request" render={(props) => <PuppyRequests {...props} />} />
+            <Route path="/puppy-requests" render={(props) => <PuppyRequests {...props} />} />
             {/* <Route path="/login" render={(props) => <Login {...props} />} />
             <Route path="/email-verification" render={(props) => <EmailVerification {...props} />} />
             <Route path="/user-registration"render={(props) => <UserRegistration {...props} />} />
