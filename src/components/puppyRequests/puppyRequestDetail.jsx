@@ -20,7 +20,7 @@ class PuppyRequestDetail extends Component {
     constructor(props) {
         super(props);
         const requestID = props.match.params.puppyRequestID;
-        
+
         if (requestID.length === 0)
             this.state.requestFound = false;
         else

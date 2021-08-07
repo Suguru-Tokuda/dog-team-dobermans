@@ -216,12 +216,17 @@ function sendWaitRequestConfirmationEmail(email: string, firstName: string, last
     });
 }
 
-function sendNotificationForWaitListMessage(email: string, sender: any, recipient: any, waitRequestID: string, toBreeder: boolean) {
+function sendNotificationForWaitListMessage(email: string, message: string, sender: any, recipient: any, waitRequestID: string, toBreeder: boolean) {
     return new Promise((res, rej) => {
         if (email && sender && waitRequestID) {
             let htmlBody: string = '';
             const publicBaseURL = getPublicBaseURL();
             const adminBaseURL = getAdminBaseURL();
+            let msg: string = '';
+
+            if (message.length > 10) {
+                msg = `${message.substring(0, Math.floor(message.length / 2))}...`;
+            }
 
             if (toBreeder === false) {
                 htmlBody = `
@@ -229,8 +234,10 @@ function sendNotificationForWaitListMessage(email: string, sender: any, recipien
                         <body>
                             <p>Hello ${recipient.firstName},</p>
                             <p>You received a new message from the breeder.</p>
-                            <p>Please click the following link to read the message.</p>
-                            <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}puppy-requests/${waitRequestID}</a></p>
+                            <p>${msg}</p>
+                            <p>Please click the following link to read the whole message and to reply.</p>
+                            <p><a href="${publicBaseURL}puppy-request/${waitRequestID}">${publicBaseURL}puppy-request/${waitRequestID}</a></p>
+                            <p>This email is generated automatically. Please do not reply to this message.</p>
                             <br /><br />
                             Dog Team Dobermans
                         </body>
@@ -241,7 +248,8 @@ function sendNotificationForWaitListMessage(email: string, sender: any, recipien
                     <!DOCTYPE html>
                         <body>
                             <p>You received a new message from ${recipient.firstName} ${recipient.lastName}.</p>
-                            <p>Please click the following link to read the message.</p>
+                            <p>${msg}</p>
+                            <p>Please click the following link to read the whole message and to reply.</p>
                             <p><a href="${adminBaseURL}wait-list/${waitRequestID}">${adminBaseURL}/wait-list/${waitRequestID}</a></p>
                             <br /><br />
                             Dog Team Dobermans
@@ -1563,7 +1571,7 @@ export const waitList = functions.https.onRequest((request, response) => {
                                         lastName: ''
                                     };
 
-                                    await sendNotificationForWaitListMessage(recipient.email, senderObj, recipient, waitRequestID, false);
+                                    await sendNotificationForWaitListMessage(recipient.email, messageBody, senderObj, recipient, waitRequestID, false);
                                 } else {
                                     if (body.indexOf('[FIRST_NAME]') !== -1) {
                                         body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
@@ -1671,14 +1679,14 @@ export const waitList = functions.https.onRequest((request, response) => {
                                     lastName: ''
                                 };
 
-                                await sendNotificationForWaitListMessage(recipient.email, senderObj, recipient, waitRequestID, false);
+                                await sendNotificationForWaitListMessage(recipient.email, messageBody, senderObj, recipient, waitRequestID, false);
                             } else if (isBreeder === false) {
                                 const recipientObj = {
                                     firstName: 'Bob',
                                     lastName: 'Johnson'
                                 };
 
-                                await sendNotificationForWaitListMessage(getBreederEmail(), sender, recipientObj, waitRequestID, true);
+                                await sendNotificationForWaitListMessage(getBreederEmail(), messageBody, sender, recipientObj, waitRequestID, true);
                             }
 
                             response.status(201).send(messageData);
