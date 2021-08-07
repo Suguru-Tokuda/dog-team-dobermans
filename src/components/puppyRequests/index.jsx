@@ -21,6 +21,7 @@ export class PuppyRequests extends Component {
             <React.Fragment>
                 {/* <Route path="/puppy-requests" exact render={(props) => <PuppyRequestList {...props} />} /> */}
                 <Route path="/puppy-request/:puppyRequestID" exact render={(props) => <PuppyRequestDetail {...props} />} />
+                <Route path="/puppy-requests/:puppyRequestID" exact render={(props) => <PuppyRequestDetail {...props} />} />
             </React.Fragment>
         );
         // const { authenticated, user } = this.props;
