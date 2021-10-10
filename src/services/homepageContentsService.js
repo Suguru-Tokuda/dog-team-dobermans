@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export default class HomepageContentsService {
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}homepageContents?key=${api.API_KEY}`;
+        return `${SessionInfoService.getBaseUrlForAPI()}api/homepageContents`;
     }
 
     static getHomepageContents() {
@@ -12,6 +12,6 @@ export default class HomepageContentsService {
     }
 
     static getPuppyMessage() {
-        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}homepageContents/puppyMessage?key=${api.API_KEY}`);
+        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}/puppyMessage`);
     }
 }

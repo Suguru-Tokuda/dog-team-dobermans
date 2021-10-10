@@ -5,22 +5,22 @@ import axios from 'axios';
 export default class PuppyService {
 
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}`
+        return `${SessionInfoService.getBaseUrlForAPI()}api/puppies`
     }
 
     static getAllPuppies() {
-        return axios.get(`${this.getServiceBase()}puppies?key=${api.API_KEY}`)
+        return axios.get(`${this.getServiceBase()}`)
     }
 
     static getAllLivePuppies() {
-        return axios.get(`${this.getServiceBase()}puppies?key=${api.API_KEY}&live=true`);
+        return axios.get(`${this.getServiceBase()}?live=true`);
     }
 
     static getLivePuppiesForLimit(limit) {
-        return axios.get(`${this.getServiceBase()}puppies?key=${api.API_KEY}&live=true&limit=${limit}`);
+        return axios.get(`${this.getServiceBase()}?live=true&limit=${limit}`);
     }
 
     static getPuppy(puppyID) {
-        return axios.get(`${this.getServiceBase()}puppy?key=${api.API_KEY}&puppyID=${puppyID}`);
+        return axios.get(`${this.getServiceBase()}?puppyID=${puppyID}`);
     }
 }

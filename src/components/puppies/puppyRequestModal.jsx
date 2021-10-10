@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import { connect } from 'react-redux';
-import WaitListService from '../../services/waitListService';
+import WaitlistService from '../../services/waitlistService';
 import ValidationService from '../../services/validationService';
 import UtilService from '../../services/utilService';
 import ConstantsService from '../../services/contactService';
@@ -255,7 +255,7 @@ class PuppyRequestModal extends Component {
                 message: selections.message
             };
 
-            WaitListService.createWaitRequest(waitRequest)
+            WaitlistService.createWaitRequest(waitRequest)
                 .then(() => {
                     toastr.success('The inquiry was successfully sent. We will get back to you within a couple business days.');
                     this.setState({

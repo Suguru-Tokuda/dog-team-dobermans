@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Messages from './messages';
 import Messenger from './messenger';
-import waitListService from '../../services/waitListService';
+import waitlistService from '../../services/waitlistService';
 import toastr from 'toastr';
 import moment from 'moment';
 import $ from 'jquery';
@@ -34,10 +34,10 @@ class PuppyRequestDetail extends Component {
 
         this.props.showLoading({ reset: false, count: 1 });
             try {
-                const waitRequestRes = await waitListService.getWaitRequestList(requestID);
+                const waitRequestRes = await waitlistService.getWaitRequestList(requestID);
                 const waitRequest = waitRequestRes.data;
                 
-                const messagesRes = await waitListService.getWaitRequestMessages(requestID);
+                const messagesRes = await waitlistService.getWaitRequestMessages(requestID);
 
                 const messages = messagesRes.data.map(message => {
                     message.messageBody = $('<textarea />').html(message.messageBody).text();
@@ -54,7 +54,7 @@ class PuppyRequestDetail extends Component {
     
                     if (messageIDsMarkAsRead.length > 0) {
                         try {
-                            await waitListService.markMessageAsRead(messageIDsMarkAsRead);
+                            await waitlistService.markMessageAsRead(messageIDsMarkAsRead);
                         } catch (err) {
                             console.log(err);
                         }

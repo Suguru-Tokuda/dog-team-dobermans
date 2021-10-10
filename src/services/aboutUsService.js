@@ -4,10 +4,10 @@ import axios from 'axios';
 
 export default class AboutUsService {
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}aboutUs`;
+        return `${SessionInfoService.getBaseUrlForAPI()}api/aboutUs`;
     }
 
     static getAboutUs() {
-        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}`);
+        return axios.get(`${this.getServiceBase()}`);
     }
 }
