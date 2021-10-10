@@ -15,15 +15,10 @@ waitlist.get('/', (request, response) => {
         });
 });
 
-waitlist.get('/getByRange', (request, response) => {
-    const query: any = request.query;
-    if (query.startIndex !== undefined && query.endIndex !== undefined && query.sortField !== undefined && query.sortDescending !== undefined && query.activeOnly !== undefined) {
-        query.startIndex = parseInt(query.startIndex);
-        query.endIndex = parseInt(query.endIndex);
-        query.sortDescending = query.sortDescending === 'true' ? true : false;
-        query.activeOnly = query.activeOnly === 'true' ? true : false;
-
-        WaitlistService.getWaitRequestsByRange(query)
+waitlist.post('/getByRange', (request, response) => {
+    const data: any = request.body;
+    if (data.startIndex !== undefined && data.endIndex !== undefined && data.sortField !== undefined && data.sortDescending !== undefined && data.activeOnly !== undefined) {
+        WaitlistService.getWaitRequestsByRange(data)
             .then(res => {
                 response.status(200).send(res);
             })
@@ -31,7 +26,7 @@ waitlist.get('/getByRange', (request, response) => {
                 response.status(500).send(err);
             });
     } else {
-        response.status(400).send('Invalid query');
+        response.status(400).send('Invalid data');
     }
 });
 

@@ -117,7 +117,7 @@ export default class WaitlistService {
                 /* can be sorted by: color, created, lastModified, message, notified, firstName, lastName, email */
     
                 /* Get all wait requests and users (sorted by userID) first. */
-                const { startIndex, endIndex, activeOnly } = data;
+                const { startIndex, endIndex, activeOnly, searchText } = data;
                 let { sortField, sortDescending } = data;
     
                 const users: any[] = [];
@@ -161,6 +161,53 @@ export default class WaitlistService {
     
                     waitRequests.push(waitRequestObj);
                 }
+
+                /* if there is searchText available, filter for it */
+                if (searchText) {
+                    const searchTextArr: string[] = searchText.toLowerCase().split(' ');
+                    const uniqueKeywords: string[] = [];
+
+                    for (const keyword of searchTextArr) {
+                        if (uniqueKeywords.indexOf(keyword) === -1)
+                            uniqueKeywords.push(keyword);
+                    }
+
+                    let foundCount: number;
+                    const testCount: number = uniqueKeywords.length;
+
+                    waitRequests = waitRequests.filter(waitRequest => {
+                        foundCount = 0;
+                        const name = `${waitRequest.firstName.toLowerCase()} ${waitRequest.lastName.toLowerCase()}`;
+                        let {waitRequestID, email, city, state} = waitRequest;
+                        const {phone} = waitRequest;
+                        waitRequestID = waitRequestID.toLowerCase();
+
+                        if (email)
+                            email = email.toLowerCase();
+                        if (city)
+                            city = city.toLowerCase();
+                        if (state)                        
+                            state = state.toLowerCase();
+
+                        for (const keyword of uniqueKeywords) {
+                            if (waitRequestID === keyword)
+                                foundCount++;
+                            if (name.indexOf(keyword) !== -1 || (email && email.indexOf(keyword) !== -1))
+                                foundCount++;
+                            if (city && city.indexOf(keyword) !== -1)
+                                foundCount++;
+                            if (state && state.indexOf(keyword) !== -1)
+                                foundCount++;
+                            if (phone && phone.indexOf(keyword) !== -1)
+                                foundCount++;
+                        }
+
+                        return foundCount === testCount;
+                    });
+
+                    resolve(waitRequests);
+                    return;
+                }
     
                 /* do quick sort */
                 if (!sortField) {
@@ -173,6 +220,7 @@ export default class WaitlistService {
     
                 resolve(waitRequests);
             } catch (err) {
+                console.log(err);
                 reject(err);
             }
         });
