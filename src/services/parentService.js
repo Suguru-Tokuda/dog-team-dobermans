@@ -1,5 +1,4 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class ParentService {
