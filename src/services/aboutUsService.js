@@ -1,5 +1,4 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class AboutUsService {
@@ -9,5 +8,9 @@ export default class AboutUsService {
 
     static getAboutUs() {
         return axios.get(`${this.getServiceBase()}`);
+    }
+
+    static getAboutDobermans() {
+        return axios.get(`${this.getServiceBase()}/aboutDobermans`)
     }
 }

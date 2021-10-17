@@ -45,6 +45,22 @@ waitlist.get('/getByID', (request, response) => {
     }
 });
 
+waitlist.post('/getByIDs', (request, response) => {
+    const data: any = request.body;
+
+    if (data.waitRequestIDs && data.waitRequestIDs.length > 0) {
+        WaitlistService.getWaitRequestByIDs(data.waitRequestIDs)
+            .then(res => {
+                response.status(200).send(res);
+            })
+            .catch(err => {
+                response.status(500).send(err);
+            });
+    } else {
+        response.status(400).send('WaitRequestIDs are required.');
+    }
+});
+
 waitlist.get('/getByUserID', (request, response) => {
     const query: any = request.query;
     if (query.userID) {

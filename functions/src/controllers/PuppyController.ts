@@ -33,8 +33,8 @@ puppy.get('/getByBuyerID', (request, response) => {
 puppy.get('/getByID', (request, response) => {
     const query: any = request.query;
 
-    if (query.buyerID) {
-        PuppyService.getPuppyByID(query.buyerID)
+    if (query.puppyID) {
+        PuppyService.getPuppyByID(query.puppyID)
             .then(res => {
                 response.status(200).send(res);
             })

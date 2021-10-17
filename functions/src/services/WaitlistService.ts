@@ -115,10 +115,10 @@ export default class WaitlistService {
         return new Promise(async (resolve, reject) => {
             try {
                 /* can be sorted by: color, created, lastModified, message, notified, firstName, lastName, email */
-    
                 /* Get all wait requests and users (sorted by userID) first. */
-                const { startIndex, endIndex, activeOnly, searchText } = data;
+                const { startIndex, endIndex, activeOnly, searchText, recipientID } = data;
                 let { sortField, sortDescending } = data;
+                let totalItems: number;
     
                 const users: any[] = [];
                 let waitRequests: any[] = [];
@@ -141,6 +141,9 @@ export default class WaitlistService {
                 for (const waitRequest of waitRequestSnapshot.docs) {
                     waitRequestObj = waitRequest.data();
                     waitRequestObj.waitRequestID = waitRequest.id;
+                    waitRequestObj.numberOfUnreadMessages = 0;
+                    waitRequestObj.lastMessageFromUser = null;
+                    waitRequestObj.hasUnRepliedMessage = false;
 
                     if (activeOnly === true && waitRequestObj.statusID === 2)
                         continue;
@@ -204,9 +207,6 @@ export default class WaitlistService {
 
                         return foundCount === testCount;
                     });
-
-                    resolve(waitRequests);
-                    return;
                 }
     
                 /* do quick sort */
@@ -215,12 +215,52 @@ export default class WaitlistService {
                     sortDescending = true;
                 }
     
-                SortService.quickSort(waitRequests, sortField, sortDescending);    
+                SortService.quickSort(waitRequests, sortField, sortDescending);
+                /* Get the number of total items before slicing */
+                totalItems = waitRequests.length;   
                 waitRequests = waitRequests.slice(startIndex, endIndex);
+
+                /* Assign messages */
+                if (recipientID) {
+                    for (const waitRequest of waitRequests) {
+                        const messageSnapshot = await admin.firestore().collection('messages').where('waitRequestID', '==', waitRequest.waitRequestID).get();
     
-                resolve(waitRequests);
+                        if (messageSnapshot.size > 0) {
+                            const messages = [];
+                            const allMessages = [];
+    
+                            for (const doc of messageSnapshot.docs) {
+                                const message = doc.data();
+                                message.messageID = doc.id;
+    
+                                if (message.read === false && message.recipientID === recipientID)
+                                    waitRequest.numberOfUnreadMessages++;
+    
+                                if (message.recipientID === recipientID)
+                                    messages.push(message);
+    
+                                allMessages.push(message);
+                            }
+    
+                            if (messages.length > 0) {
+                                SortService.quickSort(messages, 'sentDate', true);
+                                waitRequest.lastMessageFromUser = messages[0];
+                            }
+
+                            if (allMessages.length > 0) {
+                                SortService.quickSort(allMessages, 'sentDate', true);
+                                if (allMessages[0].recipientID === recipientID)
+                                    waitRequest.hasUnRepliedMessage = true;
+                            }
+                        }    
+                    }
+                }
+    
+                resolve({
+                    waitRequests: waitRequests,
+                    totalItems: totalItems
+                });
             } catch (err) {
-                console.log(err);
                 reject(err);
             }
         });
@@ -303,6 +343,54 @@ export default class WaitlistService {
                 .catch(err => {
                     reject(err);
                 });
+        });
+    }
+
+    static getWaitRequestByIDs(waitRequestIDs: string[]) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const waitRequestSnapshot = await admin.firestore().collection('waitList').get();
+                const userSnapshot = await admin.firestore().collection('buyers').get();
+    
+                const waitRequests: any[] = [];
+                const users: any[] = [];
+    
+                for (const doc of userSnapshot.docs) {
+                    const user = doc.data();
+                    user.userID = doc.id;
+    
+                    const insertIndex = SearchService.getInsertIndex(users, user.userID, 'userID');
+                    if (insertIndex !== -1)
+                        users.push(user);
+                }
+    
+                for (const doc of waitRequestSnapshot.docs) {
+                    if (waitRequestIDs.indexOf(doc.id) !== -1) {
+                        const waitRequest = doc.data();
+                        waitRequest.waitRequestID = doc.id;
+    
+                        if (waitRequest.userID) {
+                            const index = SearchService.binarySearch(users, waitRequest.userID, 'userID');
+    
+                            if (index !== -1) {
+                                waitRequest.user = users[index];
+                                waitRequest.firstName = waitRequest.user.firstName;
+                                waitRequest.lastName = waitRequest.user.lastName;
+                                waitRequest.email = waitRequest.user.email;
+                                waitRequest.city = waitRequest.user.city;
+                                waitRequest.state = waitRequest.user.state;
+                                waitRequest.phone = waitRequest.user.phone;
+                            }
+                        }
+    
+                        waitRequests.push(waitRequest);
+                    }
+                }
+    
+                resolve(waitRequests);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 

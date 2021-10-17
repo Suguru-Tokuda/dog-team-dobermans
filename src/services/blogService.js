@@ -1,5 +1,4 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class BlogService {
@@ -12,6 +11,6 @@ export default class BlogService {
     }
 
     static getBlog(blogID) {
-        return axios.get(`${this.getServiceBase()}&blogID=${blogID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?blogID=${blogID}`);
     }
 }

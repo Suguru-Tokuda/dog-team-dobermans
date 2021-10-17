@@ -1,5 +1,4 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class HomepageContentsService {
@@ -12,6 +11,6 @@ export default class HomepageContentsService {
     }
 
     static getPuppyMessage() {
-        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}/puppyMessage`);
+        return axios.get(`${this.getServiceBase()}/puppyMessage`);
     }
 }

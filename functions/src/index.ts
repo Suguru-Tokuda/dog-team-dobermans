@@ -10,6 +10,7 @@ import AboutUsController from './controllers/AboutUsController';
 import TestimonialController from './controllers/TestimonialController';
 import WaitlistController from './controllers/WaitlistController';
 import BlogController from './controllers/BlogController';
+import ContactController from './controllers/ContactController';
 
 const main = express();
 main.use(cors({origin: "*"}))
@@ -22,5 +23,6 @@ main.use('/aboutUs', AboutUsController);
 main.use('/testimonials', TestimonialController);
 main.use('/blogs', BlogController);
 main.use('/waitlist', WaitlistController);
+main.use('/contact', ContactController);
 
 exports.api = functions.https.onRequest(main);

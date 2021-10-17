@@ -21,7 +21,7 @@ class PuppyRequestList extends Component {
         if (this.props.authenticated === true) {
             this.props.showLoading({ reset: false, count: 1 });
 
-            waitlistService.getWaitRequestList(this.props.user.userID)
+            waitlistService.getWaitRequestListByUserID(this.props.user.userID)
                 .then(res => {
                     this.setState({
                         userID: this.props.user.userID,

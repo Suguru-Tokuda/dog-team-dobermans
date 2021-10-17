@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import AboutDobermanService from '../../services/aboutDobermansService'
+import AboutUsService from '../../services/aboutUsService';
 
 class AboutDobermans extends Component {
     state = {
@@ -11,7 +11,7 @@ class AboutDobermans extends Component {
     componentDidMount() {
         window.scrollTo(0, 0);
         this.props.showLoading({ reset: true, count: 1 });
-        AboutDobermanService.getAboutDobermans()
+        AboutUsService.getAboutDobermans()
             .then(res => {
                 this.setState({
                     message: res.data

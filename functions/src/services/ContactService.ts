@@ -30,6 +30,7 @@ export default class ContactService {
                         // update
                         const contactID = data.contactID;
                         const contactRef = admin.firestore().collection('contact').doc(contactID);
+                        delete data.contactID;
                         contactRef.set(data, { merge: true })
                             .then(() => {
                                 const retVal = data;

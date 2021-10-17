@@ -15,7 +15,7 @@ parent.get('/', (request, response) => {
 });
 
 parent.get('/getByID', (request, response) => {
-    const query: any = request.body;
+    const query: any = request.query;
 
     if (query.parentID) {
         ParentService.getParentByID(query.parentID)

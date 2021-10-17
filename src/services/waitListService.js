@@ -10,6 +10,10 @@ export default class WaitlistService {
         return axios.post(`${this.getServiceBase()}/createByEmail`, data);
     }
 
+    static getWaitRequestListByUserID(userID) {
+        return axios.get(`${this.getServiceBase()}/getByUserID?userID=${userID}`);
+    }
+
     static sendWaitRequestMessage(senderID, waitRequestID, messageBody) {
         const recipientID = 'sSJ0mWxDjtaTuFsolvKskzDY4GI3'; // bob's ID
     
@@ -42,8 +46,9 @@ export default class WaitlistService {
         return axios.get(`${this.getServiceBase()}/messages/unreadByUseID&userID=${userID}`)
     }
 
-    static getWaitRequestList(waitRequestID) {
-        return axios.get(`${this.getServiceBase()}?waitRequestID=${waitRequestID}`);
+    static getWaitRequest(waitRequestID) {
+        console.log(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
     }
 
     static markMessageAsRead(messageIDs) {

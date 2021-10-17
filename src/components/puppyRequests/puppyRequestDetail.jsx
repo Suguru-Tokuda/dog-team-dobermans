@@ -34,7 +34,7 @@ class PuppyRequestDetail extends Component {
 
         this.props.showLoading({ reset: false, count: 1 });
             try {
-                const waitRequestRes = await waitlistService.getWaitRequestList(requestID);
+                const waitRequestRes = await waitlistService.getWaitRequest(requestID);
                 const waitRequest = waitRequestRes.data;
                 
                 const messagesRes = await waitlistService.getWaitRequestMessages(requestID);

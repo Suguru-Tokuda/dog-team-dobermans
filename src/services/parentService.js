@@ -21,6 +21,6 @@ export default class ParentService {
     }
 
     static getParent(parentID) {
-        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}/getByID?parentID=${parentID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?parentID=${parentID}`);
     }
 }

@@ -1,5 +1,4 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class PuppyService {
@@ -21,6 +20,6 @@ export default class PuppyService {
     }
 
     static getPuppy(puppyID) {
-        return axios.get(`${this.getServiceBase()}?puppyID=${puppyID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?puppyID=${puppyID}`);
     }
 }
