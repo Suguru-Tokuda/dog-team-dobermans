@@ -1,14 +1,17 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
-export default class WaitListService {
+export default class WaitlistService {
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}waitList`;
+        return `${SessionInfoService.getBaseUrlForAPI()}api/waitlist`;
     }
 
     static createWaitRequest(data) {
-        return axios.post(`${this.getServiceBase()}/createByEmail?key=${api.API_KEY}`, data);
+        return axios.post(`${this.getServiceBase()}/createByEmail`, data);
+    }
+
+    static getWaitRequestListByUserID(userID) {
+        return axios.get(`${this.getServiceBase()}/getByUserID?userID=${userID}`);
     }
 
     static sendWaitRequestMessage(senderID, waitRequestID, messageBody) {
@@ -23,7 +26,7 @@ export default class WaitListService {
             read: false
         };
 
-        return axios.post(`${this.getServiceBase()}/messages?key=${api.API_KEY}`, data);
+        return axios.post(`${this.getServiceBase()}/messages`, data);
     }
 
     static editWaitRequestMessage(messageID, messageBody) {
@@ -32,19 +35,20 @@ export default class WaitListService {
             messageBody: messageBody
         };
 
-        return axios.put(`${this.getServiceBase()}/messages?key=${api.API_KEY}`, data);
+        return axios.put(`${this.getServiceBase()}/messages`, data);
     }
     
     static getWaitRequestMessages(waitRequestID) {
-        return axios.get(`${this.getServiceBase()}/messages?key=${api.API_KEY}&waitRequestID=${waitRequestID}`);
+        return axios.get(`${this.getServiceBase()}/messages?waitRequestID=${waitRequestID}`);
     }
 
     static getUnreadMessagesByUserID(userID) {
-        return axios.get(`${this.getServiceBase()}/messages/getUnreadMessagesByUserID?key=${api.API_KEY}&userID=${userID}`)
+        return axios.get(`${this.getServiceBase()}/messages/unreadByUseID&userID=${userID}`)
     }
 
-    static getWaitRequestList(waitRequestID) {
-        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&waitRequestID=${waitRequestID}`);
+    static getWaitRequest(waitRequestID) {
+        console.log(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
     }
 
     static markMessageAsRead(messageIDs) {
@@ -52,6 +56,6 @@ export default class WaitListService {
             messageIDs: messageIDs
         };
 
-        return axios.post(`${this.getServiceBase()}/messages/markAsRead?key=${api.API_KEY}`, data);
+        return axios.post(`${this.getServiceBase()}/messages/markAsRead`, data);
     }
 }

@@ -14,7 +14,7 @@ class ParentList extends Component {
         window.scrollTo(0, 0);
 
         this.props.showLoading({ reset: false, count: 1 });
-        ParentService.getAllParents()
+        ParentService.getAllLiveParents()
             .then(res => {
                 this.setState({ parents: res.data });
             })

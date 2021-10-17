@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import waitListService from '../../services/waitListService';
+import waitlistService from '../../services/waitlistService';
 import toastr from 'toastr';
 
 class Messenger extends Component {
@@ -40,7 +40,7 @@ class Messenger extends Component {
             this.props.showLoading({ reset: true, count: 1 });
 
             
-            waitListService.sendWaitRequestMessage(userID, requestID, messageBody)
+            waitlistService.sendWaitRequestMessage(userID, requestID, messageBody)
                 .then(res => {
                     let { messages } = this.state;
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import toastr from 'toastr';
 import moment from 'moment';
-import waitListService from '../../services/waitListService';
+import waitlistService from '../../services/waitlistService';
 
 class PuppyRequestList extends Component {
 
@@ -21,7 +21,7 @@ class PuppyRequestList extends Component {
         if (this.props.authenticated === true) {
             this.props.showLoading({ reset: false, count: 1 });
 
-            waitListService.getWaitRequestList(this.props.user.userID)
+            waitlistService.getWaitRequestListByUserID(this.props.user.userID)
                 .then(res => {
                     this.setState({
                         userID: this.props.user.userID,

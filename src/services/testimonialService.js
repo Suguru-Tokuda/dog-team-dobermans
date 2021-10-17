@@ -1,16 +1,15 @@
 import SessionInfoService from './sessionInfoService';
 import UtilService from './utilService';
-import * as api from '../api.json';
 import axios from 'axios';
 import { storage } from './firebaseService';
 
 export default class TestimonialService {
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}testimonials`;
+        return `${SessionInfoService.getBaseUrlForAPI()}api/testimonials`;
     }
 
     static getTestimonials() {
-        return axios.get(`${this.getServiceBase()}?key=${api.API_KEY}&approved=true`);
+        return axios.get(`${this.getServiceBase()}?approved=true`);
     }
 
     static createTestimonial(firstName, lastName, dogName, email, message, picture, date) {
@@ -24,7 +23,7 @@ export default class TestimonialService {
             created: date,
             approved: false
         };
-        return axios.post(`${this.getServiceBase()}?key=${api.API_KEY}`, data);
+        return axios.post(`${this.getServiceBase()}`, data);
     }
 
     static uploadPicture(imageFile, dogName) {

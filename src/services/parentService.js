@@ -1,11 +1,10 @@
 import SessionInfoService from './sessionInfoService';
-import * as api from '../api.json';
 import axios from 'axios';
 
 export default class ParentService {
 
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}parents?key=${api.API_KEY}`;
+        return `${SessionInfoService.getBaseUrlForAPI()}api/parents`;
     }
 
     static getAllParents() {
@@ -13,14 +12,14 @@ export default class ParentService {
     }
 
     static getAllLiveParents() {
-        return axios.get(`${this.getServiceBase()}&live=true`);
+        return axios.get(`${this.getServiceBase()}?live=true`);
     }
 
     static getLiveParentsForLimit(limit) {
-        return axios.get(`${this.getServiceBase()}&live=true&limit=${limit}`);
+        return axios.get(`${this.getServiceBase()}?live=true&limit=${limit}`);
     }
 
     static getParent(parentID) {
-        return axios.get(`${SessionInfoService.getBaseUrlForAPI()}parent?key=${api.API_KEY}&parentID=${parentID}`);
+        return axios.get(`${this.getServiceBase()}/getByID?parentID=${parentID}`);
     }
 }

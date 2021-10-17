@@ -13,7 +13,7 @@ class PuppyList extends Component {
     };
 
     componentDidMount() {
-        const promises = [PuppyService.getAllLivePuppies() ,HomepageContentsService.getPuppyMessage()];
+        const promises = [PuppyService.getAllLivePuppies(), HomepageContentsService.getPuppyMessage()];
         window.scrollTo(0, 0);
 
         this.props.showLoading({ reset: true, count: 1 });
