@@ -1,4 +1,4 @@
-import * as config from "../assets/config.json";
+import * as config from "../config.json";
 
 export default class ConfigService {
     static isProd = true;
