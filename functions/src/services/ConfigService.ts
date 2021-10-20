@@ -27,6 +27,16 @@ export default class ConfigService {
             return configJson.baseURL.dev.admin;
         }
     }
+
+    static getOriginList() {
+        const configJson = this.getConfig();
+
+        if (this.isProd) {
+            return configJson.originList.prod;
+        } else {
+            return configJson.originList.dev;
+        }
+    }
     
     static getBreederEmail() {
         const configJSON = this.getConfig();

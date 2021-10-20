@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as express from 'express';
 import * as cors from 'cors';
+import ConfigService from './services/ConfigService';
 
 import HomepageContentController from './controllers/HomepageContentController';
 import PuppyController from './controllers/PuppyController';
@@ -13,7 +14,8 @@ import BlogController from './controllers/BlogController';
 import ContactController from './controllers/ContactController';
 
 const main = express();
-main.use(cors({origin: "*"}))
+
+main.use(cors({origin: ConfigService.getOriginList()}));
 
 main.use('/homepageContents', HomepageContentController);
 main.use('/puppies', PuppyController);
