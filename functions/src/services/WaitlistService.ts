@@ -218,7 +218,7 @@ export default class WaitlistService {
                 SortService.quickSort(waitRequests, sortField, sortDescending);
                 /* Get the number of total items before slicing */
                 totalItems = waitRequests.length;   
-                waitRequests = waitRequests.slice(startIndex, endIndex);
+                waitRequests = waitRequests.slice(startIndex, endIndex + 1);
 
                 /* Assign messages */
                 if (recipientID) {
