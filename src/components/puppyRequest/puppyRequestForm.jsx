@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import LaddaButton, { S, SLIDE_LEFT } from 'react-ladda';
 import ValidationService from '../../services/validationService';
-import WaitListService from '../../services/waitlistService';
+import WaitListService from '../../services/waitlistService'
+
 import ConstantsService from '../../services/contactService';
 import toastr from 'toastr';
 import UtilService from '../../services/utilService';

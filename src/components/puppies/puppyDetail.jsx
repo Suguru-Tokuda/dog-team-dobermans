@@ -26,6 +26,7 @@ class PuppyDetail extends Component {
         pictures: [],
         parents: {},
         sold: false,
+        showPrice: false,
         pageLoaded: false,
         puppyFound: false
     };
@@ -71,6 +72,7 @@ class PuppyDetail extends Component {
                         pictures: puppyData.pictures,
                         parents: parents,
                         sold: puppyData.sold,
+                        showPrice: puppyData.showPrice,
                         puppyFound: true
                     });
                 }
@@ -182,10 +184,7 @@ class PuppyDetail extends Component {
     }
 
     getDetailsSection() {
-        const { name, description, price, paidAmount, sold } = this.state;
-        const { authenticated, user } = this.props;
-
-        console.log(sold);
+        const { name, description, price, paidAmount, sold, showPrice } = this.state;
 
         return (
             <section className="product-details">
@@ -204,7 +203,9 @@ class PuppyDetail extends Component {
                             <div className="d-flex align-items-center justify-content-between flex-column flex-sm-row">
                                 <ul className="price list-inline no-margin">
                                     <li className="list-inline-item">{name}</li>
-                                    <li className="list-inline-item current">{`$${price}`}</li>
+                                    {showPrice && (
+                                        <li className="list-inline-item current">{`$${price}`}</li>
+                                    )}
                                 </ul>
                             </div>
                             <p>{description}</p>

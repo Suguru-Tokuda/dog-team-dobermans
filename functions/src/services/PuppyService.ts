@@ -1,3 +1,6 @@
+import { Buyer } from "../models/buyer.model";
+import { Parent } from "../models/parent.model";
+import { Puppy } from "../models/puppy.model";
 import FirebaseService from "./FirebaseService";
 
 const admin = FirebaseService.getFirebaseAdmin();
@@ -58,7 +61,7 @@ export default class PuppyService {
             try {
                 const snapshot = await admin.firestore().collection('puppies').doc(puppyID).get();
     
-                const retVal = snapshot.data();
+                const retVal: Puppy = snapshot.data() as Puppy;
                 if (retVal) {
                     retVal.puppyID = snapshot.id;
                     /* get dad and mom info */
@@ -66,15 +69,15 @@ export default class PuppyService {
                     const momID = retVal.momID;
 
                     const dadDoc = await admin.firestore().collection('parents').doc(dadID).get();
-                    retVal.dad = dadDoc.data();
+                    retVal.dad = dadDoc.data() as Parent;
                     retVal.dad.dadID = dadID;
                     const momDoc = await admin.firestore().collection('parents').doc(momID).get();
-                    retVal.mom = momDoc.data();
+                    retVal.mom = momDoc.data() as Parent;
                     retVal.mom.momID = momID;
 
                     if (retVal.buyerID !== null) {
                         const buyerDoc = await admin.firestore().collection('buyers').doc(retVal.buyerID).get();
-                        retVal.buyer = buyerDoc.data();
+                        retVal.buyer = buyerDoc.data() as Buyer;
                         retVal.buyer.buyerID = buyerDoc.id;
                     }
 
