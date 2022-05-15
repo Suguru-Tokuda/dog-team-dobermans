@@ -15,6 +15,34 @@ export default class WaitlistService {
                     const retVal: any = [];
 
                     if (querySnapshot.size > 0) {
+                        // get all puppies, users, and messages
+                        const res = await Promise.all([
+                            admin.firestore().collection('puppies').get(),
+                            admin.firestore().collection('buyers').get(),
+                            admin.firestore().collection('messages').get()
+                        ]);
+
+                        const masterPuppies = [];
+                        const masterUsers = [];
+                        const masterMessages = [];
+
+                        for (const puppyDoc of res[0].docs) {
+                            const puppy = puppyDoc.data();
+                            puppy.puppyID = puppyDoc.id;
+                            masterPuppies.push(puppy);
+                        }
+
+                        for (const userDoc of res[1].docs) {
+                            const user = userDoc.data();
+                            user.userID = userDoc.id;
+                            masterUsers.push(user);
+                        }
+
+                        for (const messageDoc of res[2].docs) {
+                            const message = messageDoc.data();
+                            message.messageID = messageDoc.id;
+                            masterMessages.push(message);
+                        }
 
                         for (const waitRequestDoc of querySnapshot.docs) {
                             const waitRequest = waitRequestDoc.data();
@@ -22,9 +50,8 @@ export default class WaitlistService {
 
                             if (waitRequest.puppyID) {
                                 try {
-                                    const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
-                                    const puppyData: any = puppyDoc.data();
-                                    waitRequest.puppyName = puppyData.name;
+                                    const selectedPuppy: any = masterPuppies.filter(puppy => puppy.puppyID === waitRequest.puppyID)[0];
+                                    waitRequest.puppyName = selectedPuppy ? selectedPuppy.name : '';
                                 } catch (err) {
                                     console.log(err);
                                 }
@@ -35,65 +62,61 @@ export default class WaitlistService {
 
                             if (waitRequest.userID) {
                                 try {
-                                    const userDoc = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
-                                    const userData: any = userDoc.data();
+                                    const user = masterUsers.filter(masterUser => masterUser.userID === waitRequest.userID)[0];
 
-                                    const { firstName, lastName, email, phone, city, state } = userData;
-
-                                    waitRequest.firstName = firstName;
-                                    waitRequest.lastName = lastName;
-                                    waitRequest.email = email;
-                                    waitRequest.phone = phone;
-                                    waitRequest.city = city;
-                                    waitRequest.state = state;
-                                    
-                                    const messagesRef = admin.firestore().collection('messages');
-                                    const snapshot = await messagesRef.where('waitRequestID', '==', waitRequest.waitRequestID).get();
-
-                                    if (snapshot.size > 0 && recipientID) {
-                                        const messages = [];
-                                        const allMessages = [];
-
-                                        for (const messageDoc of snapshot.docs) {
-                                            const message = messageDoc.data();
-                                            message.messageID = messageDoc.id;
-
-                                            if (message.read === false && message.recipientID === recipientID) {
-                                                waitRequest.numberOfUnreadMessages++;
+                                    if (user) {
+                                        const { firstName, lastName, email, phone, city, state } = user;
+    
+                                        waitRequest.firstName = firstName;
+                                        waitRequest.lastName = lastName;
+                                        waitRequest.email = email;
+                                        waitRequest.phone = phone;
+                                        waitRequest.city = city;
+                                        waitRequest.state = state;
+                                        
+                                        const userMessages = masterMessages.filter(message => message.waitRequestID === waitRequest.waitRequestID);
+    
+                                        if (userMessages && userMessages.length > 0 && recipientID) {
+                                            const messages = [];
+                                            const allMessages = [];
+    
+                                            for (const message of userMessages) {
+                                                if (message.read === false && message.recipientID === recipientID) {
+                                                    waitRequest.numberOfUnreadMessages++;
+                                                }
+    
+                                                if (message.recipientID === recipientID)
+                                                    messages.push(message);
+    
+                                                allMessages.push(message);
                                             }
-
-                                            if (message.recipientID === recipientID)
-                                                messages.push(message);
-
-                                            allMessages.push(message);
+    
+                                            messages.sort((a: any, b: any) => {
+                                                const sentDateA = new Date(a.sentDate);
+                                                const sentDateB = new Date(b.sentDate);
+    
+                                                return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                            });
+    
+                                            allMessages.sort((a: any, b: any) => {
+                                                const sentDateA = new Date(a.sentDate);
+                                                const sentDateB = new Date(b.sentDate);
+    
+                                                return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
+                                            });
+    
+                                            if (messages.length > 0) {
+                                                waitRequest.lastMessageFromUser = messages[0];
+                                            }
+    
+                                            if (allMessages[0].recipientID === recipientID)
+                                                waitRequest.hasUnRepliedMessage = true;                                                    
                                         }
-
-                                        messages.sort((a: any, b: any) => {
-                                            const sentDateA = new Date(a.sentDate);
-                                            const sentDateB = new Date(b.sentDate);
-
-                                            return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
-                                        });
-
-                                        allMessages.sort((a: any, b: any) => {
-                                            const sentDateA = new Date(a.sentDate);
-                                            const sentDateB = new Date(b.sentDate);
-
-                                            return sentDateA > sentDateB ? -1 : sentDateA > sentDateB ? 1 : 0;
-                                        });
-
-                                        if (messages.length > 0) {
-                                            waitRequest.lastMessageFromUser = messages[0];
-                                        }
-
-                                        if (allMessages[0].recipientID === recipientID)
-                                            waitRequest.hasUnRepliedMessage = true;                                                    
                                     }
                                 } catch (err) {
                                     console.log(err);
                                 }
                             }
-
                             retVal.push(waitRequest);
                         }
 
@@ -110,7 +133,6 @@ export default class WaitlistService {
         });
     }
 
-    
     static getWaitRequestsByRange(data: any) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -121,50 +143,83 @@ export default class WaitlistService {
                 let totalItems: number;
     
                 const users: any[] = [];
+                const masterPuppies: any[] = [];
+                const masterMessages: any[] = [];
+                let masterWaitRequests: any[] = [];
                 let waitRequests: any[] = [];
                 let userObj: any;
+                let puppyObj: any;
                 let waitRequestObj: any;
-    
-                const userSnapshot = await admin.firestore().collection('buyers').get();
-                const waitRequestSnapshot = await admin.firestore().collection('waitList').get();
-    
-                for (const user of userSnapshot.docs) {
+                let messageObj: any;
+
+                const res = await Promise.all([
+                    admin.firestore().collection('puppies').get(),
+                    admin.firestore().collection('buyers').get(),
+                    admin.firestore().collection('messages').get(),
+                    admin.firestore().collection('waitList').get()
+                ]);
+
+                for (const puppy of res[0].docs) {
+                    puppyObj = puppy.data();
+                    puppyObj.puppyID = puppy.id;
+                    masterPuppies.push(puppyObj);
+                }
+
+                for (const user of res[1].docs) {
                     userObj = user.data();
                     userObj.userID = user.id;
                     users.push(userObj);
                 }
-    
-                /* quicksort */
-                SortService.quickSort(users, 'userID', false);
-    
-                /* Iterate wait list and assign user value */
-                for (const waitRequest of waitRequestSnapshot.docs) {
-                    waitRequestObj = waitRequest.data();
-                    waitRequestObj.waitRequestID = waitRequest.id;
-                    waitRequestObj.numberOfUnreadMessages = 0;
-                    waitRequestObj.lastMessageFromUser = null;
-                    waitRequestObj.hasUnRepliedMessage = false;
 
-                    if (activeOnly === true && waitRequestObj.statusID === 2)
-                        continue;
-    
-                    if (waitRequestObj.userID) {
-                        const userIndex = SearchService.binarySearch(users, waitRequestObj.userID, 'userID');
-                        if (userIndex !== -1) {
-                            userObj = users[userIndex];
-                            waitRequestObj.user = userObj;
-                            waitRequestObj.firstName = userObj.firstName;
-                            waitRequestObj.lastName = userObj.lastName;
-                            waitRequestObj.email = userObj.email;
-                            waitRequestObj.city = userObj.city;
-                            waitRequestObj.state = userObj.state;
-                            waitRequestObj.phone = userObj.phone;
-                        }
-                    }
-    
-                    waitRequests.push(waitRequestObj);
+                for (const messageDoc of res[2].docs) {
+                    messageObj = messageDoc.data();
+                    messageObj.messageID = messageDoc.id;
+                    masterMessages.push(messageObj);
                 }
 
+                for (const waitRequestDoc of res[3].docs) {
+                    waitRequestObj = waitRequestDoc.data();
+                    waitRequestObj.waitRequestID = waitRequestDoc.id;
+                    if (activeOnly === true && waitRequestObj.statusID === 2)
+                        continue;
+                    else
+                        masterWaitRequests.push(waitRequestObj);
+                }
+
+                /* quicksort */
+                SortService.quickSort(users, 'userID', false);
+                SortService.quickSort(masterPuppies, 'puppyID', false);
+                SortService.quickSort(masterMessages, 'messageID', false);
+
+                /* Iterate wait list and assign user value */
+                for (const waitRequest of masterWaitRequests) {
+                    waitRequest.numberOfUnreadMessages = 0;
+                    waitRequest.lastMessageFromUser = null;
+                    waitRequest.hasUnRepliedMessage = false;
+    
+                    if (waitRequest.userID) {
+                        const userIndex = SearchService.binarySearch(users, waitRequest.userID, 'userID');
+                        if (userIndex !== -1) {
+                            userObj = users[userIndex];
+                            waitRequest.user = userObj;
+                            waitRequest.firstName = userObj.firstName;
+                            waitRequest.lastName = userObj.lastName;
+                            waitRequest.email = userObj.email;
+                            waitRequest.city = userObj.city;
+                            waitRequest.state = userObj.state;
+                            waitRequest.phone = userObj.phone;
+                        }
+                    }
+
+                    if (waitRequest.puppyID) {
+                        const puppyIndex = SearchService.binarySearch(masterPuppies, waitRequest.puppyID, 'puppyID');
+                        if (puppyIndex !== -1)
+                            waitRequest.puppyName = puppyIndex !== -1 ? masterPuppies[puppyIndex].name : '';
+                    }
+                }
+    
+                SortService.quickSort(masterWaitRequests, sortField, sortDescending);
+                
                 /* if there is searchText available, filter for it */
                 if (searchText) {
                     const searchTextArr: string[] = searchText.toLowerCase().split(' ');
@@ -178,11 +233,11 @@ export default class WaitlistService {
                     let foundCount: number;
                     const testCount: number = uniqueKeywords.length;
 
-                    waitRequests = waitRequests.filter(waitRequest => {
+                    masterWaitRequests = masterWaitRequests.filter(waitRequest => {
                         foundCount = 0;
                         const name = `${waitRequest.firstName.toLowerCase()} ${waitRequest.lastName.toLowerCase()}`;
-                        let {waitRequestID, email, city, state} = waitRequest;
-                        const {phone} = waitRequest;
+                        let { waitRequestID, email, city, state } = waitRequest;
+                        const { phone } = waitRequest;
                         waitRequestID = waitRequestID.toLowerCase();
 
                         if (email)
@@ -205,34 +260,31 @@ export default class WaitlistService {
                                 foundCount++;
                         }
 
-                        return foundCount === testCount;
+                        return foundCount > 0 && foundCount === testCount;
                     });
                 }
-    
+
+                waitRequests = masterWaitRequests.slice(startIndex, endIndex + 1);
+
                 /* do quick sort */
                 if (!sortField) {
                     sortField = 'created';
                     sortDescending = true;
                 }
     
-                SortService.quickSort(waitRequests, sortField, sortDescending);
-                /* Get the number of total items before slicing */
-                totalItems = waitRequests.length;   
-                waitRequests = waitRequests.slice(startIndex, endIndex + 1);
+                /* Get the number of total items */
+                totalItems = masterWaitRequests.length;   
 
                 /* Assign messages */
                 if (recipientID) {
                     for (const waitRequest of waitRequests) {
-                        const messageSnapshot = await admin.firestore().collection('messages').where('waitRequestID', '==', waitRequest.waitRequestID).get();
+                        const selectedMessages = masterMessages.filter(m => m.waitRequestID === waitRequest.waitRequestID);
     
-                        if (messageSnapshot.size > 0) {
+                        if (selectedMessages.length > 0) {
                             const messages = [];
                             const allMessages = [];
     
-                            for (const doc of messageSnapshot.docs) {
-                                const message = doc.data();
-                                message.messageID = doc.id;
-    
+                            for (const message of selectedMessages) {    
                                 if (message.read === false && message.recipientID === recipientID)
                                     waitRequest.numberOfUnreadMessages++;
     
@@ -266,7 +318,6 @@ export default class WaitlistService {
         });
     }
     
-
     static getWaitRequestByID(waitRequestID: string, recipientID: string) {
         return new Promise((resolve, reject) => {
             admin.firestore().collection('waitList').doc(waitRequestID).get()
