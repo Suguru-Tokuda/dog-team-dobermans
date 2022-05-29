@@ -1,3 +1,6 @@
+import FirebaseService from "./FirebaseService";
+const admin = FirebaseService.getFirebaseAdmin();
+
 export default class UtilService {
     // a function to access the value of the object for a corresponding nested key
     static accessValue(object: any, key: string) {
@@ -53,5 +56,39 @@ export default class UtilService {
         }
 
         return retVal;
+    }
+
+    static getContentByID = (path: string, ids: string[], idName: string): Promise<any[]> => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const retVal: any[] = [];
+        
+                if (ids && ids.length) {
+                    const idsCopy: string[] = JSON.parse(JSON.stringify(ids));
+                    let batch: string[] = [];
+                    let obj: any;
+        
+                    while (idsCopy && idsCopy.length) {
+                        batch = idsCopy.splice(0, 10);
+    
+                        const res = await admin.firestore().collection(path).where(admin.firestore.FieldPath.documentId(), 'in', [...batch]).get()
+                        for (const doc of res.docs) {
+                            obj = doc.data();
+                            obj[idName] = doc.id;
+                            retVal.push(obj);
+                        }
+                    }
+                }
+
+                resolve(retVal);
+            } catch (err) {
+                reject(err);
+            }
+            if (!ids || !ids.length || !path) {
+                resolve([]);
+                return;
+            }
+
+        });
     }
 }

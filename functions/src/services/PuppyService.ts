@@ -1,6 +1,7 @@
 import { Buyer } from "../models/buyer.model";
 import { Parent } from "../models/parent.model";
 import { Puppy } from "../models/puppy.model";
+import SortService from "./SortService";
 import FirebaseService from "./FirebaseService";
 
 const admin = FirebaseService.getFirebaseAdmin();
@@ -15,6 +16,8 @@ export default class PuppyService {
                         limit = parseInt(query.limit);
 
                     const puppyArr: any = [];
+                    const userIDs: string[] = [];
+                    const users: any[] = [];
 
                     if (querySnapshot.size > 0) {
                         for (const doc of querySnapshot.docs) {
@@ -22,13 +25,8 @@ export default class PuppyService {
                             retVal.puppyID = doc.id;
 
                             if (query.includeBuyer === "true" && retVal.buyerID !== null) {
-                                try {
-                                    const buyerDoc = await admin.firestore().collection('buyers').doc(retVal.buyerID).get();
-                                    retVal.buyer = buyerDoc.data();
-                                    retVal.buyer.buyerID = buyerDoc.id;
-                                } catch (err) {
-                                    reject(err);
-                                }
+                                if (userIDs.indexOf(retVal.buyerID) !== -1)
+                                    userIDs.push(retVal.buyerID);
                             }
 
                             if (query.live === "true" && retVal.live === true) {
@@ -44,9 +42,20 @@ export default class PuppyService {
                         }
                     }
 
-                    puppyArr.sort((a: any, b: any) => {
-                        return a.dateOfBirth < b.dateOfBirth ? 1 : a.dateOfBirth > b.dateOfBirth ? -1 : 0;
-                    });
+                    if (userIDs.length > 0 && query.includeBuyer === 'true') {
+                        const usersSnapshot = await admin.firestore().collection('buyers').where(admin.firestore.FieldPath.documentId(), 'in', userIDs).get();
+                        for (const userDoc of usersSnapshot.docs) {
+                            const user = userDoc.data();
+                            user.userID = userDoc.id;
+                            users.push(user);
+                        }
+
+                        puppyArr.forEach((puppy: any) => {
+                            puppy.buyer = users.filter(user => user.userID === puppy.buyerID)[0];
+                        });
+                    }
+
+                    SortService.quickSort(puppyArr, 'dateOfBirth', true);
 
                     resolve(puppyArr);
                 })

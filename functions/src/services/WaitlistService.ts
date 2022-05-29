@@ -4,6 +4,7 @@ import ConfigService from "./ConfigService";
 import UtilService from "./UtilService";
 import SortService from "./SortService";
 import SearchService from "./SearchService";
+import moment = require("moment");
 
 const admin = FirebaseService.getFirebaseAdmin();
 
@@ -138,53 +139,70 @@ export default class WaitlistService {
             try {
                 /* can be sorted by: color, created, lastModified, message, notified, firstName, lastName, email */
                 /* Get all wait requests and users (sorted by userID) first. */
-                const { startIndex, endIndex, activeOnly, searchText, recipientID } = data;
+                // const { startIndex, endIndex, activeOnly, searchText, recipientID } = data;
+                const { 
+                    startIndex, 
+                    endIndex, 
+                    searchText, 
+                    activeOnly, 
+                    recipientID
+                 } = data;
+                let { startDate, endDate } = data;
                 let { sortField, sortDescending } = data;
                 let totalItems: number;
+
+                if (!startDate)
+                    startDate = moment().subtract(30, 'days').startOf('day').toDate().toUTCString();
+                if (!endDate)
+                    endDate = new Date().toUTCString();
     
-                const users: any[] = [];
-                const masterPuppies: any[] = [];
-                const masterMessages: any[] = [];
+                let users: any[] = [];
+                let masterPuppies: any[] = [];
+                let masterMessages: any[] = [];
                 let masterWaitRequests: any[] = [];
                 let waitRequests: any[] = [];
-                let userObj: any;
-                let puppyObj: any;
                 let waitRequestObj: any;
-                let messageObj: any;
 
-                const res = await Promise.all([
-                    admin.firestore().collection('puppies').get(),
-                    admin.firestore().collection('buyers').get(),
-                    admin.firestore().collection('messages').get(),
-                    admin.firestore().collection('waitList').get()
-                ]);
+                const waitListRes = await admin.firestore().collection('waitList').orderBy('created', 'desc')
+                                                                                  .where('statusID', 'in', activeOnly ? [1] : [1, 2])
+                                                                                  .where('created', '>=', moment(startDate).toDate().toISOString())
+                                                                                  .where('created', '<=', moment(endDate).toDate().toISOString())
+                                                                                  .get();
+                const puppyIDs: string[] = [];
+                const userIDs: string[] = [];
+                const waitRequestIDs: string[] = [];
 
-                for (const puppy of res[0].docs) {
-                    puppyObj = puppy.data();
-                    puppyObj.puppyID = puppy.id;
-                    masterPuppies.push(puppyObj);
-                }
-
-                for (const user of res[1].docs) {
-                    userObj = user.data();
-                    userObj.userID = user.id;
-                    users.push(userObj);
-                }
-
-                for (const messageDoc of res[2].docs) {
-                    messageObj = messageDoc.data();
-                    messageObj.messageID = messageDoc.id;
-                    masterMessages.push(messageObj);
-                }
-
-                for (const waitRequestDoc of res[3].docs) {
+                for (const waitRequestDoc of waitListRes.docs) {
                     waitRequestObj = waitRequestDoc.data();
                     waitRequestObj.waitRequestID = waitRequestDoc.id;
                     if (activeOnly === true && waitRequestObj.statusID === 2)
                         continue;
-                    else
+                    else {
                         masterWaitRequests.push(waitRequestObj);
+
+                        if (waitRequestObj.puppyID) {
+                            if (puppyIDs.indexOf(waitRequestObj.puppyID) === -1)
+                                puppyIDs.push(waitRequestObj.puppyID);
+                        }
+
+                        if (waitRequestObj.userID) {
+                            if (userIDs.indexOf(waitRequestObj.userID) === -1)
+                                userIDs.push(waitRequestObj.userID);
+                        }
+
+                        waitRequestIDs.push(waitRequestObj.waitRequestID);
+                    }
                 }
+
+                const res = await Promise.all([
+                    UtilService.getContentByID('buyers', userIDs, 'userID'),
+                    UtilService.getContentByID('puppies', puppyIDs, 'puppyID'),
+                    UtilService.getContentByID('messages', waitRequestIDs, 'waitRequestID')
+                ]);
+                
+                users = res[0];
+                masterPuppies = res[1];
+                masterMessages = res[2];
 
                 /* quicksort */
                 SortService.quickSort(users, 'userID', false);
@@ -200,7 +218,7 @@ export default class WaitlistService {
                     if (waitRequest.userID) {
                         const userIndex = SearchService.binarySearch(users, waitRequest.userID, 'userID');
                         if (userIndex !== -1) {
-                            userObj = users[userIndex];
+                            const userObj = users[userIndex];
                             waitRequest.user = userObj;
                             waitRequest.firstName = userObj.firstName;
                             waitRequest.lastName = userObj.lastName;
@@ -273,7 +291,7 @@ export default class WaitlistService {
                 }
     
                 /* Get the number of total items */
-                totalItems = masterWaitRequests.length;   
+                totalItems = masterWaitRequests.length;
 
                 /* Assign messages */
                 if (recipientID) {

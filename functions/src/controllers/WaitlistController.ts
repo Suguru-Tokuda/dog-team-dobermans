@@ -17,7 +17,7 @@ waitlist.get('/', (request, response) => {
 
 waitlist.post('/getByRange', (request, response) => {
     const data: any = request.body;
-    if (data.startIndex !== undefined && data.endIndex !== undefined && data.sortField !== undefined && data.sortDescending !== undefined && data.activeOnly !== undefined) {
+    if (data.startIndex !== undefined && data.endIndex !== undefined && data.sortField !== undefined && data.sortDescending !== undefined && data.activeOnly !== undefined && data.startDate && data.endDate) {
         WaitlistService.getWaitRequestsByRange(data)
             .then(res => {
                 response.status(200).send(res);
