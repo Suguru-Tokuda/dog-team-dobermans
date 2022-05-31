@@ -58,6 +58,15 @@ export default class UtilService {
         return retVal;
     }
 
+    /**
+     * Return data searching by ids. If useFieldPath is false, then idNameToSearch is required
+     * @param path 
+     * @param ids 
+     * @param idName 
+     * @param useFieldPath 
+     * @param idNameToSearch 
+     * @returns 
+     */
     static getContentByID = (path: string, ids: string[], idName: string, useFieldPath: boolean = true, idNameToSearch: string = ''): Promise<any[]> => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -71,7 +80,7 @@ export default class UtilService {
                     while (idsCopy && idsCopy.length) {
                         batch = idsCopy.splice(0, 10);
     
-                        const res = await admin.firestore().collection(path).where(useFieldPath ? admin.firestore.FieldPath.documentId() : idName, 'in', [...batch]).get()
+                        const res = await admin.firestore().collection(path).where(useFieldPath ? admin.firestore.FieldPath.documentId() : idNameToSearch, 'in', [...batch]).get()
                         for (const doc of res.docs) {
                             obj = doc.data();
                             obj[idName] = doc.id;
