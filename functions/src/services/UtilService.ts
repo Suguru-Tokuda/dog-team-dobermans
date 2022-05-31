@@ -58,7 +58,7 @@ export default class UtilService {
         return retVal;
     }
 
-    static getContentByID = (path: string, ids: string[], idName: string): Promise<any[]> => {
+    static getContentByID = (path: string, ids: string[], idName: string, useFieldPath: boolean = true, idNameToSearch: string = ''): Promise<any[]> => {
         return new Promise(async (resolve, reject) => {
             try {
                 const retVal: any[] = [];
@@ -71,7 +71,7 @@ export default class UtilService {
                     while (idsCopy && idsCopy.length) {
                         batch = idsCopy.splice(0, 10);
     
-                        const res = await admin.firestore().collection(path).where(admin.firestore.FieldPath.documentId(), 'in', [...batch]).get()
+                        const res = await admin.firestore().collection(path).where(useFieldPath ? admin.firestore.FieldPath.documentId() : idName, 'in', [...batch]).get()
                         for (const doc of res.docs) {
                             obj = doc.data();
                             obj[idName] = doc.id;

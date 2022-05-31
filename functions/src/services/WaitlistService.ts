@@ -16,39 +16,39 @@ export default class WaitlistService {
                     const retVal: any = [];
 
                     if (querySnapshot.size > 0) {
-                        // get all puppies, users, and messages
-                        const res = await Promise.all([
-                            admin.firestore().collection('puppies').get(),
-                            admin.firestore().collection('buyers').get(),
-                            admin.firestore().collection('messages').get()
-                        ]);
-
-                        const masterPuppies = [];
-                        const masterUsers = [];
-                        const masterMessages = [];
-
-                        for (const puppyDoc of res[0].docs) {
-                            const puppy = puppyDoc.data();
-                            puppy.puppyID = puppyDoc.id;
-                            masterPuppies.push(puppy);
-                        }
-
-                        for (const userDoc of res[1].docs) {
-                            const user = userDoc.data();
-                            user.userID = userDoc.id;
-                            masterUsers.push(user);
-                        }
-
-                        for (const messageDoc of res[2].docs) {
-                            const message = messageDoc.data();
-                            message.messageID = messageDoc.id;
-                            masterMessages.push(message);
-                        }
+                        const puppyIDs: string[] = [];
+                        const userIDs: string[] = [];
+                        const waitRequestIDs: string[] = [];
 
                         for (const waitRequestDoc of querySnapshot.docs) {
                             const waitRequest = waitRequestDoc.data();
                             waitRequest.waitRequestID = waitRequestDoc.id;
 
+                            if (puppyIDs.indexOf(waitRequest.puppyID) === -1)
+                                puppyIDs.push(waitRequest.puppyID);
+                            
+                            if (userIDs.indexOf(waitRequest.userID) === -1)
+                                userIDs.push(waitRequest.userID);
+
+                            if (waitRequestIDs.indexOf(waitRequest.waitRequestID) === -1)
+                                waitRequestIDs.push(waitRequest.waitRequestID);
+
+                            retVal.push(waitRequest);
+                        }
+
+
+                        // get all puppies, users, and messages
+                        const res = await Promise.all([
+                            UtilService.getContentByID('puppies', puppyIDs, 'puppyID', true),
+                            UtilService.getContentByID('buyers', userIDs, 'userID', true),
+                            UtilService.getContentByID('messages', waitRequestIDs, 'messageID', false, 'waitRequestID')
+                        ]);
+
+                        const masterPuppies: any[] = res[0];
+                        const masterUsers: any[] = res[1];
+                        const masterMessages: any[] = res[2];
+
+                        for (const waitRequest of retVal) {
                             if (waitRequest.puppyID) {
                                 try {
                                     const selectedPuppy: any = masterPuppies.filter(puppy => puppy.puppyID === waitRequest.puppyID)[0];
@@ -195,9 +195,9 @@ export default class WaitlistService {
                 }
 
                 const res = await Promise.all([
-                    UtilService.getContentByID('buyers', userIDs, 'userID'),
-                    UtilService.getContentByID('puppies', puppyIDs, 'puppyID'),
-                    UtilService.getContentByID('messages', waitRequestIDs, 'waitRequestID')
+                    UtilService.getContentByID('buyers', userIDs, 'userID', true),
+                    UtilService.getContentByID('puppies', puppyIDs, 'puppyID', true),
+                    UtilService.getContentByID('messages', waitRequestIDs, 'messageID', false, 'waitRequestID')
                 ]);
                 
                 users = res[0];
@@ -419,20 +419,19 @@ export default class WaitlistService {
         return new Promise(async (resolve, reject) => {
             try {
                 const waitRequestSnapshot = await admin.firestore().collection('waitList').get();
-                const userSnapshot = await admin.firestore().collection('buyers').get();
-    
-                const waitRequests: any[] = [];
-                const users: any[] = [];
-    
-                for (const doc of userSnapshot.docs) {
-                    const user = doc.data();
-                    user.userID = doc.id;
-    
-                    const insertIndex = SearchService.getInsertIndex(users, user.userID, 'userID');
-                    if (insertIndex !== -1)
-                        users.push(user);
+                const userIDs: string[] = [];
+
+                for (const doc of waitRequestSnapshot.docs) {
+                    const data = doc.data();
+
+                    if (userIDs.indexOf(data.userID) === -1)
+                        userIDs.push(data.userID);
+
                 }
-    
+
+                const waitRequests: any[] = [];
+                const users: any[] = await UtilService.getContentByID('buyers', userIDs, 'userID', true);
+        
                 for (const doc of waitRequestSnapshot.docs) {
                     if (waitRequestIDs.indexOf(doc.id) !== -1) {
                         const waitRequest = doc.data();
@@ -467,44 +466,52 @@ export default class WaitlistService {
         return new Promise(async (resolve, reject) => {
             try {
                 const waitListItems = await admin.firestore().collection('waitList').where('userID', '==', userID).get();
+                const puppyIDs: string[] = [];
+                const waitRequestIDs: string[] = [];
                 const retVal = [];
-    
-                if (waitListItems.size > 0) {
+
+                if (waitListItems.size) {
                     for (const doc of waitListItems.docs) {
                         const waitRequest = doc.data();
-    
                         waitRequest.waitRequestID = doc.id;
+
+                        if (puppyIDs.indexOf(waitRequest.puppyID) === -1)
+                            puppyIDs.push(waitRequest.puppyID);
+
+                        if (waitRequestIDs.indexOf(doc.id) === -1)
+                            waitRequestIDs.push(doc.id);
+
+                        retVal.push(waitRequest);
+                    }
+                }
+
+                const res = await Promise.all([
+                    UtilService.getContentByID('puppies', puppyIDs, 'puppyID', true),
+                    UtilService.getContentByID('messages', waitRequestIDs, 'messageID', false, 'waitRequestID')
+                ])
+
+                const puppies: any[] = res[0];
+                const messages: any[] = res[1];
+
+    
+                if (retVal.length) {
+                    for (const waitRequest of retVal) {
     
                         if (waitRequest.puppyID) {
-                            try {
-                                const puppyDoc = await admin.firestore().collection('puppies').doc(waitRequest.puppyID).get();
-                                const puppyData: any = puppyDoc.data();
-    
-                                waitRequest.puppy = puppyData;
-                            } catch (err) {
-                                console.log(err);
-                            }
+                            const filteredPuppies = puppies.filter(p => p.puppyID === waitRequest.puppyID);
+                            const puppy = filteredPuppies[0] ? filteredPuppies[0] : null;
+                            waitRequest.puppy = puppy;
                         }
     
                         if (waitRequest.userID) {
-                            try {
-                                const messagesRef = admin.firestore().collection('messages');
-                                const snapshot = await messagesRef.where('waitRequestID', '==', waitRequest.waitRequestID).get();
-    
-                                waitRequest.numberOfUnreadMessages = 0;
-    
-                                if (snapshot.size > 0) {
-                                    for (const messageDoc of snapshot.docs) {
-                                        const message = messageDoc.data();
-                                        message.messageID = messageDoc.id;
-    
-                                        if (message.read === false && message.recipientID === userID) {
-                                            waitRequest.numberOfUnreadMessages++;
-                                        }
-                                    }
+                            const filteredMessages: any[] = messages.filter(m => m.waitRequestID === waitRequest.waitRequestID);
+
+                            waitRequest.numberOfUnreadMessages = 0;
+
+                            for (const message of filteredMessages) {
+                                if (message.read === false && message.recipientID === userID) {
+                                    waitRequest.numberOfUnreadMessages++;
                                 }
-                            } catch (err) {
-                                console.log(err);
                             }
                         }
     
