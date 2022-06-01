@@ -140,7 +140,7 @@ class PuppiesTable extends Component {
                                       style={{ color: 'white' }}
                                 >
                                     <span className="btn btn-sm btn-primary mt-2"
-                                          style={{ maxWidth: '200px' }}
+                                          style={{ minWidth: '200px' }}
                                     >
                                         View
                                     </span>
