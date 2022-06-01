@@ -153,7 +153,7 @@ class ParentsTable extends Component {
 
     render() {
         return (
-            <div className="products-grid col-xl-9 col-lg-8 sidebar-left">
+            <div className="products-grid col-xl-12 sidebar-left">
                 {this.getHeader()}
                 {this.getItems()}
                 {this.getPagination()}
