@@ -136,10 +136,14 @@ class PuppiesTable extends Component {
                                     </h3>
                                 </Link>
                                 <Link to={`/puppies/${puppy.puppyID}`}
-                                      className="btn btn-sm btn-primary"
+                                      className="text-center"
                                       style={{ color: 'white' }}
                                 >
+                                    <span className="btn btn-sm btn-primary mt-2"
+                                          style={{ maxWidth: '200px' }}
+                                    >
                                         View
+                                    </span>
                                 </Link>
                             </div>
                         </div>

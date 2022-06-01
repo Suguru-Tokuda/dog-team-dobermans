@@ -131,10 +131,14 @@ class ParentsTable extends Component {
                                     </h3>
                                 </Link>
                                 <Link to={`/our-dogs/${parent.parentID}`}
-                                      className="btn btn-sm btn-primary"
+                                      className="text-center"
                                       style={{ color: 'white' }}
                                 >
-                                    View
+                                    <span className="btn btn-sm btn-primary mt-2"
+                                          style={{ maxWidth: '200px' }}
+                                    >
+                                        View
+                                    </span>
                                 </Link>
                             </div>
                         </div>
