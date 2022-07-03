@@ -23,6 +23,7 @@ class PuppyRequestForm extends Component {
             color: '',
         },
         validations: {},
+        formDescription: `If you'd like to send a request us for a Doberman puppy, please fill out the form. When we have puppies that match your preferences, we will contact you.`,
         formSubmitted: false,
         loading: false
     };
@@ -312,6 +313,9 @@ class PuppyRequestForm extends Component {
                         <h2 className="heading-line">Doberman Puppy Wait List Form</h2>
                     </header>
                     <div className="row">
+                        <div className="col-xs-12 col-md-7 d-block d-md-none mb-2">
+                            <p>{ this.state.formDescription }</p>
+                        </div>
                         <div className="col-md-7">
                             <form noValidate className="custom-form form">
                                 <div className="controls">
@@ -409,8 +413,8 @@ class PuppyRequestForm extends Component {
                                 </div>
                             </form>
                         </div>
-                        <div className="col-md-5">
-                            <p>If you'd like to send a request us for a Doberman puppy, please fill out the form. When we have puppies that match your preferences, we will contact you.</p>
+                        <div className="col-md-5 d-none d-xs-none d-sm-none d-md-block">
+                            <p>{ this.state.formDescription }</p>
                         </div>
                     </div>
                 </div>
