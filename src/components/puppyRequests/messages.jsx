@@ -58,11 +58,11 @@ class Messages extends Component {
                         </div>
                         <div className="row">
                             <div className="col-12">
-                                <textarea className="form-control" 
-                                          value={message.messageBody} 
-                                          rows="3" style={ message.senderID !== userID ? { resize: 'none', color: '#ffffff', backgroundColor: 'rgba(184, 133, 255, 0.7)' } : { resize: 'none', 'color': 'black' }} 
-                                          readOnly>        
-                                </textarea>
+                                <div style={ message.senderID !== userID ? { resize: 'none', color: '#ffffff', backgroundColor: 'rgba(184, 133, 255, 0.7)', borderRadius: '30px' } : { resize: 'none', 'color': 'black', borderRadius: '30px', border: '0.5px solid black' }}>
+                                    <div style={{ padding: '10px' }}>
+                                        <div dangerouslySetInnerHTML={{ __html: message.messageBody }}></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

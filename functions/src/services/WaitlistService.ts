@@ -912,8 +912,8 @@ export default class WaitlistService {
                     }
 
                     messages = messages.sort((a, b) => {
-                        const dateA = new Date(a.sentDate);
-                        const dateB = new Date(b.sentDate);
+                        const dateA: Date = new Date(a.sentDate);
+                        const dateB: Date = new Date(b.sentDate);
 
                         return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
                     });
@@ -974,7 +974,7 @@ export default class WaitlistService {
                                     body = body.replace(/\[LAST_NAME\]/gm, recipient.lastName);
                                 }
                                 
-                                const messageBody = UtilService.stripHTML(body);
+                                const plainBody = UtilService.stripHTML(body);
                                 
                                 messageData = {
                                     email: recipient.email,
@@ -982,7 +982,8 @@ export default class WaitlistService {
                                     recipientID: waitRequest.userID,
                                     recipient: recipient,
                                     waitRequestID: waitRequestID,
-                                    messageBody: messageBody,
+                                    plainBody: plainBody,
+                                    messageBody: body,
                                     sentDate: new Date().toISOString(),
                                     lastModified: new Date().toISOString(),
                                     statusID: 1
@@ -1013,10 +1014,11 @@ export default class WaitlistService {
                         const messagesRef = admin.firestore().collection('messages');
                         for (const message of messagesToSend) {
                             if (message.recipientID) {
-                                await this.sendNotificationForWaitListMessage(message.email, message.messageBody, senderObj, message.recipient, message.waitRequestID, false);
+                                await this.sendNotificationForWaitListMessage(message.email, message.plainBody, senderObj, message.recipient, message.waitRequestID, false);
                                 message.read = false;
                                 delete message.email;
                                 delete message.recipient;
+                                delete message.plainBody;
                                 await messagesRef.add(message);
                             } else {
                                 await EmailService.sendEmail(message.email, data.subject, message.messageBody);

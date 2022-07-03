@@ -47,7 +47,6 @@ export default class WaitlistService {
     }
 
     static getWaitRequest(waitRequestID) {
-        console.log(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
         return axios.get(`${this.getServiceBase()}/getByID?waitRequestID=${waitRequestID}`);
     }
 
