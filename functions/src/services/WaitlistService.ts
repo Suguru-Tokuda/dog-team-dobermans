@@ -418,40 +418,25 @@ export default class WaitlistService {
     static getWaitRequestByIDs(waitRequestIDs: string[]) {
         return new Promise(async (resolve, reject) => {
             try {
-                const waitRequestSnapshot = await admin.firestore().collection('waitList').get();
-                const userIDs: string[] = [];
+                const waitRequests = await UtilService.getContentByID('waitList', waitRequestIDs, 'waitRequestID', true);
 
-                for (const doc of waitRequestSnapshot.docs) {
-                    const data = doc.data();
+                const userIDs: string[] = waitRequests.map(wr => wr.userID);
+                const users = await UtilService.getContentByID('buyers', userIDs, 'userID', true);
 
-                    if (userIDs.indexOf(data.userID) === -1)
-                        userIDs.push(data.userID);
+                SortService.quickSort(users, 'userID', false);
 
-                }
-
-                const waitRequests: any[] = [];
-                const users: any[] = await UtilService.getContentByID('buyers', userIDs, 'userID', true);
-        
-                for (const doc of waitRequestSnapshot.docs) {
-                    if (waitRequestIDs.indexOf(doc.id) !== -1) {
-                        const waitRequest = doc.data();
-                        waitRequest.waitRequestID = doc.id;
-    
-                        if (waitRequest.userID) {
-                            const index = SearchService.binarySearch(users, waitRequest.userID, 'userID');
-    
-                            if (index !== -1) {
-                                waitRequest.user = users[index];
-                                waitRequest.firstName = waitRequest.user.firstName;
-                                waitRequest.lastName = waitRequest.user.lastName;
-                                waitRequest.email = waitRequest.user.email;
-                                waitRequest.city = waitRequest.user.city;
-                                waitRequest.state = waitRequest.user.state;
-                                waitRequest.phone = waitRequest.user.phone;
-                            }
+                for (const waitRequest of waitRequests) {
+                    if (waitRequest.userID) {
+                        const index = SearchService.binarySearch(users, waitRequest.userID, 'userID');
+                        if (index !== -1) {
+                            waitRequest.user = users[index];
+                            waitRequest.firstName = waitRequest.user.firstName;
+                            waitRequest.lastName = waitRequest.user.lastName;
+                            waitRequest.email = waitRequest.user.email;
+                            waitRequest.city = waitRequest.user.city;
+                            waitRequest.state = waitRequest.user.state;
+                            waitRequest.phone = waitRequest.user.phone;
                         }
-    
-                        waitRequests.push(waitRequest);
                     }
                 }
     
