@@ -735,7 +735,6 @@ export default class WaitlistService {
 
                     await this.sendNotificationForWaitListMessage(ConfigService.getBreederEmail(), messageBody, sender, recipientObj, waitRequestID, true);
                 }
-
                 resolve(messageData);
             } catch (err) {
                 reject(err);
@@ -930,67 +929,102 @@ export default class WaitlistService {
     static notifyUsers(data: any) {
         return new Promise(async (resolve, reject) => {
             try {
-                const waitRequestIDs = data.waitRequestIDs;
-                for (let i = 0, max = waitRequestIDs.length; i < max; i++) {
-                    const waitRequestID = waitRequestIDs[i];
-                    const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
-                    const doc = await waitRequestRef.get();
-                    let waitRequest: any = {};
-                    waitRequest = doc.data();
-                    waitRequest.notified = new Date().toISOString();
+                const { waitRequestIDs } = data;
+                const messagesToSend: any = [];
+                const senderObj: any = {
+                    firstName: 'Robert Johnson (The Doberman Breeder)',
+                    lastName: ''
+                };
+    
+                const waitRequests = await UtilService.getContentByID('waitList', waitRequestIDs, 'waitRequestID', true);
+                const userIDs: string[] = [];
+    
+                waitRequests.forEach(waitRequest => {
+                    if (waitRequest.userID)
+                        userIDs.push(waitRequest.userID);
+                });
+    
+                const users = await UtilService.getContentByID('buyers', userIDs, 'userID', true);
 
-                    let body = data.body;
+                SortService.quickSort(users, 'userID', false);
 
-                    await waitRequestRef.set(waitRequest, { merge: true });
-
-                    // Check if the waitRequest has userID
-                    if (waitRequest.userID) {
-                        const recipientRef = await admin.firestore().collection('buyers').doc(waitRequest.userID).get();
-                        const recipient: any = recipientRef.data();
-
-                        if (body.indexOf('[FIRST_NAME]') !== -1) {
-                            body = body.replace(/\[FIRST_NAME\]/gm, recipient.firstName);
+                if (waitRequests && waitRequests.length) {
+                    for (let i = 0, max = waitRequests.length; i < max; i++) {
+                        const waitRequest = waitRequests[i];
+                        const waitRequestID = waitRequest.waitRequestID;
+                        const waitRequestRef = admin.firestore().collection('waitList').doc(waitRequestID);
+                        waitRequest.notified = new Date().toISOString();
+                        let messageData: any = null;
+    
+                        let body: string = JSON.parse(JSON.stringify(data.body));
+    
+                        await waitRequestRef.set(waitRequest, { merge: true });
+    
+                        // check if the waitRequest has userID
+                        if (waitRequest.userID) {
+                            const index: number = SearchService.binarySearch(users, waitRequest.userID, 'userID');
+                            if (index !== -1) {
+                                const recipient = users[index];
+    
+                                if (body.indexOf('[FIRST_NAME]') !== -1) {
+                                    body = body.replace(/\[FIRST_NAME\]/gm, recipient.firstName);
+                                }
+                                
+                                if (body.indexOf('[LAST_NAME]') !== -1) {
+                                    body = body.replace(/\[LAST_NAME\]/gm, recipient.lastName);
+                                }
+                                
+                                const messageBody = UtilService.stripHTML(body);
+                                
+                                messageData = {
+                                    email: recipient.email,
+                                    senderID: ConfigService.getBreederID(),
+                                    recipientID: waitRequest.userID,
+                                    recipient: recipient,
+                                    waitRequestID: waitRequestID,
+                                    messageBody: messageBody,
+                                    sentDate: new Date().toISOString(),
+                                    lastModified: new Date().toISOString(),
+                                    statusID: 1
+                                };
+    
+                                messagesToSend.push(messageData);
+                            }
+                        } else {
+                            if (body.indexOf('[FIRST_NAME]') !== -1) {
+                                body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
+                            }
+    
+                            if (body.indexOf('[LAST_NAME]') !== -1) {
+                                body = body.replace(/\[LAST_NAME\]/gm, waitRequest.lastName);
+                            }
+    
+                            messageData = {
+                                email: waitRequest.email,
+                                senderID: ConfigService.getBreederID(),
+                                messageBody: body
+                            };
+    
+                            messagesToSend.push(messageData);
                         }
-                        
-                        if (body.indexOf('[LAST_NAME]') !== -1) {
-                            body = body.replace(/\[LAST_NAME\]/gm, recipient.lastName);
-                        }
-                        
-                        const messageBody = UtilService.stripHTML(body);
-                        
-                        const messageData: any = {
-                            senderID: ConfigService.getBreederID(),
-                            recipientID: waitRequest.userID,
-                            waitRequestID: waitRequestID,
-                            messageBody: messageBody,
-                            sentDate: new Date().toISOString(),
-                            lastModified: new Date().toISOString(),
-                            statusID: 1
-                        };
-
-                        const messagesRef = admin.firestore().collection('messages');
-                        await messagesRef.add(messageData);
-
-                        const senderObj = {
-                            firstName: 'Robert Johnson (The Doberman Breeder)',
-                            lastName: ''
-                        };
-
-                        await this.sendNotificationForWaitListMessage(recipient.email, messageBody, senderObj, recipient, waitRequestID, false);
-                    } else {
-                        if (body.indexOf('[FIRST_NAME]') !== -1) {
-                            body = body.replace(/\[FIRST_NAME\]/gm, waitRequest.firstName);
-                        }
-
-                        if (body.indexOf('[LAST_NAME]') !== -1) {
-                            body = body.replace(/\[LAST_NAME\]/gm, waitRequest.lastName);
-                        }
-
-                        await EmailService.sendEmail(waitRequest.email, data.subject, body)
-                            .catch(err => {
-                                console.log(err);
-                            });
                     }
+
+                    if (messagesToSend && messagesToSend.length) {
+                        const messagesRef = admin.firestore().collection('messages');
+                        for (const message of messagesToSend) {
+                            if (message.recipientID) {
+                                await this.sendNotificationForWaitListMessage(message.email, message.messageBody, senderObj, message.recipient, message.waitRequestID, false);
+                                message.read = false;
+                                delete message.email;
+                                delete message.recipient;
+                                await messagesRef.add(message);
+                            } else {
+                                await EmailService.sendEmail(message.email, data.subject, message.messageBody);
+                            }
+                        }
+                    }
+                } else {
+                    reject('No wait requests found');
                 }
                 resolve(true);
             } catch (err) {
