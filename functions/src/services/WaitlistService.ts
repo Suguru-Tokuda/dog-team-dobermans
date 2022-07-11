@@ -478,7 +478,6 @@ export default class WaitlistService {
                 const puppies: any[] = res[0];
                 const messages: any[] = res[1];
 
-    
                 if (retVal.length) {
                     for (const waitRequest of retVal) {
     
@@ -887,38 +886,46 @@ export default class WaitlistService {
     // gets all latest messages grouped by waitRequest
     static getMessagesByWaitRequest() {
         return new Promise((resolve, reject) => {
-            admin.firestore().collection('messages').orderBy('sentDate').get()
+            admin.firestore().collection('messages').where('senderID', '!=', ConfigService.getBreederID()).orderBy('sentDate').get()
                 .then(async snapshot => {
-                    const waitRequestIDs: string[] = [];
-                    let messages: any[] = [];
-
-                    if (snapshot.size > 0) {
-                        for (const messageDoc of snapshot.docs) {
-                            const message = messageDoc.data();
-                            message.messageID = messageDoc.id;
-
-                            if (waitRequestIDs.indexOf(message.waitRequestID) === -1) {
-                                try {
-                                    const userSnapshot = await admin.firestore().collection('buyers').doc(message.senderID).get();
-                                    message.sender = userSnapshot.data();
-                                } catch (err) {
-                                    console.log(err);
-                                }
-
+                    try {
+                        const waitRequestIDs: string[] = [];
+                        const messages: any[] = [];
+                        const retVal: any[] = [];
+                        const senderIDs: string[] = [];
+                        let users: any[] = [];
+    
+                        if (snapshot.size > 0) {
+                            for (const messageDoc of snapshot.docs) {
+                                const message = messageDoc.data();
+    
+                                if (message.senderID)
+                                    senderIDs.push(message.senderID);
+    
                                 messages.push(message);
-                                waitRequestIDs.push(message.waitRequestID);
                             }
+                            
+                            if (senderIDs.length)
+                                users = await UtilService.getContentByID('buyers', senderIDs, 'userID', true);
+
+                            messages.forEach(message => {
+                                if (waitRequestIDs.indexOf(message.waitRequestID) === -1) {
+                                    const user = users.filter(u => u.userID === message.senderID)[0];
+
+                                    if (user) {
+                                        message.sender = user;
+                                        retVal.push(message);
+                                        waitRequestIDs.push(message.waitRequestID);
+                                    }
+                                }
+                            });
                         }
+    
+                        SortService.quickSort(retVal, 'sentDate', true);
+                        resolve(retVal);    
+                    } catch (err) {
+                        reject(err);
                     }
-
-                    messages = messages.sort((a, b) => {
-                        const dateA: Date = new Date(a.sentDate);
-                        const dateB: Date = new Date(b.sentDate);
-
-                        return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
-                    });
-
-                    resolve(messages);
                 })
                 .catch(err => {
                     reject(err);
