@@ -886,50 +886,52 @@ export default class WaitlistService {
     // gets all latest messages grouped by waitRequest
     static getMessagesByWaitRequest() {
         return new Promise((resolve, reject) => {
-            admin.firestore().collection('messages').where('senderID', '!=', ConfigService.getBreederID()).orderBy('sentDate').get()
-                .then(async snapshot => {
-                    try {
-                        const waitRequestIDs: string[] = [];
-                        const messages: any[] = [];
-                        const retVal: any[] = [];
-                        const senderIDs: string[] = [];
-                        let users: any[] = [];
-    
-                        if (snapshot.size > 0) {
-                            for (const messageDoc of snapshot.docs) {
-                                const message = messageDoc.data();
-    
-                                if (message.senderID)
-                                    senderIDs.push(message.senderID);
-    
-                                messages.push(message);
-                            }
-                            
-                            if (senderIDs.length)
-                                users = await UtilService.getContentByID('buyers', senderIDs, 'userID', true);
-
-                            messages.forEach(message => {
-                                if (waitRequestIDs.indexOf(message.waitRequestID) === -1) {
-                                    const user = users.filter(u => u.userID === message.senderID)[0];
-
-                                    if (user) {
-                                        message.sender = user;
-                                        retVal.push(message);
-                                        waitRequestIDs.push(message.waitRequestID);
-                                    }
+            admin.firestore().collection('messages')
+                .where('senderID', '!=', ConfigService.getBreederID())
+                .get()
+                    .then(async snapshot => {
+                        try {
+                            const waitRequestIDs: string[] = [];
+                            const messages: any[] = [];
+                            const retVal: any[] = [];
+                            const senderIDs: string[] = [];
+                            let users: any[] = [];
+        
+                            if (snapshot.size > 0) {
+                                for (const messageDoc of snapshot.docs) {
+                                    const message = messageDoc.data();
+        
+                                    if (message.senderID)
+                                        senderIDs.push(message.senderID);
+        
+                                    messages.push(message);
                                 }
-                            });
+                                
+                                if (senderIDs.length)
+                                    users = await UtilService.getContentByID('buyers', senderIDs, 'userID', true);
+
+                                messages.forEach(message => {
+                                    if (waitRequestIDs.indexOf(message.waitRequestID) === -1) {
+                                        const user = users.filter(u => u.userID === message.senderID)[0];
+
+                                        if (user) {
+                                            message.sender = user;
+                                            retVal.push(message);
+                                            waitRequestIDs.push(message.waitRequestID);
+                                        }
+                                    }
+                                });
+                            }
+        
+                            SortService.quickSort(retVal, 'sentDate', true);
+                            resolve(retVal);    
+                        } catch (err) {
+                            reject(err);
                         }
-    
-                        SortService.quickSort(retVal, 'sentDate', true);
-                        resolve(retVal);    
-                    } catch (err) {
+                    })
+                    .catch(err => {
                         reject(err);
-                    }
-                })
-                .catch(err => {
-                    reject(err);
-                });
+                    });
         });
     }
 
