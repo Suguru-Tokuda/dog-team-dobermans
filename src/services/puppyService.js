@@ -4,7 +4,7 @@ import axios from 'axios';
 export default class PuppyService {
 
     static getServiceBase() {
-        return `${SessionInfoService.getBaseUrlForAPI()}api/puppies`
+        return `${SessionInfoService.getBaseUrlForAPI()}api/puppies`;
     }
 
     static getAllPuppies() {
