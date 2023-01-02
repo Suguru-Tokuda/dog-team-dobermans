@@ -4,10 +4,29 @@ import { NavLink, Link } from 'react-router-dom';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
 import ReactTooltip from 'react-tooltip';
 import firebase from '../../services/firebaseService';
+import ContactService from '../../services/contactService';
+import UtilService from '../../services/utilService';
 
 class Topnavbar extends Component {
+    state = {
+        contactData: null
+    };
+
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        ContactService.getContact() 
+            .then(res => {
+                console.log(res.data);
+                this.setState({
+                    contactData: res.data
+                });
+            })
+            .catch(err => {
+
+            });
     }
 
     handleLogoutClicked = () => {
@@ -24,6 +43,14 @@ class Topnavbar extends Component {
             .finally(() => {
                 this.props.doneLoading({ reset: true });
             });
+    }
+
+    getPhoneLink = () => {
+        if (this.state.contactData) {
+            return <div><a href={'tel:' + this.state.contactData.phone}><i className="fas fa-phone" style={{ fontSize: '1rem', color: 'white'}} data-tip="Your Puppy Requests"></i><span className="ml-2" style={{ fontSize: '1rem', color: 'white'}}>{UtilService.formatPhoneNumber(this.state.contactData.phone)}</span></a></div>;
+        } else {
+            return null;
+        }
     }
     
     render() {
@@ -86,8 +113,11 @@ class Topnavbar extends Component {
                                 </li> */}
                             </ul>
                         </div>
-                        {/* <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs hidden-sm">
-                            {(this.props.authenticated === true) && (
+                        <div className="right-col d-flex align-items-lg-center flex-column flex-lg-row hidden-xs hidden-sm">
+                            <div className="user">
+                                {this.getPhoneLink()}
+                            </div>
+                            {/* {(this.props.authenticated === true) && (
                                 <div className="user">
                                     <Link id="account" to="/puppy-requests">
                                         <i className="far fa-list-alt" style={{ fontSize: '25px', color: 'white'}} data-tip="Your Puppy Requests"></i>
@@ -110,8 +140,8 @@ class Topnavbar extends Component {
                                 {(this.props.authenticated === true) && (
                                     <a onClick={this.handleLogoutClicked} style={{ color: 'white', cursor: 'pointer' }}>Logout</a>
                                 )}
-                            </div>
-                        </div> */}
+                            </div> */}
+                        </div>
                     </div>
                 </nav>
             </header>
