@@ -213,7 +213,8 @@ const mapStateToProps = state => ({
     user: state.user,
     authenticated: state.authenticated,
     userChecked: state.userChecked,
-    redirectURL: state.redirectURL
+    redirectURL: state.redirectURL,
+    contactData: state.contactData
 });
 
 const mapDispatchToProps = dispatch => {

@@ -2,16 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, Link } from 'react-router-dom';
 import * as siteLogo from '../../assets/img/site_logo.PNG';
-import ReactTooltip from 'react-tooltip';
 import firebase from '../../services/firebaseService';
 import ContactService from '../../services/contactService';
 import UtilService from '../../services/utilService';
 
 class Topnavbar extends Component {
-    state = {
-        contactData: null
-    };
-
     constructor(props) {
         super(props);
     }
@@ -19,10 +14,7 @@ class Topnavbar extends Component {
     componentDidMount() {
         ContactService.getContact() 
             .then(res => {
-                console.log(res.data);
-                this.setState({
-                    contactData: res.data
-                });
+                this.props.setContact(res.data);
             })
             .catch(err => {
 
@@ -46,8 +38,8 @@ class Topnavbar extends Component {
     }
 
     getPhoneLink = () => {
-        if (this.state.contactData) {
-            return <div><a href={'tel:' + this.state.contactData.phone}><i className="fas fa-phone" style={{ fontSize: '1rem', color: 'white'}} data-tip="Your Puppy Requests"></i><span className="ml-2" style={{ fontSize: '1rem', color: 'white'}}>{UtilService.formatPhoneNumber(this.state.contactData.phone)}</span></a></div>;
+        if (this.props.contactData) {
+            return <div><a href={'tel:' + this.props.contactData.phone}><i className="fas fa-phone" style={{ fontSize: '1rem', color: 'white'}} data-tip="Your Puppy Requests"></i><span className="ml-2" style={{ fontSize: '1rem', color: 'white'}}>{UtilService.formatPhoneNumber(this.props.contactData.phone)}</span></a></div>;
         } else {
             return null;
         }
@@ -150,7 +142,8 @@ class Topnavbar extends Component {
 }
 
 const mapStateToProps = state => ({
-    authenticated: state.authenticated
+    authenticated: state.authenticated,
+    contactData: state.contact
 });
 
 const mapDispatchToProps = dispatch => {
@@ -160,7 +153,8 @@ const mapDispatchToProps = dispatch => {
         resetUser: () => dispatch({ type: 'RESET_USER' }),
         showLoading: (params) => dispatch({ type: 'SHOW_LOADING', params: params }),
         doneLoading: () => dispatch({ type: 'DONE_LOADING' }),
-        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' })
+        resetRedirectURL: () => dispatch({ type: 'RESET_REDIRECT_URL' }),
+        setContact: (contactData) => dispatch({ type: 'SET_CONTACT', contactData: contactData})
     };
 }
 

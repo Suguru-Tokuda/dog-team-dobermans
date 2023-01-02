@@ -4,6 +4,7 @@ import ImageGallery from 'react-image-gallery';
 import HomepageContentsService from '../../services/homepageContentsService';
 import toastr from 'toastr';
 import { connect } from 'react-redux';
+import UtilService from '../../services/utilService';
 
 class Main extends Component {
     state = {
@@ -149,7 +150,7 @@ class Main extends Component {
                     <div className="container">
                         <header className="text-center">
                             <h2 className="text-uppercase">
-                                Pupppies
+                                Puppies
                             </h2>
                         </header>
                         <div data-slider-id="2" className="owl-carousel">
@@ -224,6 +225,12 @@ class Main extends Component {
                                             <h1 className="text-uppercase text-shadow letter-spacing mb-4">{title}</h1>
                                             <hr className="bg-light m-5"></hr>
                                             <p className="lead mb-5">{description}</p>
+                                            {this.props.contactData && (
+                                                <div style={{ fontWeight: 'bold' }}>
+                                                    <p className="mb-0 d-lg-none" >Questions about Dobermans Puppies?</p>
+                                                    <p className="mb-5 d-lg-none"><i className="fas fa-phone" style={{ fontSize: '1rem', color: 'white'}} data-tip="Your Puppy Requests"></i><a className="ml-1" href={'tel:' + this.props.contactData.phone} style={{ fontSize: '1rem', color: 'white'}}>{UtilService.formatPhoneNumber(this.props.contactData.phone)}</a></p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -243,7 +250,8 @@ const mapStateToProps = state => ({
   user: state.user,
   authenticated: state.authenticated,
   loadCount: state.loadCount,
-  userChecked: state.userChecked
+  userChecked: state.userChecked,
+  contactData: state.contact
 });
 
 const mapDispatchToProps = dispatch => {

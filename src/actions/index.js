@@ -17,6 +17,13 @@ export const setUser = (user) => {
     };
 }
 
+export const setContactData = (data) => {
+    return {
+        type: 'SET_CONTACT',
+        contactData: data
+    };
+}
+
 export const resetUser = () => {
     return {
         type: 'RESET_USER'
