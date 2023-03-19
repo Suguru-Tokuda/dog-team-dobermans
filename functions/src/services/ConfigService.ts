@@ -1,7 +1,7 @@
 import * as config from "../config.json";
 
 export default class ConfigService {
-    static isProd = false;
+    static isProd = true;
 
     static getConfig() {
         const parsedJSON = JSON.parse(JSON.stringify(config));
